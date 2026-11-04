@@ -128,6 +128,7 @@ export default function ProfilePageClient({ user }: ProfilePageClientProps) {
             <div className="text-center">
               <h1 className="text-xl font-semibold text-zinc-900">{user.name}</h1>
               <p className="text-xs font-mono text-zinc-500">{user.email}</p>
+              <p className="text-xs font-mono text-zinc-500">{user.role}</p>
             </div>
           </div>
         </div>
