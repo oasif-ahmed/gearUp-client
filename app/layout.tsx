@@ -3,6 +3,7 @@ import Footer from '@/components/shared/footer'
 import './globals.css'
 import { Inter } from 'next/font/google'
 import { getMe } from '@/services/getMe'
+import { Toaster } from 'sonner'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -22,7 +23,9 @@ export default async function RootLayout({
     <html lang="en">
       <body className={`${inter.className} bg-background text-foreground antialiased selection:bg-zinc-900 selection:text-[#FDFBF7]`}>
         <Navbar user={user} />
-        <main className="min-h-screen pb-16 md:pb-0">{children}</main>
+        <main className="min-h-screen pb-16 md:pb-0">{children}
+           <Toaster richColors position="top-center" /> {/* Add this line */}
+        </main>
         <Footer />
       </body>
     </html>

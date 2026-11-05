@@ -129,7 +129,13 @@ export default function ProviderDashboard({
   // Show a toast when a gear item is added successfully.
   useEffect(() => {
     if (actionState.success && actionState.message) {
-      toast.success(actionState.message);
+      toast.success("Listing Published", {
+        description: actionState.message,
+      });
+    } else if (!actionState.success && actionState.message) {
+      toast.error("Add Gear Failed", {
+        description: actionState.message,
+      });
     }
   }, [actionState]);
 
@@ -406,7 +412,9 @@ export default function ProviderDashboard({
       setEditMessage(result.message);
       setEditSuccess(result.success);
       if (result.success) {
-        toast.success(result.message || "Gear item updated successfully!");
+        toast.success("Gear Updated", {
+          description: result.message || "Gear item updated successfully!",
+        });
         setInventory((prev) =>
           prev.map((item) =>
             item.id === editingItem.id
@@ -430,10 +438,12 @@ export default function ProviderDashboard({
         router.refresh();
       }
     } catch (error) {
-      setEditMessage(
-        error instanceof Error ? error.message : "Failed to update gear item.",
-      );
+      const errorMessage = error instanceof Error ? error.message : "Failed to update gear item.";
+      setEditMessage(errorMessage);
       setEditSuccess(false);
+      toast.error("Update Failed", {
+        description: errorMessage,
+      });
     } finally {
       setIsUpdating(false);
     }
@@ -445,7 +455,9 @@ export default function ProviderDashboard({
     try {
       const result = await deleteGearItem(gearId);
       if (result.success) {
-        toast.success(result.message || "Gear item deleted successfully!");
+        toast.success("Gear Deleted", {
+          description: result.message || "Gear item deleted successfully!",
+        });
         
         // Immediately filter out the deleted item from local inventory state
         setInventory((prev) => prev.filter((item) => item.id !== gearId));
@@ -453,7 +465,9 @@ export default function ProviderDashboard({
         // Refresh server components and re-fetch page data
         router.refresh();
       } else {
-        toast.error(result.message || "Failed to delete gear item.");
+        toast.error("Delete Failed", {
+          description: result.message || "Failed to delete gear item.",
+        });
       }
     } catch (error) {
       console.error("Delete error:", error);
@@ -472,7 +486,9 @@ export default function ProviderDashboard({
     const result = await restockGearItem(restockItem.id, restockQuantity);
     
     if (result.success) {
-      toast.success(result.message);
+      toast.success("Restock Successful", {
+        description: result.message || "Stock updated successfully!",
+      });
       // Update local state to reflect new quantity immediately
       setInventory((prev) =>
         prev.map((item) =>
@@ -485,7 +501,9 @@ export default function ProviderDashboard({
       setRestockQuantity(1);
       router.refresh();
     } else {
-      toast.error(result.message);
+      toast.error("Restock Failed", {
+        description: result.message || "Failed to update stock.",
+      });
     }
   } catch (error) {
     toast.error("Failed to update stock.");
