@@ -1,5 +1,7 @@
 "use server";
 
+import { cookies } from "next/headers";
+
 export const getAllGearItems = async () => {
   const res = await fetch(`${process.env.BACKEND_API_URL}/api/gear`, {
     cache: "no-store"
@@ -23,4 +25,12 @@ export const getGearItemById = async (id: string) => {
   const result = await res.json();
 
   return result.data.gearItem;
+}
+
+
+// add Gear from PROVIDER
+
+export const addGearItem = async () => {
+  const cookieStore = await cookies();
+  const accessToken = await cookieStore.get("accessToken").value;
 }

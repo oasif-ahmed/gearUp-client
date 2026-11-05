@@ -2,7 +2,7 @@
 
 import React, { useState, useTransition } from "react";
 import Link from "next/link";
-import { Menu, X, Rocket, User, Settings, LogOut } from "lucide-react";
+import { Menu, X, Rocket, User, Settings, LogOut, LayoutDashboard, ShieldAlert } from "lucide-react";
 import { logoutUser } from "@/services/auth.service"; // Adjust import path if needed
 
 import { Button } from "@/components/ui/button";
@@ -49,10 +49,15 @@ const Navbar = ({ user }: NavbarProps) => {
     );
   };
 
+  // Role checks (case-insensitive for safety)
+  const userRole = user?.role?.toUpperCase();
+  const isProvider = userRole === "PROVIDER";
+  const isAdmin = userRole === "ADMIN";
+
   return (
     <header className="sticky top-0 z-50 w-full px-4 pt-3 sm:px-6 lg:px-8">
       {/* Contained Floating / Island Navbar */}
-      <nav className="mx-auto max-w-6xl border border-zinc-200 bg-background/90 px-4 py-2.5 shadow-xs backdrop-blur-md">
+      <nav className="mx-auto max-w-6xl border border-black-200 bg-background/90 px-4 py-2.5 shadow-xs backdrop-blur-md">
         <div className="flex items-center justify-between">
           
           {/* Logo */}
@@ -151,6 +156,27 @@ const Navbar = ({ user }: NavbarProps) => {
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
+                  
+                  {/* Conditionally render Provider Dashboard */}
+                  {isProvider && (
+                    <DropdownMenuItem asChild>
+                      <Link href="/dashboard/provider" className="cursor-pointer text-xs rounded-none">
+                        <LayoutDashboard className="mr-2 h-3.5 w-3.5 text-zinc-500" />
+                        <span>Provider Dashboard</span>
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
+
+                  {/* Conditionally render Admin Dashboard */}
+                  {isAdmin && (
+                    <DropdownMenuItem asChild>
+                      <Link href="/dashboard/admin" className="cursor-pointer text-xs rounded-none">
+                        <ShieldAlert className="mr-2 h-3.5 w-3.5 text-zinc-500" />
+                        <span>Admin Dashboard</span>
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
+
                   <DropdownMenuItem asChild>
                     <Link href="/profile" className="cursor-pointer text-xs rounded-none">
                       <User className="mr-2 h-3.5 w-3.5 text-zinc-500" />
@@ -234,6 +260,24 @@ const Navbar = ({ user }: NavbarProps) => {
             <div className="mt-3 flex flex-col gap-2 border-t border-zinc-200 pt-3">
               {user ? (
                 <>
+                  {isProvider && (
+                    <Link
+                      href="/dashboard/provider"
+                      className="inline-flex items-center justify-center rounded-none border border-zinc-200 px-3 py-1.5 text-xs font-medium text-zinc-900 hover:bg-zinc-50"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      Provider Dashboard
+                    </Link>
+                  )}
+                  {isAdmin && (
+                    <Link
+                      href="/dashboard/admin"
+                      className="inline-flex items-center justify-center rounded-none border border-zinc-200 px-3 py-1.5 text-xs font-medium text-zinc-900 hover:bg-zinc-50"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      Admin Dashboard
+                    </Link>
+                  )}
                   <Link
                     href="/profile"
                     className="inline-flex items-center justify-center rounded-none border border-zinc-200 px-3 py-1.5 text-xs font-medium text-zinc-900 hover:bg-zinc-50"

@@ -73,9 +73,9 @@ export const loginUser = async (prevState: any, formData: FormData) => {
     if (payload.role === "CUSTOMER") {
       redirect("/");
     } else if (payload.role === "PROVIDER") {
-      redirect("/provider");
+      redirect("dashboard/provider");
     } else if (payload.role === "ADMIN") {
-      redirect("/admin");
+      redirect("/dashboard/admin");
     }
     return result.data.user;
   }
@@ -117,21 +117,9 @@ export const registerUser = async (prevState: any, formData: FormData) => {
 export async function logoutUser() {
   const cookieStore = await cookies();
 
-  // Expire the access token cookie immediately
-  cookieStore.set("accessToken", "", {
-    httpOnly: true,
-    expires: new Date(0),
-    path: "/",
-  });
+  cookieStore.delete("accessToken");
+  cookieStore.delete("refreshToken");
 
-  // Expire the refresh token cookie immediately
-  cookieStore.set("refreshToken", "", {
-    httpOnly: true,
-    expires: new Date(0),
-    path: "/",
-  });
-
-  // Redirect back to the public homepage
   redirect("/");
 }
 
