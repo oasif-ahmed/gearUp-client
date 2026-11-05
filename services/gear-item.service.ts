@@ -489,3 +489,107 @@ export const updateGearItem = async (
     };
   }
 };
+
+
+export const deleteGearItem = async (gearId: string): Promise<AddGearState> => {
+  try {
+    const cookieStore = await cookies();
+    const accessToken = cookieStore.get("accessToken")?.value;
+
+    if (!accessToken) {
+      return {
+        success: false,
+        message: "Unauthorized: Missing access token.",
+      };
+    }
+
+    const backendUrl = process.env.BACKEND_API_URL;
+    if (!backendUrl) {
+      throw new Error("BACKEND_API_URL is not configured.");
+    }
+
+    const response = await fetch(
+      `${backendUrl}/api/provider/gear/${encodeURIComponent(gearId)}`,
+      {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        cache: "no-store",
+      },
+    );
+
+    const result = await response.json().catch(() => null);
+
+    if (!response.ok || result?.success === false) {
+      return {
+        success: false,
+        message: result?.message || "Failed to delete gear item.",
+      };
+    }
+
+    return {
+      success: true,
+      message: result?.message || "Gear item deleted successfully!",
+    };
+  } catch (error) {
+    console.error("Error in deleteGearItem Server Action:", error);
+    return {
+      success: false,
+      message:
+        error instanceof Error
+          ? error.message
+          : "An unexpected error occurred while deleting gear.",
+    };
+  }
+};
+
+// restock Gear Item
+
+export const restockGearItem = async (
+  gearId: string, 
+  quantity: number
+): Promise<AddGearState> => {
+  try {
+    const cookieStore = await cookies();
+    const accessToken = cookieStore.get("accessToken")?.value;
+
+    if (!accessToken) {
+      return { success: false, message: "Unauthorized: Missing access token." };
+    }
+
+    const backendUrl = process.env.BACKEND_API_URL;
+    
+    const response = await fetch(
+      `${backendUrl}/api/provider/gear/${gearId}/stock`,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({ quantity: Number(quantity) }),
+        cache: "no-store",
+      }
+    );
+
+    const result = await response.json().catch(() => null);
+
+    if (!response.ok || result?.success === false) {
+      return {
+        success: false,
+        message: result?.message || "Failed to restock item.",
+      };
+    }
+
+    return {
+      success: true,
+      message: result?.message || "Stock updated successfully!",
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : "Error updating stock.",
+    };
+  }
+};
