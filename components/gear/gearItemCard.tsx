@@ -10,18 +10,19 @@ interface GearItemCardProps {
   brand: string;
   images: string[];
   specifications: {
-    color: string;
-    weight: string;
-    seasons: number;
-    capacity: number;
-    material: string;
-    setupTime: string;
-    dimensions: string;
-    waterproof: boolean;
+    color?: string;
+    weight?: string;
+    seasons?: number;
+    capacity?: number;
+    material?: string;
+    setupTime?: string;
+    dimensions?: string;
+    waterproof?: boolean;
+    [key: string]: any; // fallback for dynamic spec keys
   };
   condition: string;
-  pricePerDay: string;
-  securityDeposit: string;
+  pricePerDay: string | number;
+  securityDeposit: string | number;
   quantity: number;
   status: string;
   category: {
@@ -29,8 +30,8 @@ interface GearItemCardProps {
     description?: string;
     image?: string;
   };
-  createdAt: string;
-  updatedAt: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 const GearItemCard: React.FC<GearItemCardProps> = ({
@@ -39,28 +40,26 @@ const GearItemCard: React.FC<GearItemCardProps> = ({
   description,
   brand,
   images,
-  specifications,
+  specifications = {},
   condition,
   pricePerDay,
   securityDeposit,
   quantity,
   status,
   category,
-  createdAt,
-  updatedAt,
 }) => {
   const imageUrl = images?.[0] || "/placeholder-gear.jpg";
 
-  const formatCondition = (condition: string) => {
-    return condition.charAt(0) + condition.slice(1).toLowerCase();
+  const formatCondition = (cond: string) => {
+    return cond ? cond.charAt(0) + cond.slice(1).toLowerCase() : "";
   };
 
-  const formatPrice = (price: string) => {
+  const formatPrice = (price: string | number) => {
     return `৳${price}`;
   };
 
-  const conditionVariant = (condition: string): "default" | "secondary" | "destructive" | "outline" => {
-    switch (condition) {
+  const conditionVariant = (cond: string): "default" | "secondary" | "destructive" | "outline" => {
+    switch (cond) {
       case "NEW": return "default";
       case "GOOD": return "secondary";
       case "FAIR": return "outline";
@@ -69,8 +68,8 @@ const GearItemCard: React.FC<GearItemCardProps> = ({
     }
   };
 
-  const statusVariant = (status: string): "default" | "secondary" | "destructive" | "outline" => {
-    switch (status) {
+  const statusVariant = (stat: string): "default" | "secondary" | "destructive" | "outline" => {
+    switch (stat) {
       case "AVAILABLE": return "default";
       case "UNAVAILABLE": return "destructive";
       case "MAINTENANCE": return "secondary";
@@ -79,9 +78,9 @@ const GearItemCard: React.FC<GearItemCardProps> = ({
   };
 
   return (
-    <div className="group relative rounded-lg border bg-card shadow-sm transition-all hover:shadow-lg overflow-hidden">
+    <div className="group relative rounded-lg border bg-card shadow-sm transition-all hover:shadow-lg overflow-hidden flex flex-col justify-between">
       {/* Image Section */}
-      <div className="relative h-64 overflow-hidden bg-muted">
+      <div className="relative h-56 overflow-hidden bg-muted shrink-0">
         <img
           src={imageUrl}
           alt={name}
@@ -92,73 +91,87 @@ const GearItemCard: React.FC<GearItemCardProps> = ({
             {formatCondition(condition)}
           </Badge>
           <Badge variant={statusVariant(status)}>
-            {status.charAt(0) + status.slice(1).toLowerCase()}
+            {status ? status.charAt(0) + status.slice(1).toLowerCase() : ""}
           </Badge>
         </div>
         <div className="absolute top-4 right-4">
           <span className="bg-background/90 backdrop-blur-sm px-3 py-1 text-sm font-semibold rounded-full text-foreground">
-            {category.name}
+            {category?.name}
           </span>
         </div>
       </div>
 
       {/* Content Section */}
-      <div className="p-6">
-        {/* Header */}
-        <div className="mb-4">
-          <h3 className="text-xl font-bold text-card-foreground mb-2 group-hover:text-primary transition-colors">
-            {name}
-          </h3>
-          <p className="text-sm text-muted-foreground mb-2">
-            {brand} • {description}
-          </p>
+      <div className="p-6 flex flex-col flex-grow justify-between">
+        <div>
+          {/* Header */}
+          <div className="mb-3">
+            <span className="text-xs font-mono uppercase text-muted-foreground tracking-wider">{brand}</span>
+            <h3 className="text-lg font-bold text-card-foreground line-clamp-1 group-hover:text-primary transition-colors">
+              {name}
+            </h3>
+            {/* 🛑 CLAMPED DESCRIPTION TO 2 LINES */}
+            <p className="text-xs text-muted-foreground mt-1 line-clamp-2 leading-relaxed">
+              {description}
+            </p>
+          </div>
+
+          {/* Specifications Grid */}
+          <div className="grid grid-cols-2 gap-2 mb-4 text-xs">
+            {specifications.color && (
+              <div className="flex items-center gap-1.5 text-muted-foreground truncate">
+                <Tag className="h-3.5 w-3.5 shrink-0" />
+                <span className="truncate">{specifications.color}</span>
+              </div>
+            )}
+            {specifications.capacity && (
+              <div className="flex items-center gap-1.5 text-muted-foreground truncate">
+                <Package className="h-3.5 w-3.5 shrink-0" />
+                <span className="truncate">{specifications.capacity}P Capacity</span>
+              </div>
+            )}
+            {specifications.seasons && (
+              <div className="flex items-center gap-1.5 text-muted-foreground truncate">
+                <Zap className="h-3.5 w-3.5 shrink-0" />
+                <span className="truncate">{specifications.seasons} Season</span>
+              </div>
+            )}
+            {typeof specifications.waterproof === "boolean" && (
+              <div className="flex items-center gap-1.5 text-muted-foreground truncate">
+                <Shield className="h-3.5 w-3.5 shrink-0" />
+                <span className="truncate">{specifications.waterproof ? "Waterproof" : "Not Waterproof"}</span>
+              </div>
+            )}
+          </div>
         </div>
 
-        {/* Specifications Grid */}
-        <div className="grid grid-cols-2 gap-3 mb-4 text-sm">
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <Tag className="h-4 w-4" />
-            <span>{specifications.color}</span>
-          </div>
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <Package className="h-4 w-4" />
-            <span>{specifications.capacity}P</span>
-          </div>
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <Zap className="h-4 w-4" />
-            <span>{specifications.seasons} Season</span>
-          </div>
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <Shield className="h-4 w-4" />
-            <span>{specifications.waterproof ? "Waterproof" : "Not WP"}</span>
-          </div>
-        </div>
-
-        {/* Price Section */}
-        <div className="border-t border-border pt-4 mb-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-muted-foreground">Daily Rate</p>
-              <p className="text-2xl font-bold text-primary">
-                {formatPrice(pricePerDay)}
-              </p>
+        <div>
+          {/* Price Section */}
+          <div className="border-t border-border pt-3 mb-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-[11px] text-muted-foreground uppercase font-mono">Daily Rate</p>
+                <p className="text-xl font-bold text-primary">
+                  {formatPrice(pricePerDay)}
+                </p>
+              </div>
+              <div className="text-right">
+                <p className="text-[11px] text-muted-foreground uppercase font-mono">Deposit</p>
+                <p className="text-sm font-semibold text-card-foreground">
+                  {formatPrice(securityDeposit)}
+                </p>
+              </div>
             </div>
-            <div className="text-right">
-              <p className="text-sm text-muted-foreground">Deposit</p>
-              <p className="text-lg font-semibold text-card-foreground">
-                {formatPrice(securityDeposit)}
-              </p>
-            </div>
           </div>
-        </div>
 
-        {/* Quantity & Action */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Package className="h-4 w-4" />
-            <span>{quantity} in stock</span>
+          {/* Quantity & Action */}
+          <div className="flex items-center justify-between pt-1">
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-mono">
+              <Package className="h-3.5 w-3.5" />
+              <span>{quantity} in stock</span>
+            </div>
+            <Button size="sm">Rent Now</Button>
           </div>
-          <Button>Rent Now</Button>
         </div>
       </div>
     </div>
