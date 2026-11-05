@@ -4,7 +4,7 @@ import { Grid, Search, SlidersHorizontal } from "lucide-react";
 export default function GearItemsLoading() {
   return (
     <div className="min-h-screen bg-[#FDFBF7] text-zinc-900 py-8 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto space-y-6">
+      <div className="max-w-6xl px-4 mx-auto space-y-6">
         
         {/* Editorial Top Header Skeleton */}
         <div className="border-b border-zinc-200 pb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">

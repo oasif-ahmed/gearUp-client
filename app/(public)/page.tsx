@@ -14,15 +14,15 @@ export default async function PublicHome() {
   }
 
   return (
-    <div className="min-h-screen bg-[#FDFBF7] text-zinc-900 selection:bg-zinc-900 selection:text-[#FDFBF7]">
+    <div className="min-h-screen w-full bg-[#FDFBF7] text-zinc-900 selection:bg-zinc-900 selection:text-[#FDFBF7]">
       {/* Editorial Navigation Bar Header space / divider line */}
-      <div className="max-w-7xl mx-auto px-6 pt-12 pb-6 border-b border-zinc-200 flex justify-between items-center text-xs tracking-widest uppercase font-mono text-zinc-500">
+      <div className="max-w-6xl mx-auto px-4 pt-12 pb-6 border-b border-zinc-200 flex justify-between items-center text-xs tracking-widest uppercase font-mono text-zinc-500">
         <span>Est. 2026 / Rental Architecture</span>
         <span>Catalog Vol. 01</span>
       </div>
 
       {/* Main Hero Section */}
-      <section className="max-w-7xl mx-auto px-6 pt-20 pb-28">
+      <section className="max-w-6xl mx-auto px-4 pt-20 pb-28">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-end">
           {/* Left Hero Title Column */}
           <div className="lg:col-span-8 space-y-8">
@@ -66,13 +66,13 @@ export default async function PublicHome() {
       </section>
 
       {/* Editorial Rule Divider */}
-      <div className="max-w-7xl mx-auto px-6">
+      <div className="max-w-6xl mx-auto px-4">
         <div className="w-full h-px bg-zinc-200" />
       </div>
 
       {/* Featured Equipment Section */}
       {featuredGear.length > 0 && (
-        <section className="max-w-7xl mx-auto px-6 py-20">
+        <section className="max-w-6xl mx-auto px-4 py-20">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-12 gap-4">
             <div>
               <span className="text-xs font-mono uppercase tracking-widest text-zinc-500 block mb-2">
@@ -107,7 +107,7 @@ export default async function PublicHome() {
       )}
 
       {/* Minimalist Footer Note */}
-      <footer className="max-w-7xl mx-auto px-6 py-12 border-t border-zinc-200 text-xs text-zinc-500 flex justify-between font-mono">
+      <footer className="max-w-6xl mx-auto px-4 py-12 border-t border-zinc-200 text-xs text-zinc-500 flex justify-between font-mono">
         <span>Gear Rental Operations</span>
         <span>System Active</span>
       </footer>
