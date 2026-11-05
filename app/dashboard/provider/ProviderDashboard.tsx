@@ -1,6 +1,13 @@
+
 "use client";
 
-import React, { useState, useEffect, useMemo, useRef, useActionState } from "react";
+import React, {
+  useState,
+  useEffect,
+  useMemo,
+  useRef,
+  useActionState,
+} from "react";
 import {
   Plus,
   Trash2,
@@ -33,7 +40,7 @@ import {
 import { Category } from "./page";
 import { addGearItem, AddGearState } from "@/services/gear-item.service";
 
-// Backend enums are defined locally in this client component.
+// Backend enums
 const GearCondition = {
   NEW: "NEW",
   LIKE_NEW: "LIKE_NEW",
@@ -41,25 +48,31 @@ const GearCondition = {
   FAIR: "FAIR",
 } as const;
 
-type GearConditionType = (typeof GearCondition)[keyof typeof GearCondition];
+type GearConditionType =
+  (typeof GearCondition)[keyof typeof GearCondition];
 
 const GearStatus = {
   AVAILABLE: "AVAILABLE",
   NOT_AVAILABLE: "NOT_AVAILABLE",
 } as const;
 
-type GearStatusType = (typeof GearStatus)[keyof typeof GearStatus];
+type GearStatusType =
+  (typeof GearStatus)[keyof typeof GearStatus];
 
-interface ProviderDashboardProps {
-  categories: Category[];
-}
-
+// Category is returned as a relation object from the backend.
 interface GearItem {
   id: string;
   name: string;
-  category: string;
+  category: Pick<Category, "id" | "name">;
   pricePerDay: number;
   quantity: number;
+  providerId: string;
+}
+
+interface ProviderDashboardProps {
+  categories: Category[];
+  gearItems: GearItem[];
+  currentUserId: string;
 }
 
 interface RentalOrder {
@@ -72,7 +85,12 @@ interface RentalOrder {
   rentalWindow: string;
   dailyRate: number;
   totalDays: number;
-  status: "PLACED" | "CONFIRMED" | "PICKED_UP" | "RETURNED" | "CANCELLED";
+  status:
+    | "PLACED"
+    | "CONFIRMED"
+    | "PICKED_UP"
+    | "RETURNED"
+    | "CANCELLED";
   createdAt: string;
 }
 
@@ -83,6 +101,8 @@ interface Specification {
 
 export default function ProviderDashboard({
   categories,
+  gearItems,
+  currentUserId,
 }: ProviderDashboardProps) {
   const [activeTab, setActiveTab] = useState<"gear" | "orders">("gear");
 
@@ -96,38 +116,46 @@ export default function ProviderDashboard({
     initialActionState,
   );
 
-  // Add Gear Form State matching exact payload schema
+  // Add Gear Form State
   const [gearName, setGearName] = useState("");
   const [description, setDescription] = useState("");
   const [brand, setBrand] = useState("");
   const [categoryId, setCategoryId] = useState("");
-  const [condition, setCondition] = useState<GearConditionType>(GearCondition.GOOD);
+  const [condition, setCondition] =
+    useState<GearConditionType>(GearCondition.GOOD);
   const [pricePerDay, setPricePerDay] = useState<number | "">(2500);
-  const [securityDeposit, setSecurityDeposit] = useState<number | "">(10000);
+  const [securityDeposit, setSecurityDeposit] =
+    useState<number | "">(10000);
   const [quantity, setQuantity] = useState<number | "">(2);
-  const [status, setStatus] = useState<GearStatusType>(GearStatus.AVAILABLE);
+  const [status, setStatus] =
+    useState<GearStatusType>(GearStatus.AVAILABLE);
 
-  // Image files chosen from the computer
+  // Image files
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Append React-managed files to the FormData before dispatching the action.
-  // This supports selecting files in multiple batches and removing previews.
+  // Append selected files to FormData before dispatching Server Action.
   const handleGearFormAction = (formData: FormData) => {
-    imageFiles.forEach((file) => formData.append("images", file));
+    imageFiles.forEach((file) => {
+      formData.append("images", file);
+    });
+
     return formAction(formData);
   };
 
-  // Preview URLs for the selected files (cleaned up to avoid memory leaks)
+  // Image previews
   const previews = useMemo(
     () => imageFiles.map((file) => URL.createObjectURL(file)),
     [imageFiles],
   );
+
   useEffect(() => {
-    return () => previews.forEach((url) => URL.revokeObjectURL(url));
+    return () => {
+      previews.forEach((url) => URL.revokeObjectURL(url));
+    };
   }, [previews]);
 
-  // Dynamic Specifications State
+  // Technical Specifications
   const [specifications, setSpecifications] = useState<Specification[]>([
     { key: "sensor", value: "Full Frame CMOS" },
     { key: "resolution", value: "24.5 MP" },
@@ -137,29 +165,33 @@ export default function ProviderDashboard({
     { key: "batteryType", value: "EN-EL15c" },
     { key: "storage", value: "Dual Slots (CFexpress/XQD + SD)" },
   ]);
+
   const [specKey, setSpecKey] = useState("");
   const [specValue, setSpecValue] = useState("");
 
-  // Restock & Invoice States
+  // Restock and Invoice States
   const [restockItem, setRestockItem] = useState<GearItem | null>(null);
   const [restockQuantity, setRestockQuantity] = useState<number>(1);
   const [isRestocking, setIsRestocking] = useState(false);
-  const [selectedInvoice, setSelectedInvoice] = useState<RentalOrder | null>(
-    null,
-  );
 
-  // Mock Inventory List
-  const [inventory, setInventory] = useState<GearItem[]>([
-    {
-      id: "gear-101",
-      name: "Nikon Z6 II Mirrorless Camera",
-      category: "Camera & Video",
-      pricePerDay: 2500,
-      quantity: 2,
-    },
-  ]);
+  const [selectedInvoice, setSelectedInvoice] =
+    useState<RentalOrder | null>(null);
 
-  // Mock Orders List
+  // Filter gear items belonging to the current provider
+  const myGearItems = useMemo(() => {
+    return gearItems.filter(
+      (item) => item.providerId === currentUserId,
+    );
+  }, [gearItems, currentUserId]);
+
+  // Initialize inventory
+  const [inventory, setInventory] = useState<GearItem[]>([]);
+
+  useEffect(() => {
+    setInventory(myGearItems);
+  }, [myGearItems]);
+
+  // Mock Rental Orders
   const [orders, setOrders] = useState<RentalOrder[]>([
     {
       id: "ord-7042",
@@ -179,43 +211,65 @@ export default function ProviderDashboard({
   // Specification Handlers
   const handleAddSpec = () => {
     if (!specKey.trim() || !specValue.trim()) return;
+
     setSpecifications([
       ...specifications,
-      { key: specKey.trim(), value: specValue.trim() },
+      {
+        key: specKey.trim(),
+        value: specValue.trim(),
+      },
     ]);
+
     setSpecKey("");
     setSpecValue("");
   };
 
   const handleRemoveSpec = (index: number) => {
-    setSpecifications(specifications.filter((_, i) => i !== index));
+    setSpecifications(
+      specifications.filter((_, i) => i !== index),
+    );
   };
 
   // Image Handlers
-  const handleFilesSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFilesSelected = (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     const selected = Array.from(e.target.files ?? []);
+
     setImageFiles((prev) => [...prev, ...selected]);
-    e.target.value = ""; // lets you pick the same file again if needed
+
+    e.target.value = "";
   };
 
   const handleRemoveImage = (index: number) => {
-    setImageFiles(imageFiles.filter((_, i) => i !== index));
+    setImageFiles(
+      imageFiles.filter((_, i) => i !== index),
+    );
   };
 
   // Restock Submit Handler
-  const handleRestockSubmit = async (e: React.FormEvent) => {
+  const handleRestockSubmit = async (
+    e: React.FormEvent,
+  ) => {
     e.preventDefault();
+
     if (!restockItem) return;
 
     setIsRestocking(true);
+
     try {
       setInventory((prev) =>
         prev.map((item) =>
           item.id === restockItem.id
-            ? { ...item, quantity: item.quantity + Number(restockQuantity) }
+            ? {
+                ...item,
+                quantity:
+                  item.quantity + Number(restockQuantity),
+              }
             : item,
         ),
       );
+
       setRestockItem(null);
       setRestockQuantity(1);
     } finally {
@@ -223,10 +277,16 @@ export default function ProviderDashboard({
     }
   };
 
-  const handleStatusUpdate = (orderId: string, newStatus: any) => {
+  // Rental Order Status Handler
+  const handleStatusUpdate = (
+    orderId: string,
+    newStatus: RentalOrder["status"],
+  ) => {
     setOrders((prev) =>
       prev.map((ord) =>
-        ord.id === orderId ? { ...ord, status: newStatus } : ord,
+        ord.id === orderId
+          ? { ...ord, status: newStatus }
+          : ord,
       ),
     );
   };
@@ -239,10 +299,12 @@ export default function ProviderDashboard({
           <span className="text-xs font-mono uppercase tracking-widest text-zinc-500">
             [ Management Console ]
           </span>
+
           <h1 className="text-3xl font-light tracking-tight text-zinc-900 mt-1">
             Provider Dashboard
           </h1>
         </div>
+
         <div className="flex items-center gap-2">
           <button
             onClick={() => setActiveTab("gear")}
@@ -254,6 +316,7 @@ export default function ProviderDashboard({
           >
             Gear Inventory
           </button>
+
           <button
             onClick={() => setActiveTab("orders")}
             className={`px-4 py-2 text-xs font-mono uppercase tracking-wider rounded-none border transition-colors ${
@@ -274,15 +337,20 @@ export default function ProviderDashboard({
           <div className="border border-zinc-200 bg-white p-8 rounded-none shadow-xs">
             <div className="mb-6 border-b border-zinc-100 pb-4">
               <h2 className="text-sm font-mono uppercase tracking-tight text-zinc-900 flex items-center gap-2">
-                <Plus className="h-4 w-4" /> Add New Equipment Listing
+                <Plus className="h-4 w-4" />
+                Add New Equipment Listing
               </h2>
+
               <p className="text-xs text-zinc-500 mt-1">
-                Register professional equipment with technical specs, deposits,
-                and gallery media.
+                Register professional equipment with technical specs,
+                deposits, and gallery media.
               </p>
             </div>
 
-            <form action={handleGearFormAction} className="space-y-6">
+            <form
+              action={handleGearFormAction}
+              className="space-y-6"
+            >
               {/* Core Information */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="md:col-span-2 space-y-1.5">
@@ -292,6 +360,7 @@ export default function ProviderDashboard({
                   >
                     Gear Name
                   </Label>
+
                   <Input
                     id="name"
                     name="name"
@@ -302,6 +371,7 @@ export default function ProviderDashboard({
                     required
                   />
                 </div>
+
                 <div className="space-y-1.5">
                   <Label
                     htmlFor="brand"
@@ -309,6 +379,7 @@ export default function ProviderDashboard({
                   >
                     Brand
                   </Label>
+
                   <Input
                     id="brand"
                     name="brand"
@@ -330,6 +401,7 @@ export default function ProviderDashboard({
                   >
                     Category
                   </Label>
+
                   <Select
                     name="categoryId"
                     value={categoryId}
@@ -341,6 +413,7 @@ export default function ProviderDashboard({
                     >
                       <SelectValue placeholder="Select category" />
                     </SelectTrigger>
+
                     <SelectContent className="rounded-none border-zinc-200 text-xs">
                       {categories.map((cat) => (
                         <SelectItem
@@ -354,6 +427,7 @@ export default function ProviderDashboard({
                     </SelectContent>
                   </Select>
                 </div>
+
                 <div className="space-y-1.5">
                   <Label
                     htmlFor="condition"
@@ -361,22 +435,34 @@ export default function ProviderDashboard({
                   >
                     Gear Condition
                   </Label>
-                  <Select value={condition} onValueChange={(value) => setCondition(value as GearConditionType)}>
+
+                  <Select
+                    value={condition}
+                    onValueChange={(value) =>
+                      setCondition(value as GearConditionType)
+                    }
+                  >
                     <SelectTrigger
                       id="condition"
                       className="rounded-none border-zinc-200 text-xs"
                     >
                       <SelectValue placeholder="Select condition" />
                     </SelectTrigger>
+
                     <SelectContent className="rounded-none border-zinc-200 text-xs">
                       {Object.values(GearCondition).map((value) => (
-                        <SelectItem key={value} value={value} className="rounded-none text-xs">
+                        <SelectItem
+                          key={value}
+                          value={value}
+                          className="rounded-none text-xs"
+                        >
                           {value.replaceAll("_", " ")}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
+
                 <div className="space-y-1.5">
                   <Label
                     htmlFor="status"
@@ -384,16 +470,27 @@ export default function ProviderDashboard({
                   >
                     Listing Status
                   </Label>
-                  <Select value={status} onValueChange={(value) => setStatus(value as GearStatusType)}>
+
+                  <Select
+                    value={status}
+                    onValueChange={(value) =>
+                      setStatus(value as GearStatusType)
+                    }
+                  >
                     <SelectTrigger
                       id="status"
                       className="rounded-none border-zinc-200 text-xs"
                     >
                       <SelectValue placeholder="Select status" />
                     </SelectTrigger>
+
                     <SelectContent className="rounded-none border-zinc-200 text-xs">
                       {Object.values(GearStatus).map((value) => (
-                        <SelectItem key={value} value={value} className="rounded-none text-xs">
+                        <SelectItem
+                          key={value}
+                          value={value}
+                          className="rounded-none text-xs"
+                        >
                           {value.replaceAll("_", " ")}
                         </SelectItem>
                       ))}
@@ -411,6 +508,7 @@ export default function ProviderDashboard({
                   >
                     Price Per Day (৳)
                   </Label>
+
                   <Input
                     id="pricePerDay"
                     name="pricePerDay"
@@ -418,7 +516,9 @@ export default function ProviderDashboard({
                     value={pricePerDay}
                     onChange={(e) =>
                       setPricePerDay(
-                        e.target.value === "" ? "" : Number(e.target.value),
+                        e.target.value === ""
+                          ? ""
+                          : Number(e.target.value),
                       )
                     }
                     placeholder="2500"
@@ -426,6 +526,7 @@ export default function ProviderDashboard({
                     required
                   />
                 </div>
+
                 <div className="space-y-1.5">
                   <Label
                     htmlFor="securityDeposit"
@@ -433,6 +534,7 @@ export default function ProviderDashboard({
                   >
                     Security Deposit (৳)
                   </Label>
+
                   <Input
                     id="securityDeposit"
                     name="securityDeposit"
@@ -440,7 +542,9 @@ export default function ProviderDashboard({
                     value={securityDeposit}
                     onChange={(e) =>
                       setSecurityDeposit(
-                        e.target.value === "" ? "" : Number(e.target.value),
+                        e.target.value === ""
+                          ? ""
+                          : Number(e.target.value),
                       )
                     }
                     placeholder="10000"
@@ -448,6 +552,7 @@ export default function ProviderDashboard({
                     required
                   />
                 </div>
+
                 <div className="space-y-1.5">
                   <Label
                     htmlFor="quantity"
@@ -455,6 +560,7 @@ export default function ProviderDashboard({
                   >
                     Quantity Stock
                   </Label>
+
                   <Input
                     id="quantity"
                     name="quantity"
@@ -462,7 +568,9 @@ export default function ProviderDashboard({
                     value={quantity}
                     onChange={(e) =>
                       setQuantity(
-                        e.target.value === "" ? "" : Number(e.target.value),
+                        e.target.value === ""
+                          ? ""
+                          : Number(e.target.value),
                       )
                     }
                     placeholder="2"
@@ -480,6 +588,7 @@ export default function ProviderDashboard({
                 >
                   Description
                 </Label>
+
                 <Textarea
                   id="description"
                   name="description"
@@ -492,9 +601,19 @@ export default function ProviderDashboard({
                 />
               </div>
 
-              {/* Values submitted with the Server Action */}
-              <input type="hidden" name="condition" value={condition} />
-              <input type="hidden" name="status" value={status} />
+              {/* Hidden values submitted with Server Action */}
+              <input
+                type="hidden"
+                name="condition"
+                value={condition}
+              />
+
+              <input
+                type="hidden"
+                name="status"
+                value={status}
+              />
+
               <input
                 type="hidden"
                 name="specifications"
@@ -512,7 +631,8 @@ export default function ProviderDashboard({
               {/* Image Upload */}
               <div className="space-y-3 border-t border-zinc-100 pt-4">
                 <Label className="text-xs font-mono uppercase text-zinc-700 flex items-center gap-1.5">
-                  <ImageIcon className="h-3.5 w-3.5" /> Gear Images
+                  <ImageIcon className="h-3.5 w-3.5" />
+                  Gear Images
                 </Label>
 
                 <input
@@ -523,13 +643,15 @@ export default function ProviderDashboard({
                   onChange={handleFilesSelected}
                   className="hidden"
                 />
+
                 <Button
                   type="button"
                   variant="outline"
                   onClick={() => fileInputRef.current?.click()}
                   className="rounded-none text-xs border-zinc-200 h-9 px-4 font-mono gap-1.5"
                 >
-                  <Upload className="h-3.5 w-3.5" /> Choose Images
+                  <Upload className="h-3.5 w-3.5" />
+                  Choose Images
                 </Button>
 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-2 pt-1">
@@ -543,6 +665,7 @@ export default function ProviderDashboard({
                         alt={imageFiles[idx].name}
                         className="h-28 w-full object-cover"
                       />
+
                       <button
                         type="button"
                         onClick={() => handleRemoveImage(idx)}
@@ -550,6 +673,7 @@ export default function ProviderDashboard({
                       >
                         <X className="h-3.5 w-3.5" />
                       </button>
+
                       <p className="truncate px-2 py-1 text-[10px] font-mono text-zinc-600">
                         {imageFiles[idx].name}
                       </p>
@@ -558,11 +682,13 @@ export default function ProviderDashboard({
                 </div>
               </div>
 
-              {/* Dynamic Specifications Key/Value Pair Builder */}
+              {/* Dynamic Specifications */}
               <div className="space-y-3 border-t border-zinc-100 pt-4">
                 <Label className="text-xs font-mono uppercase text-zinc-700 flex items-center gap-1.5">
-                  <Layers className="h-3.5 w-3.5" /> Technical Specifications
+                  <Layers className="h-3.5 w-3.5" />
+                  Technical Specifications
                 </Label>
+
                 <div className="grid grid-cols-1 md:grid-cols-5 gap-2">
                   <Input
                     placeholder="Key (e.g., sensor)"
@@ -570,12 +696,14 @@ export default function ProviderDashboard({
                     onChange={(e) => setSpecKey(e.target.value)}
                     className="rounded-none border-zinc-200 text-xs font-mono md:col-span-2"
                   />
+
                   <Input
                     placeholder="Value (e.g., Full Frame CMOS)"
                     value={specValue}
                     onChange={(e) => setSpecValue(e.target.value)}
                     className="rounded-none border-zinc-200 text-xs font-mono md:col-span-2"
                   />
+
                   <Button
                     type="button"
                     variant="outline"
@@ -596,10 +724,12 @@ export default function ProviderDashboard({
                         <span className="text-zinc-400 uppercase text-[10px]">
                           {spec.key}:{" "}
                         </span>
+
                         <span className="text-zinc-900 font-medium">
                           {spec.value}
                         </span>
                       </div>
+
                       <button
                         type="button"
                         onClick={() => handleRemoveSpec(idx)}
@@ -612,12 +742,15 @@ export default function ProviderDashboard({
                 </div>
               </div>
 
+              {/* Action State Message */}
               {actionState.message && (
                 <p
                   role="status"
                   aria-live="polite"
                   className={`text-xs font-mono ${
-                    actionState.success ? "text-emerald-700" : "text-red-600"
+                    actionState.success
+                      ? "text-emerald-700"
+                      : "text-red-600"
                   }`}
                 >
                   {actionState.message}
@@ -631,7 +764,9 @@ export default function ProviderDashboard({
                   disabled={isPending || !categoryId}
                   className="rounded-none bg-zinc-900 px-8 py-3 text-xs font-mono uppercase tracking-wider text-white hover:bg-zinc-800 transition-colors disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  {isPending ? "Uploading & Publishing..." : "Publish Listing"}
+                  {isPending
+                    ? "Uploading & Publishing..."
+                    : "Publish Listing"}
                 </button>
               </div>
             </form>
@@ -644,10 +779,12 @@ export default function ProviderDashboard({
                 <h2 className="text-sm font-mono uppercase tracking-tight text-zinc-900">
                   Active Inventory
                 </h2>
+
                 <p className="text-xs text-zinc-500 mt-1">
                   Manage stock allocations and equipment state.
                 </p>
               </div>
+
               <span className="text-xs font-mono text-zinc-400">
                 {inventory.length} ITEMS LISTED
               </span>
@@ -660,35 +797,47 @@ export default function ProviderDashboard({
                     <TableHead className="text-xs font-mono uppercase text-zinc-500">
                       Name
                     </TableHead>
+
                     <TableHead className="text-xs font-mono uppercase text-zinc-500">
                       Category
                     </TableHead>
+
                     <TableHead className="text-xs font-mono uppercase text-zinc-500">
                       Rate/Day
                     </TableHead>
+
                     <TableHead className="text-xs font-mono uppercase text-zinc-500">
                       Stock
                     </TableHead>
+
                     <TableHead className="text-xs font-mono uppercase text-zinc-500 text-right">
                       Actions
                     </TableHead>
                   </TableRow>
                 </TableHeader>
+
                 <TableBody>
                   {inventory.map((item) => (
-                    <TableRow key={item.id} className="border-zinc-100 text-xs">
+                    <TableRow
+                      key={item.id}
+                      className="border-zinc-100 text-xs"
+                    >
                       <TableCell className="font-medium text-zinc-900">
                         {item.name}
                       </TableCell>
+
                       <TableCell className="text-zinc-600">
-                        {item.category}
+                        {item.category?.name}
                       </TableCell>
+
                       <TableCell className="font-mono text-zinc-900">
                         ৳{item.pricePerDay}
                       </TableCell>
+
                       <TableCell className="font-mono text-zinc-600">
                         {item.quantity}
                       </TableCell>
+
                       <TableCell className="text-right space-x-1">
                         <Button
                           variant="outline"
@@ -696,8 +845,10 @@ export default function ProviderDashboard({
                           onClick={() => setRestockItem(item)}
                           className="h-7 text-xs rounded-none border-zinc-200 text-zinc-800 hover:bg-zinc-100 gap-1.5 font-mono"
                         >
-                          <RefreshCw className="h-3 w-3" /> Restock
+                          <RefreshCw className="h-3 w-3" />
+                          Restock
                         </Button>
+
                         <Button
                           variant="ghost"
                           size="sm"
@@ -705,6 +856,7 @@ export default function ProviderDashboard({
                         >
                           Edit
                         </Button>
+
                         <Button
                           variant="ghost"
                           size="sm"
@@ -715,6 +867,17 @@ export default function ProviderDashboard({
                       </TableCell>
                     </TableRow>
                   ))}
+
+                  {inventory.length === 0 && (
+                    <TableRow>
+                      <TableCell
+                        colSpan={5}
+                        className="text-center text-xs text-zinc-500 py-8"
+                      >
+                        No equipment listed yet.
+                      </TableCell>
+                    </TableRow>
+                  )}
                 </TableBody>
               </Table>
             </div>
@@ -731,11 +894,13 @@ export default function ProviderDashboard({
                 <h2 className="text-sm font-mono uppercase tracking-tight text-zinc-900">
                   Rental Invoices & Manifests
                 </h2>
+
                 <p className="text-xs text-zinc-500 mt-1">
                   Select any transaction to inspect the official paper invoice
                   receipt.
                 </p>
               </div>
+
               <span className="text-xs font-mono text-zinc-400">
                 {orders.length} TOTAL INVOICES
               </span>
@@ -753,10 +918,12 @@ export default function ProviderDashboard({
                       <span className="text-[10px] font-mono text-zinc-400 uppercase tracking-widest">
                         [ RENTAL INVOICE ]
                       </span>
+
                       <h3 className="text-sm font-mono font-semibold text-zinc-900 mt-0.5">
                         {ord.invoiceNo}
                       </h3>
                     </div>
+
                     <span
                       className={`inline-flex items-center px-2 py-0.5 text-[10px] font-mono border ${
                         ord.status === "PLACED"
@@ -773,16 +940,20 @@ export default function ProviderDashboard({
                   <div className="space-y-1.5 text-xs text-zinc-700 font-mono">
                     <div className="flex justify-between">
                       <span className="text-zinc-400">Client:</span>
+
                       <span className="font-medium text-zinc-900">
                         {ord.clientName}
                       </span>
                     </div>
+
                     <div className="flex justify-between">
                       <span className="text-zinc-400">Asset:</span>
+
                       <span className="text-zinc-900">
                         {ord.gearName} (Qty: {ord.quantity})
                       </span>
                     </div>
+
                     <div className="flex justify-between">
                       <span className="text-zinc-400">Duration:</span>
                       <span>{ord.rentalWindow}</span>
@@ -791,10 +962,13 @@ export default function ProviderDashboard({
 
                   <div className="pt-3 border-t border-zinc-200/80 flex items-center justify-between text-xs font-mono">
                     <span className="text-zinc-500">
-                      Total: ৳{(ord.dailyRate * ord.totalDays).toLocaleString()}
+                      Total: ৳
+                      {(ord.dailyRate * ord.totalDays).toLocaleString()}
                     </span>
+
                     <span className="text-zinc-900 group-hover:underline flex items-center gap-1 font-medium">
-                      Inspect Paper Receipt <ArrowUpRight className="h-3 w-3" />
+                      Inspect Paper Receipt
+                      <ArrowUpRight className="h-3 w-3" />
                     </span>
                   </div>
                 </div>
@@ -819,9 +993,11 @@ export default function ProviderDashboard({
               <span className="text-[10px] font-mono uppercase tracking-widest text-zinc-500">
                 GearUp Rental Corp — Official Statement
               </span>
+
               <h2 className="text-2xl font-normal tracking-tight text-zinc-900">
                 Equipment Rental Invoice
               </h2>
+
               <p className="text-xs font-mono text-zinc-500">
                 {selectedInvoice.invoiceNo} • Issued:{" "}
                 {selectedInvoice.createdAt}
@@ -833,20 +1009,25 @@ export default function ProviderDashboard({
                 <span className="text-zinc-400 block uppercase text-[10px]">
                   Billed To:
                 </span>
+
                 <span className="font-semibold text-zinc-900 text-sm block mt-0.5">
                   {selectedInvoice.clientName}
                 </span>
+
                 <span className="text-zinc-600">
                   {selectedInvoice.clientEmail}
                 </span>
               </div>
+
               <div className="text-right">
                 <span className="text-zinc-400 block uppercase text-[10px]">
                   Rental Period:
                 </span>
+
                 <span className="font-medium text-zinc-900 block mt-0.5">
                   {selectedInvoice.rentalWindow}
                 </span>
+
                 <span className="text-zinc-600">
                   {selectedInvoice.totalDays} Billing Days
                 </span>
@@ -857,28 +1038,39 @@ export default function ProviderDashboard({
               <span className="text-[10px] font-mono uppercase tracking-widest text-zinc-400 block">
                 Itemized Manifest
               </span>
+
               <table className="w-full text-xs font-mono border-collapse">
                 <thead>
                   <tr className="border-b border-zinc-300 text-left text-zinc-500">
                     <th className="pb-2 font-medium">Description</th>
                     <th className="pb-2 font-medium text-center">Qty</th>
-                    <th className="pb-2 font-medium text-right">Rate/Day</th>
-                    <th className="pb-2 font-medium text-right">Amount</th>
+                    <th className="pb-2 font-medium text-right">
+                      Rate/Day
+                    </th>
+                    <th className="pb-2 font-medium text-right">
+                      Amount
+                    </th>
                   </tr>
                 </thead>
+
                 <tbody className="divide-y divide-zinc-200">
                   <tr>
                     <td className="py-3 text-zinc-900 font-sans font-medium">
                       {selectedInvoice.gearName}
                     </td>
+
                     <td className="py-3 text-center text-zinc-600">
                       {selectedInvoice.quantity}
                     </td>
+
                     <td className="py-3 text-right text-zinc-600">
                       ৳{selectedInvoice.dailyRate}
                     </td>
+
                     <td className="py-3 text-right font-semibold text-zinc-900">
-                      ৳{selectedInvoice.dailyRate * selectedInvoice.totalDays}
+                      ৳
+                      {selectedInvoice.dailyRate *
+                        selectedInvoice.totalDays}
                     </td>
                   </tr>
                 </tbody>
@@ -890,19 +1082,24 @@ export default function ProviderDashboard({
                 <span className="text-zinc-500 block text-[10px]">
                   Fulfillment Status:
                 </span>
+
                 <span className="font-semibold text-zinc-900 uppercase">
                   {selectedInvoice.status}
                 </span>
               </div>
+
               <div className="text-right space-y-1">
                 <div className="text-zinc-500">
                   Subtotal: ৳
-                  {selectedInvoice.dailyRate * selectedInvoice.totalDays}
+                  {selectedInvoice.dailyRate *
+                    selectedInvoice.totalDays}
                 </div>
+
                 <div className="text-sm font-semibold text-zinc-900">
                   Total Due: ৳
                   {(
-                    selectedInvoice.dailyRate * selectedInvoice.totalDays
+                    selectedInvoice.dailyRate *
+                    selectedInvoice.totalDays
                   ).toLocaleString()}{" "}
                   BDT
                 </div>
@@ -914,37 +1111,46 @@ export default function ProviderDashboard({
                 <span className="text-[11px] font-mono text-zinc-500">
                   Update Status:
                 </span>
+
                 <Select
-                  defaultValue={selectedInvoice.status}
+                  value={selectedInvoice.status}
                   onValueChange={(val) =>
-                    handleStatusUpdate(selectedInvoice.id, val)
+                    handleStatusUpdate(
+                      selectedInvoice.id,
+                      val as RentalOrder["status"],
+                    )
                   }
                 >
                   <SelectTrigger className="h-7 w-[130px] text-xs rounded-none border-zinc-300 bg-white font-mono">
                     <SelectValue placeholder="Status" />
                   </SelectTrigger>
+
                   <SelectContent className="rounded-none border-zinc-300 text-xs font-mono">
                     <SelectItem value="PLACED" className="rounded-none text-xs">
                       PLACED
                     </SelectItem>
+
                     <SelectItem
                       value="CONFIRMED"
                       className="rounded-none text-xs"
                     >
                       CONFIRMED
                     </SelectItem>
+
                     <SelectItem
                       value="PICKED_UP"
                       className="rounded-none text-xs"
                     >
                       PICKED UP
                     </SelectItem>
+
                     <SelectItem
                       value="RETURNED"
                       className="rounded-none text-xs"
                     >
                       RETURNED
                     </SelectItem>
+
                     <SelectItem
                       value="CANCELLED"
                       className="rounded-none text-xs text-red-600"
@@ -975,10 +1181,12 @@ export default function ProviderDashboard({
                 <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-400">
                   [ Inventory Increment ]
                 </span>
+
                 <h3 className="text-base font-semibold text-zinc-900">
                   Restock Equipment
                 </h3>
               </div>
+
               <button
                 onClick={() => setRestockItem(null)}
                 className="text-zinc-400 hover:text-zinc-900 transition-colors"
@@ -987,9 +1195,15 @@ export default function ProviderDashboard({
               </button>
             </div>
 
-            <form onSubmit={handleRestockSubmit} className="space-y-4">
+            <form
+              onSubmit={handleRestockSubmit}
+              className="space-y-4"
+            >
               <div className="space-y-1">
-                <p className="text-xs text-zinc-500 font-mono">Target Item:</p>
+                <p className="text-xs text-zinc-500 font-mono">
+                  Target Item:
+                </p>
+
                 <p className="text-xs font-semibold text-zinc-900">
                   {restockItem.name}
                 </p>
@@ -1002,12 +1216,15 @@ export default function ProviderDashboard({
                 >
                   Additional Quantity to Add
                 </Label>
+
                 <Input
                   id="addQuantity"
                   type="number"
                   min="1"
                   value={restockQuantity}
-                  onChange={(e) => setRestockQuantity(Number(e.target.value))}
+                  onChange={(e) =>
+                    setRestockQuantity(Number(e.target.value))
+                  }
                   className="rounded-none border-zinc-200 text-xs font-mono focus:ring-1 focus:ring-zinc-900"
                   required
                 />
@@ -1022,6 +1239,7 @@ export default function ProviderDashboard({
                 >
                   Cancel
                 </Button>
+
                 <Button
                   type="submit"
                   disabled={isRestocking}

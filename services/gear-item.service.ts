@@ -220,3 +220,237 @@ export const addGearItem = async (
     };
   }
 };
+
+
+// update gear Item
+export const updateGearItem = async (
+  _prevState: AddGearState,
+  formData: FormData,
+): Promise<AddGearState> => {
+  try {
+    const cookieStore = await cookies();
+    const accessToken = cookieStore.get("accessToken")?.value;
+
+    if (!accessToken) {
+      return {
+        success: false,
+        message: "Unauthorized: Missing access token.",
+      };
+    }
+
+    const gearId = getFormString(formData, "gearId");
+
+    if (!gearId) {
+      return {
+        success: false,
+        message: "Gear item ID is required.",
+      };
+    }
+
+    const imageBBKey =
+      process.env.IMAGE_BB_API_KEY || process.env.IMGBB_API_KEY;
+
+    if (!imageBBKey) {
+      throw new Error("ImageBB API key is missing.");
+    }
+
+    // Keep existing images.
+    let existingImages: string[];
+
+    try {
+      const parsedImages = JSON.parse(
+        getFormString(formData, "existingImages") || "[]",
+      );
+
+      if (
+        !Array.isArray(parsedImages) ||
+        !parsedImages.every((image) => typeof image === "string")
+      ) {
+        throw new Error("Invalid images.");
+      }
+
+      existingImages = parsedImages;
+    } catch {
+      return {
+        success: false,
+        message: "Invalid existing images data.",
+      };
+    }
+
+    // Upload newly selected images.
+    const imageFiles = formData
+      .getAll("images")
+      .filter((item): item is File => item instanceof File && item.size > 0);
+
+    const newImageUrls = await Promise.all(
+      imageFiles.map(async (file) => {
+        const imageFormData = new FormData();
+        imageFormData.append("image", file);
+
+        const imageResponse = await fetch(
+          `https://api.imgbb.com/1/upload?key=${imageBBKey}`,
+          {
+            method: "POST",
+            body: imageFormData,
+          },
+        );
+
+        const imageResult = await imageResponse.json().catch(() => null);
+
+        if (!imageResponse.ok || !imageResult?.success) {
+          throw new Error(
+            imageResult?.error?.message ||
+              `ImageBB upload failed for ${file.name}.`,
+          );
+        }
+
+        const imageUrl =
+          imageResult?.data?.display_url || imageResult?.data?.url;
+
+        if (!imageUrl || typeof imageUrl !== "string") {
+          throw new Error(
+            `ImageBB did not return a valid URL for ${file.name}.`,
+          );
+        }
+
+        return imageUrl;
+      }),
+    );
+
+    // Existing images + newly uploaded images.
+    const images = [...existingImages, ...newImageUrls];
+
+    let specifications: Record<string, string>;
+
+    try {
+      const parsedSpecifications = JSON.parse(
+        getFormString(formData, "specifications") || "{}",
+      );
+
+      if (
+        !parsedSpecifications ||
+        typeof parsedSpecifications !== "object" ||
+        Array.isArray(parsedSpecifications)
+      ) {
+        throw new Error("Invalid specifications.");
+      }
+
+      specifications = parsedSpecifications as Record<string, string>;
+    } catch {
+      return {
+        success: false,
+        message: "Invalid technical specifications data.",
+      };
+    }
+
+    const gearData = {
+      name: getFormString(formData, "name"),
+      description: getFormString(formData, "description"),
+      brand: getFormString(formData, "brand"),
+      categoryId: getFormString(formData, "categoryId"),
+      condition: getFormString(formData, "condition"),
+      pricePerDay: Number(getFormString(formData, "pricePerDay")),
+      securityDeposit: Number(getFormString(formData, "securityDeposit")),
+      quantity: Number(getFormString(formData, "quantity")),
+      status: getFormString(formData, "status"),
+      images,
+      specifications,
+    };
+
+    if (
+      !gearData.name ||
+      !gearData.description ||
+      !gearData.brand ||
+      !gearData.categoryId ||
+      !gearData.condition ||
+      !gearData.status
+    ) {
+      return {
+        success: false,
+        message: "Please complete all required fields.",
+      };
+    }
+
+    const allowedConditions = ["NEW", "LIKE_NEW", "GOOD", "FAIR"] as const;
+    const allowedStatuses = ["AVAILABLE", "NOT_AVAILABLE"] as const;
+
+    if (
+      !allowedConditions.includes(
+        gearData.condition as (typeof allowedConditions)[number],
+      )
+    ) {
+      return {
+        success: false,
+        message: "Invalid gear condition.",
+      };
+    }
+
+    if (
+      !allowedStatuses.includes(
+        gearData.status as (typeof allowedStatuses)[number],
+      )
+    ) {
+      return {
+        success: false,
+        message: "Invalid gear status.",
+      };
+    }
+
+    if (
+      !Number.isFinite(gearData.pricePerDay) ||
+      gearData.pricePerDay <= 0 ||
+      !Number.isFinite(gearData.securityDeposit) ||
+      gearData.securityDeposit < 0 ||
+      !Number.isInteger(gearData.quantity) ||
+      gearData.quantity < 1
+    ) {
+      return {
+        success: false,
+        message: "Please provide valid price, deposit, and quantity values.",
+      };
+    }
+
+    const backendUrl = process.env.BACKEND_API_URL;
+
+    if (!backendUrl) {
+      throw new Error("BACKEND_API_URL is not configured.");
+    }
+
+    const response = await fetch(
+      `${backendUrl}/api/gear-items/${gearId}`,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify(gearData),
+        cache: "no-store",
+      },
+    );
+
+    const result = await response.json().catch(() => null);
+
+    if (!response.ok) {
+      return {
+        success: false,
+        message: result?.message || "Failed to update gear item.",
+      };
+    }
+
+    return {
+      success: true,
+      message: result?.message || "Gear item updated successfully!",
+    };
+  } catch (error) {
+    console.error("Error in updateGearItem Server Action:", error);
+
+    return {
+      success: false,
+      message:
+        error instanceof Error
+          ? error.message
+          : "An unexpected error occurred while updating gear.",
+    };
+  }
+};
