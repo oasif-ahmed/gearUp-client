@@ -1,6 +1,6 @@
 import React from 'react'
-import ProviderDashboard from './providerClient'
 import { getCategories } from '@/services/provider.service'
+import ProviderDashboard from './ProviderDashboardClient';
 
 export interface Category {
   id: string;

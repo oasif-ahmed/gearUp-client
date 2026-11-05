@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo, useRef } from "react";
+import React, { useState, useEffect, useMemo, useRef, useActionState } from "react";
 import {
   Plus,
   Trash2,
@@ -31,6 +31,24 @@ import {
   TableCell,
 } from "@/components/ui/table";
 import { Category } from "./page";
+import { addGearItem, AddGearState } from "@/services/gear-item.service";
+
+// Backend enums are defined locally in this client component.
+const GearCondition = {
+  NEW: "NEW",
+  LIKE_NEW: "LIKE_NEW",
+  GOOD: "GOOD",
+  FAIR: "FAIR",
+} as const;
+
+type GearConditionType = (typeof GearCondition)[keyof typeof GearCondition];
+
+const GearStatus = {
+  AVAILABLE: "AVAILABLE",
+  NOT_AVAILABLE: "NOT_AVAILABLE",
+} as const;
+
+type GearStatusType = (typeof GearStatus)[keyof typeof GearStatus];
 
 interface ProviderDashboardProps {
   categories: Category[];
@@ -68,20 +86,37 @@ export default function ProviderDashboard({
 }: ProviderDashboardProps) {
   const [activeTab, setActiveTab] = useState<"gear" | "orders">("gear");
 
+  const initialActionState: AddGearState = {
+    success: false,
+    message: "",
+  };
+
+  const [actionState, formAction, isPending] = useActionState(
+    addGearItem,
+    initialActionState,
+  );
+
   // Add Gear Form State matching exact payload schema
   const [gearName, setGearName] = useState("");
   const [description, setDescription] = useState("");
   const [brand, setBrand] = useState("");
   const [categoryId, setCategoryId] = useState("");
-  const [condition, setCondition] = useState<string>("EXCELLENT");
+  const [condition, setCondition] = useState<GearConditionType>(GearCondition.GOOD);
   const [pricePerDay, setPricePerDay] = useState<number | "">(2500);
   const [securityDeposit, setSecurityDeposit] = useState<number | "">(10000);
   const [quantity, setQuantity] = useState<number | "">(2);
-  const [status, setStatus] = useState<string>("AVAILABLE");
+  const [status, setStatus] = useState<GearStatusType>(GearStatus.AVAILABLE);
 
   // Image files chosen from the computer
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Append React-managed files to the FormData before dispatching the action.
+  // This supports selecting files in multiple batches and removing previews.
+  const handleGearFormAction = (formData: FormData) => {
+    imageFiles.forEach((file) => formData.append("images", file));
+    return formAction(formData);
+  };
 
   // Preview URLs for the selected files (cleaned up to avoid memory leaks)
   const previews = useMemo(
@@ -167,40 +202,6 @@ export default function ProviderDashboard({
     setImageFiles(imageFiles.filter((_, i) => i !== index));
   };
 
-  // Submit Handler (multipart/form-data because it carries files)
-  const handleAddGearSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!categoryId) return;
-
-    // Convert array of specs back into object map
-    const specsObject = specifications.reduce(
-      (acc, curr) => {
-        acc[curr.key] = curr.value;
-        return acc;
-      },
-      {} as Record<string, string>,
-    );
-
-    const formData = new FormData();
-    formData.append("name", gearName);
-    formData.append("description", description);
-    formData.append("brand", brand);
-    formData.append("categoryId", categoryId);
-    formData.append("condition", condition);
-    formData.append("pricePerDay", String(Number(pricePerDay)));
-    formData.append("securityDeposit", String(Number(securityDeposit)));
-    formData.append("quantity", String(Number(quantity)));
-    formData.append("status", status);
-    formData.append("specifications", JSON.stringify(specsObject));
-    imageFiles.forEach((file) => formData.append("images", file));
-
-    console.log("=== PUBLISHING GEAR ===", Object.fromEntries(formData.entries()));
-
-    // TODO: send it. Do NOT set a Content-Type header; the browser adds it with the boundary.
-    // await fetch(`${process.env.NEXT_PUBLIC_API_URL}/gear`, { method: "POST", body: formData });
-  };
-
   // Restock Submit Handler
   const handleRestockSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -281,7 +282,7 @@ export default function ProviderDashboard({
               </p>
             </div>
 
-            <form onSubmit={handleAddGearSubmit} className="space-y-6">
+            <form action={handleGearFormAction} className="space-y-6">
               {/* Core Information */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="md:col-span-2 space-y-1.5">
@@ -293,6 +294,7 @@ export default function ProviderDashboard({
                   </Label>
                   <Input
                     id="name"
+                    name="name"
                     value={gearName}
                     onChange={(e) => setGearName(e.target.value)}
                     placeholder="e.g., Nikon Z6 II Mirrorless Camera"
@@ -309,6 +311,7 @@ export default function ProviderDashboard({
                   </Label>
                   <Input
                     id="brand"
+                    name="brand"
                     value={brand}
                     onChange={(e) => setBrand(e.target.value)}
                     placeholder="e.g., Nikon"
@@ -327,7 +330,11 @@ export default function ProviderDashboard({
                   >
                     Category
                   </Label>
-                  <Select value={categoryId} onValueChange={setCategoryId}>
+                  <Select
+                    name="categoryId"
+                    value={categoryId}
+                    onValueChange={setCategoryId}
+                  >
                     <SelectTrigger
                       id="categoryId"
                       className="rounded-none border-zinc-200 text-xs"
@@ -349,12 +356,35 @@ export default function ProviderDashboard({
                 </div>
                 <div className="space-y-1.5">
                   <Label
+                    htmlFor="condition"
+                    className="text-xs font-mono uppercase text-zinc-700"
+                  >
+                    Gear Condition
+                  </Label>
+                  <Select value={condition} onValueChange={(value) => setCondition(value as GearConditionType)}>
+                    <SelectTrigger
+                      id="condition"
+                      className="rounded-none border-zinc-200 text-xs"
+                    >
+                      <SelectValue placeholder="Select condition" />
+                    </SelectTrigger>
+                    <SelectContent className="rounded-none border-zinc-200 text-xs">
+                      {Object.values(GearCondition).map((value) => (
+                        <SelectItem key={value} value={value} className="rounded-none text-xs">
+                          {value.replaceAll("_", " ")}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-1.5">
+                  <Label
                     htmlFor="status"
                     className="text-xs font-mono uppercase text-zinc-700"
                   >
                     Listing Status
                   </Label>
-                  <Select value={status} onValueChange={setStatus}>
+                  <Select value={status} onValueChange={(value) => setStatus(value as GearStatusType)}>
                     <SelectTrigger
                       id="status"
                       className="rounded-none border-zinc-200 text-xs"
@@ -362,24 +392,11 @@ export default function ProviderDashboard({
                       <SelectValue placeholder="Select status" />
                     </SelectTrigger>
                     <SelectContent className="rounded-none border-zinc-200 text-xs">
-                      <SelectItem
-                        value="AVAILABLE"
-                        className="rounded-none text-xs"
-                      >
-                        AVAILABLE
-                      </SelectItem>
-                      <SelectItem
-                        value="MAINTENANCE"
-                        className="rounded-none text-xs"
-                      >
-                        MAINTENANCE
-                      </SelectItem>
-                      <SelectItem
-                        value="UNAVAILABLE"
-                        className="rounded-none text-xs"
-                      >
-                        UNAVAILABLE
-                      </SelectItem>
+                      {Object.values(GearStatus).map((value) => (
+                        <SelectItem key={value} value={value} className="rounded-none text-xs">
+                          {value.replaceAll("_", " ")}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
@@ -396,6 +413,7 @@ export default function ProviderDashboard({
                   </Label>
                   <Input
                     id="pricePerDay"
+                    name="pricePerDay"
                     type="number"
                     value={pricePerDay}
                     onChange={(e) =>
@@ -417,6 +435,7 @@ export default function ProviderDashboard({
                   </Label>
                   <Input
                     id="securityDeposit"
+                    name="securityDeposit"
                     type="number"
                     value={securityDeposit}
                     onChange={(e) =>
@@ -438,6 +457,7 @@ export default function ProviderDashboard({
                   </Label>
                   <Input
                     id="quantity"
+                    name="quantity"
                     type="number"
                     value={quantity}
                     onChange={(e) =>
@@ -462,6 +482,7 @@ export default function ProviderDashboard({
                 </Label>
                 <Textarea
                   id="description"
+                  name="description"
                   rows={3}
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
@@ -470,6 +491,23 @@ export default function ProviderDashboard({
                   required
                 />
               </div>
+
+              {/* Values submitted with the Server Action */}
+              <input type="hidden" name="condition" value={condition} />
+              <input type="hidden" name="status" value={status} />
+              <input
+                type="hidden"
+                name="specifications"
+                value={JSON.stringify(
+                  specifications.reduce(
+                    (acc, curr) => {
+                      acc[curr.key] = curr.value;
+                      return acc;
+                    },
+                    {} as Record<string, string>,
+                  ),
+                )}
+              />
 
               {/* Image Upload */}
               <div className="space-y-3 border-t border-zinc-100 pt-4">
@@ -574,13 +612,26 @@ export default function ProviderDashboard({
                 </div>
               </div>
 
+              {actionState.message && (
+                <p
+                  role="status"
+                  aria-live="polite"
+                  className={`text-xs font-mono ${
+                    actionState.success ? "text-emerald-700" : "text-red-600"
+                  }`}
+                >
+                  {actionState.message}
+                </p>
+              )}
+
               {/* Form Action */}
               <div className="flex justify-end pt-4 border-t border-zinc-100">
                 <button
                   type="submit"
-                  className="rounded-none bg-zinc-900 px-8 py-3 text-xs font-mono uppercase tracking-wider text-white hover:bg-zinc-800 transition-colors"
+                  disabled={isPending || !categoryId}
+                  className="rounded-none bg-zinc-900 px-8 py-3 text-xs font-mono uppercase tracking-wider text-white hover:bg-zinc-800 transition-colors disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  Publish Listing Payload
+                  {isPending ? "Uploading & Publishing..." : "Publish Listing"}
                 </button>
               </div>
             </form>
