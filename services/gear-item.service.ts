@@ -238,7 +238,12 @@ export const updateGearItem = async (
       };
     }
 
-    const gearId = getFormString(formData, "gearId");
+    const getString = (key: string) => {
+      const value = formData.get(key);
+      return typeof value === "string" ? value.trim() : "";
+    };
+
+    const gearId = getString("gearId");
 
     if (!gearId) {
       return {
@@ -254,22 +259,26 @@ export const updateGearItem = async (
       throw new Error("ImageBB API key is missing.");
     }
 
-    // Keep existing images.
+    // Parse images that the user wants to keep.
     let existingImages: string[];
 
     try {
-      const parsedImages = JSON.parse(
-        getFormString(formData, "existingImages") || "[]",
+      const parsed = JSON.parse(
+        getString("existingImages") || "[]",
       );
 
       if (
-        !Array.isArray(parsedImages) ||
-        !parsedImages.every((image) => typeof image === "string")
+        !Array.isArray(parsed) ||
+        !parsed.every(
+          (image) =>
+            typeof image === "string" &&
+            image.trim().length > 0,
+        )
       ) {
-        throw new Error("Invalid images.");
+        throw new Error("Invalid image array.");
       }
 
-      existingImages = parsedImages;
+      existingImages = parsed;
     } catch {
       return {
         success: false,
@@ -277,10 +286,13 @@ export const updateGearItem = async (
       };
     }
 
-    // Upload newly selected images.
+    // Upload newly selected images to ImageBB.
     const imageFiles = formData
       .getAll("images")
-      .filter((item): item is File => item instanceof File && item.size > 0);
+      .filter(
+        (item): item is File =>
+          item instanceof File && item.size > 0,
+      );
 
     const newImageUrls = await Promise.all(
       imageFiles.map(async (file) => {
@@ -295,19 +307,22 @@ export const updateGearItem = async (
           },
         );
 
-        const imageResult = await imageResponse.json().catch(() => null);
+        const imageResult = await imageResponse
+          .json()
+          .catch(() => null);
 
         if (!imageResponse.ok || !imageResult?.success) {
           throw new Error(
             imageResult?.error?.message ||
-              `ImageBB upload failed for ${file.name}.`,
+              `Image upload failed: ${file.name}`,
           );
         }
 
         const imageUrl =
-          imageResult?.data?.display_url || imageResult?.data?.url;
+          imageResult?.data?.display_url ||
+          imageResult?.data?.url;
 
-        if (!imageUrl || typeof imageUrl !== "string") {
+        if (typeof imageUrl !== "string" || !imageUrl) {
           throw new Error(
             `ImageBB did not return a valid URL for ${file.name}.`,
           );
@@ -317,25 +332,29 @@ export const updateGearItem = async (
       }),
     );
 
-    // Existing images + newly uploaded images.
+    // Keep remaining existing images and add newly uploaded images.
     const images = [...existingImages, ...newImageUrls];
 
+    // Parse technical specifications.
     let specifications: Record<string, string>;
 
     try {
-      const parsedSpecifications = JSON.parse(
-        getFormString(formData, "specifications") || "{}",
+      const parsed = JSON.parse(
+        getString("specifications") || "{}",
       );
 
       if (
-        !parsedSpecifications ||
-        typeof parsedSpecifications !== "object" ||
-        Array.isArray(parsedSpecifications)
+        !parsed ||
+        typeof parsed !== "object" ||
+        Array.isArray(parsed) ||
+        !Object.values(parsed).every(
+          (value) => typeof value === "string",
+        )
       ) {
         throw new Error("Invalid specifications.");
       }
 
-      specifications = parsedSpecifications as Record<string, string>;
+      specifications = parsed as Record<string, string>;
     } catch {
       return {
         success: false,
@@ -343,20 +362,30 @@ export const updateGearItem = async (
       };
     }
 
+    // Build the update payload.
+    const pricePerDay = Number(getString("pricePerDay"));
+    const quantity = Number(getString("quantity"));
+
+    const depositValue = getString("securityDeposit");
+
+    const securityDeposit =
+      depositValue === "" ? null : Number(depositValue);
+
     const gearData = {
-      name: getFormString(formData, "name"),
-      description: getFormString(formData, "description"),
-      brand: getFormString(formData, "brand"),
-      categoryId: getFormString(formData, "categoryId"),
-      condition: getFormString(formData, "condition"),
-      pricePerDay: Number(getFormString(formData, "pricePerDay")),
-      securityDeposit: Number(getFormString(formData, "securityDeposit")),
-      quantity: Number(getFormString(formData, "quantity")),
-      status: getFormString(formData, "status"),
+      name: getString("name"),
+      description: getString("description"),
+      brand: getString("brand"),
+      categoryId: getString("categoryId"),
+      condition: getString("condition"),
+      pricePerDay,
+      securityDeposit,
+      quantity,
+      status: getString("status"),
       images,
       specifications,
     };
 
+    // Required field validation.
     if (
       !gearData.name ||
       !gearData.description ||
@@ -371,25 +400,26 @@ export const updateGearItem = async (
       };
     }
 
-    const allowedConditions = ["NEW", "LIKE_NEW", "GOOD", "FAIR"] as const;
-    const allowedStatuses = ["AVAILABLE", "NOT_AVAILABLE"] as const;
+    const allowedConditions = [
+      "NEW",
+      "LIKE_NEW",
+      "GOOD",
+      "FAIR",
+    ];
 
-    if (
-      !allowedConditions.includes(
-        gearData.condition as (typeof allowedConditions)[number],
-      )
-    ) {
+    const allowedStatuses = [
+      "AVAILABLE",
+      "NOT_AVAILABLE",
+    ];
+
+    if (!allowedConditions.includes(gearData.condition)) {
       return {
         success: false,
         message: "Invalid gear condition.",
       };
     }
 
-    if (
-      !allowedStatuses.includes(
-        gearData.status as (typeof allowedStatuses)[number],
-      )
-    ) {
+    if (!allowedStatuses.includes(gearData.status)) {
       return {
         success: false,
         message: "Invalid gear status.",
@@ -397,16 +427,18 @@ export const updateGearItem = async (
     }
 
     if (
-      !Number.isFinite(gearData.pricePerDay) ||
-      gearData.pricePerDay <= 0 ||
-      !Number.isFinite(gearData.securityDeposit) ||
-      gearData.securityDeposit < 0 ||
-      !Number.isInteger(gearData.quantity) ||
-      gearData.quantity < 1
+      !Number.isFinite(pricePerDay) ||
+      pricePerDay <= 0 ||
+      (securityDeposit !== null &&
+        (!Number.isFinite(securityDeposit) ||
+          securityDeposit < 0)) ||
+      !Number.isInteger(quantity) ||
+      quantity < 0
     ) {
       return {
         success: false,
-        message: "Please provide valid price, deposit, and quantity values.",
+        message:
+          "Please provide valid price, deposit, and quantity values.",
       };
     }
 
@@ -416,10 +448,11 @@ export const updateGearItem = async (
       throw new Error("BACKEND_API_URL is not configured.");
     }
 
+    // Send PATCH request to your backend.
     const response = await fetch(
-      `${backendUrl}/api/gear-items/${gearId}`,
+      `${backendUrl}/api/provider/gear/${encodeURIComponent(gearId)}`,
       {
-        method: "PATCH",
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${accessToken}`,
@@ -431,16 +464,18 @@ export const updateGearItem = async (
 
     const result = await response.json().catch(() => null);
 
-    if (!response.ok) {
+    if (!response.ok || result?.success === false) {
       return {
         success: false,
-        message: result?.message || "Failed to update gear item.",
+        message:
+          result?.message || "Failed to update gear item.",
       };
     }
 
     return {
       success: true,
-      message: result?.message || "Gear item updated successfully!",
+      message:
+        result?.message || "Gear item updated successfully!",
     };
   } catch (error) {
     console.error("Error in updateGearItem Server Action:", error);

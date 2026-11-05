@@ -4,6 +4,7 @@ import { getAllGearItems } from "@/services/gear-item.service";
 import { getMe } from "@/services/getMe";
 import ProviderDashboard from "./ProviderDashboard";
 
+
 export interface Category {
   id: string;
   name: string;

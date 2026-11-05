@@ -37,8 +37,10 @@ import {
   TableBody,
   TableCell,
 } from "@/components/ui/table";
+import { useRouter } from "next/navigation";
 import { Category } from "./page";
-import { addGearItem, AddGearState } from "@/services/gear-item.service";
+import { addGearItem, updateGearItem, AddGearState } from "@/services/gear-item.service";
+import { toast } from "sonner";
 
 // Backend enums
 const GearCondition = {
@@ -59,13 +61,22 @@ const GearStatus = {
 type GearStatusType =
   (typeof GearStatus)[keyof typeof GearStatus];
 
-// Category is returned as a relation object from the backend.
+// Full gear item shape returned by the backend. Prisma Decimal values may
+// arrive as strings depending on the API serializer.
 interface GearItem {
   id: string;
   name: string;
+  description?: string;
+  brand?: string;
   category: Pick<Category, "id" | "name">;
-  pricePerDay: number;
+  categoryId?: string;
+  pricePerDay: number | string;
+  securityDeposit?: number | string | null;
   quantity: number;
+  condition?: GearConditionType;
+  status?: GearStatusType;
+  images?: string[];
+  specifications?: Record<string, string>;
   providerId: string;
 }
 
@@ -104,6 +115,7 @@ export default function ProviderDashboard({
   gearItems,
   currentUserId,
 }: ProviderDashboardProps) {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<"gear" | "orders">("gear");
 
   const initialActionState: AddGearState = {
@@ -115,6 +127,13 @@ export default function ProviderDashboard({
     addGearItem,
     initialActionState,
   );
+
+  // Show a toast when a gear item is added successfully.
+  useEffect(() => {
+    if (actionState.success && actionState.message) {
+      toast.success(actionState.message);
+    }
+  }, [actionState]);
 
   // Add Gear Form State
   const [gearName, setGearName] = useState("");
@@ -176,6 +195,28 @@ export default function ProviderDashboard({
 
   const [selectedInvoice, setSelectedInvoice] =
     useState<RentalOrder | null>(null);
+
+  // Edit Gear Modal State
+  const [editingItem, setEditingItem] = useState<GearItem | null>(null);
+  const [editForm, setEditForm] = useState({
+    name: "",
+    description: "",
+    brand: "",
+    categoryId: "",
+    condition: GearCondition.GOOD as GearConditionType,
+    pricePerDay: "",
+    securityDeposit: "",
+    quantity: "",
+    status: GearStatus.AVAILABLE as GearStatusType,
+  });
+  const [editExistingImages, setEditExistingImages] = useState<string[]>([]);
+  const [editImageFiles, setEditImageFiles] = useState<File[]>([]);
+  const [editSpecifications, setEditSpecifications] = useState<Specification[]>([]);
+  const [editSpecKey, setEditSpecKey] = useState("");
+  const [editSpecValue, setEditSpecValue] = useState("");
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [editMessage, setEditMessage] = useState("");
+  const [editSuccess, setEditSuccess] = useState(false);
 
   // Filter gear items belonging to the current provider
   const myGearItems = useMemo(() => {
@@ -277,6 +318,141 @@ export default function ProviderDashboard({
     }
   };
 
+  // Open the edit modal and populate it with the selected gear item.
+  const handleOpenEdit = (item: GearItem) => {
+    setEditingItem(item);
+    setEditForm({
+      name: item.name ?? "",
+      description: item.description ?? "",
+      brand: item.brand ?? "",
+      categoryId: item.category?.id ?? item.categoryId ?? "",
+      condition: item.condition ?? GearCondition.GOOD,
+      pricePerDay: String(item.pricePerDay ?? ""),
+      securityDeposit: item.securityDeposit == null ? "" : String(item.securityDeposit),
+      quantity: String(item.quantity ?? 0),
+      status: item.status ?? GearStatus.AVAILABLE,
+    });
+    setEditExistingImages(Array.isArray(item.images) ? [...item.images] : []);
+    setEditImageFiles([]);
+    setEditSpecifications(
+      Object.entries(item.specifications ?? {}).map(([key, value]) => ({ key, value })),
+    );
+    setEditSpecKey("");
+    setEditSpecValue("");
+    setEditMessage("");
+    setEditSuccess(false);
+  };
+
+  const handleEditFieldChange = (
+    field: keyof typeof editForm,
+    value: string,
+  ) => {
+    setEditForm((prev) => ({ ...prev, [field]: value } as typeof editForm));
+  };
+
+  const handleEditImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selected = Array.from(e.target.files ?? []);
+    setEditImageFiles((prev) => [...prev, ...selected]);
+    e.target.value = "";
+  };
+
+  const handleAddEditSpec = () => {
+    const key = editSpecKey.trim();
+    const value = editSpecValue.trim();
+    if (!key || !value) return;
+    if (editSpecifications.some((spec) => spec.key.toLowerCase() === key.toLowerCase())) {
+      setEditMessage("A specification with this key already exists.");
+      setEditSuccess(false);
+      return;
+    }
+    setEditSpecifications((prev) => [...prev, { key, value }]);
+    setEditSpecKey("");
+    setEditSpecValue("");
+  };
+
+  const handleEditSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!editingItem) return;
+
+    const price = Number(editForm.pricePerDay);
+    const deposit = editForm.securityDeposit.trim() === "" ? null : Number(editForm.securityDeposit);
+    const stock = Number(editForm.quantity);
+
+    if (!editForm.name.trim() || !editForm.description.trim() || !editForm.brand.trim() || !editForm.categoryId) {
+      setEditMessage("Please complete all required fields.");
+      setEditSuccess(false);
+      return;
+    }
+    if (!Number.isFinite(price) || price <= 0) {
+      setEditMessage("Price per day must be greater than 0.");
+      setEditSuccess(false);
+      return;
+    }
+    if (deposit !== null && (!Number.isFinite(deposit) || deposit < 0)) {
+      setEditMessage("Security deposit must be 0 or greater.");
+      setEditSuccess(false);
+      return;
+    }
+    if (!Number.isInteger(stock) || stock < 0) {
+      setEditMessage("Quantity must be a non-negative whole number.");
+      setEditSuccess(false);
+      return;
+    }
+
+    const specificationsObject = Object.fromEntries(
+      editSpecifications.map(({ key, value }) => [key, value]),
+    ) as Record<string, string>;
+
+    const formData = new FormData();
+    formData.set("gearId", editingItem.id);
+    formData.set("name", editForm.name.trim());
+    formData.set("description", editForm.description.trim());
+    formData.set("brand", editForm.brand.trim());
+    formData.set("categoryId", editForm.categoryId);
+    formData.set("condition", editForm.condition);
+    formData.set("pricePerDay", String(price));
+    formData.set("securityDeposit", deposit === null ? "" : String(deposit));
+    formData.set("quantity", String(stock));
+    formData.set("status", editForm.status);
+    formData.set("existingImages", JSON.stringify(editExistingImages));
+    formData.set("specifications", JSON.stringify(specificationsObject));
+    editImageFiles.forEach((file) => formData.append("images", file));
+
+    setIsUpdating(true);
+    setEditMessage("");
+    try {
+      const result = await updateGearItem({ success: false, message: "" }, formData);
+      setEditMessage(result.message);
+      setEditSuccess(result.success);
+      if (result.success) {
+        toast.success(result.message || "Gear item updated successfully!");
+        setInventory((prev) =>
+          prev.map((item) =>
+            item.id === editingItem.id
+              ? {
+                  ...item,
+                  ...editForm,
+                  pricePerDay: price,
+                  securityDeposit: deposit,
+                  quantity: stock,
+                  category: categories.find((category) => category.id === editForm.categoryId) ?? item.category,
+                  images: [...editExistingImages],
+                  specifications: specificationsObject,
+                }
+              : item,
+          ),
+        );
+        setEditingItem(null);
+        router.refresh();
+      }
+    } catch (error) {
+      setEditMessage(error instanceof Error ? error.message : "Failed to update gear item.");
+      setEditSuccess(false);
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
   // Rental Order Status Handler
   const handleStatusUpdate = (
     orderId: string,
@@ -332,9 +508,9 @@ export default function ProviderDashboard({
 
       {/* TAB 1: GEAR MANAGEMENT */}
       {activeTab === "gear" && (
-        <div className="space-y-12">
+  <div className="w-full max-w-[1340px] mx-auto space-y-6">
           {/* Add New Gear Form */}
-          <div className="border border-zinc-200 bg-white p-8 rounded-none shadow-xs">
+          <div className="min-w-0 border border-zinc-200 bg-white p-5 sm:p-6 lg:p-8 rounded-none shadow-sm">
             <div className="mb-6 border-b border-zinc-100 pb-4">
               <h2 className="text-sm font-mono uppercase tracking-tight text-zinc-900 flex items-center gap-2">
                 <Plus className="h-4 w-4" />
@@ -352,7 +528,7 @@ export default function ProviderDashboard({
               className="space-y-6"
             >
               {/* Core Information */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-3 gap-4 lg:gap-5">
                 <div className="md:col-span-2 space-y-1.5">
                   <Label
                     htmlFor="name"
@@ -393,7 +569,7 @@ export default function ProviderDashboard({
               </div>
 
               {/* Category, Condition, Status */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-3 gap-4 lg:gap-5">
                 <div className="space-y-1.5">
                   <Label
                     htmlFor="categoryId"
@@ -500,7 +676,7 @@ export default function ProviderDashboard({
               </div>
 
               {/* Pricing & Stock */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-3 gap-4 lg:gap-5">
                 <div className="space-y-1.5">
                   <Label
                     htmlFor="pricePerDay"
@@ -773,7 +949,7 @@ export default function ProviderDashboard({
           </div>
 
           {/* Inventory Table */}
-          <div className="border border-zinc-200 bg-white p-8 rounded-none shadow-xs">
+          <div className="w-full min-w-0 border border-zinc-200 bg-white p-5 sm:p-6 lg:p-6 2xl:p-8 rounded-none shadow-sm">
             <div className="mb-6 flex items-center justify-between border-b border-zinc-100 pb-4">
               <div>
                 <h2 className="text-sm font-mono uppercase tracking-tight text-zinc-900">
@@ -790,8 +966,8 @@ export default function ProviderDashboard({
               </span>
             </div>
 
-            <div className="overflow-x-auto">
-              <Table>
+            <div className="w-full overflow-x-auto">
+              <Table className="min-w-[620px]">
                 <TableHeader>
                   <TableRow className="border-zinc-200 hover:bg-transparent">
                     <TableHead className="text-xs font-mono uppercase text-zinc-500">
@@ -852,6 +1028,7 @@ export default function ProviderDashboard({
                         <Button
                           variant="ghost"
                           size="sm"
+                          onClick={() => handleOpenEdit(item)}
                           className="h-7 text-xs rounded-none hover:bg-zinc-100 font-mono"
                         >
                           Edit
@@ -1168,6 +1345,127 @@ export default function ProviderDashboard({
                 Close Receipt
               </Button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* EDIT GEAR MODAL */}
+      {editingItem && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-zinc-950/60 backdrop-blur-sm p-4">
+          <div className="w-full max-w-3xl max-h-[90vh] overflow-y-auto border border-zinc-200 bg-white p-5 sm:p-7 shadow-2xl">
+            <div className="flex items-center justify-between border-b border-zinc-100 pb-4 mb-5">
+              <div>
+                <span className="text-[10px] font-mono uppercase tracking-widest text-zinc-400">[ Inventory Management ]</span>
+                <h2 className="text-lg font-semibold text-zinc-900">Edit Gear Item</h2>
+                <p className="text-xs text-zinc-500 mt-1">Update listing details, images, stock, and specifications.</p>
+              </div>
+              <button type="button" onClick={() => setEditingItem(null)} className="text-zinc-400 hover:text-zinc-900" aria-label="Close edit modal">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleEditSubmit} className="space-y-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <Label htmlFor="edit-name">Gear Name</Label>
+                  <Input id="edit-name" value={editForm.name} onChange={(e) => handleEditFieldChange("name", e.target.value)} required />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="edit-brand">Brand</Label>
+                  <Input id="edit-brand" value={editForm.brand} onChange={(e) => handleEditFieldChange("brand", e.target.value)} required />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>Category</Label>
+                  <Select value={editForm.categoryId} onValueChange={(value) => handleEditFieldChange("categoryId", value)}>
+                    <SelectTrigger><SelectValue placeholder="Select category" /></SelectTrigger>
+                    <SelectContent>{categories.map((category) => <SelectItem key={category.id} value={category.id}>{category.name}</SelectItem>)}</SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-1.5">
+                  <Label>Condition</Label>
+                  <Select value={editForm.condition} onValueChange={(value) => handleEditFieldChange("condition", value)}>
+                    <SelectTrigger><SelectValue placeholder="Select condition" /></SelectTrigger>
+                    <SelectContent>{Object.values(GearCondition).map((value) => <SelectItem key={value} value={value}>{value.replaceAll("_", " ")}</SelectItem>)}</SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="edit-price">Price Per Day (৳)</Label>
+                  <Input id="edit-price" type="number" min="0.01" step="any" value={editForm.pricePerDay} onChange={(e) => handleEditFieldChange("pricePerDay", e.target.value)} required />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="edit-deposit">Security Deposit (৳)</Label>
+                  <Input id="edit-deposit" type="number" min="0" step="any" value={editForm.securityDeposit} onChange={(e) => handleEditFieldChange("securityDeposit", e.target.value)} placeholder="Leave empty for no deposit" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="edit-quantity">Quantity</Label>
+                  <Input id="edit-quantity" type="number" min="0" step="1" value={editForm.quantity} onChange={(e) => handleEditFieldChange("quantity", e.target.value)} required />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>Status</Label>
+                  <Select value={editForm.status} onValueChange={(value) => handleEditFieldChange("status", value)}>
+                    <SelectTrigger><SelectValue placeholder="Select status" /></SelectTrigger>
+                    <SelectContent>{Object.values(GearStatus).map((value) => <SelectItem key={value} value={value}>{value.replaceAll("_", " ")}</SelectItem>)}</SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <Label htmlFor="edit-description">Description</Label>
+                <Textarea id="edit-description" rows={4} value={editForm.description} onChange={(e) => handleEditFieldChange("description", e.target.value)} required />
+              </div>
+
+              <div className="space-y-3 border-t border-zinc-100 pt-4">
+                <Label className="flex items-center gap-2"><ImageIcon className="h-4 w-4" /> Existing Images</Label>
+                {editExistingImages.length === 0 ? (
+                  <p className="text-xs text-zinc-500">No existing images. Add new images below if needed.</p>
+                ) : (
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    {editExistingImages.map((src, index) => (
+                      <div key={`${src}-${index}`} className="relative border border-zinc-200">
+                        <img src={src} alt={`Gear image ${index + 1}`} className="h-28 w-full object-cover" />
+                        <button type="button" onClick={() => setEditExistingImages((prev) => prev.filter((_, i) => i !== index))} className="absolute top-1 right-1 bg-white border p-1 text-red-600" aria-label="Remove existing image"><X className="h-3.5 w-3.5" /></button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <Label htmlFor="edit-images">Add New Images</Label>
+                <Input id="edit-images" type="file" accept="image/*" multiple onChange={handleEditImageSelect} />
+                {editImageFiles.length > 0 && (
+                  <ul className="space-y-1">
+                    {editImageFiles.map((file, index) => (
+                      <li key={`${file.name}-${index}`} className="flex items-center justify-between text-xs border px-2 py-1">
+                        <span className="truncate">{file.name}</span>
+                        <button type="button" onClick={() => setEditImageFiles((prev) => prev.filter((_, i) => i !== index))} className="text-red-600 ml-3">Remove</button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+
+              <div className="space-y-3 border-t border-zinc-100 pt-4">
+                <Label className="flex items-center gap-2"><Layers className="h-4 w-4" /> Technical Specifications</Label>
+                <div className="grid grid-cols-1 sm:grid-cols-[1fr_1fr_auto] gap-2">
+                  <Input placeholder="Specification key" value={editSpecKey} onChange={(e) => setEditSpecKey(e.target.value)} />
+                  <Input placeholder="Specification value" value={editSpecValue} onChange={(e) => setEditSpecValue(e.target.value)} />
+                  <Button type="button" variant="outline" onClick={handleAddEditSpec}>Add</Button>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {editSpecifications.map((spec, index) => (
+                    <div key={`${spec.key}-${index}`} className="flex items-center justify-between gap-2 border bg-zinc-50 px-3 py-2 text-xs">
+                      <span className="min-w-0 truncate"><strong>{spec.key}:</strong> {spec.value}</span>
+                      <button type="button" onClick={() => setEditSpecifications((prev) => prev.filter((_, i) => i !== index))} className="text-red-600" aria-label={`Remove ${spec.key}`}><Trash2 className="h-3.5 w-3.5" /></button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {editMessage && <p role="status" aria-live="polite" className={`text-xs ${editSuccess ? "text-emerald-700" : "text-red-600"}`}>{editMessage}</p>}
+
+              <div className="flex justify-end gap-2 border-t border-zinc-100 pt-4">
+                <Button type="button" variant="outline" onClick={() => setEditingItem(null)} disabled={isUpdating}>Cancel</Button>
+                <Button type="submit" disabled={isUpdating}>{isUpdating ? "Saving Changes..." : "Save Changes"}</Button>
+              </div>
+            </form>
           </div>
         </div>
       )}
