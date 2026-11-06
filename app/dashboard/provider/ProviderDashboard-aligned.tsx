@@ -44,6 +44,7 @@ import {
   deleteGearItem,
   restockGearItem,
 } from "@/services/gear-item.service";
+import { updateRentalOrderStatusAction } from "@/services/provider.service";
 import { toast } from "sonner";
 import { useRouter, useSearchParams } from "next/navigation";
 import { RentalOrder } from "@/services/provider.service";
@@ -62,6 +63,8 @@ const GearStatus = {
   AVAILABLE: "AVAILABLE",
   NOT_AVAILABLE: "NOT_AVAILABLE",
 } as const;
+
+const STATUS_FLOW = ["PLACED", "CONFIRMED", "PICKED_UP", "RETURNED"];
 
 type GearStatusType = (typeof GearStatus)[keyof typeof GearStatus];
 
@@ -203,8 +206,16 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
   const [selectedInvoice, setSelectedInvoice] = useState<RentalOrder | null>(
     null,
   );
+  const [tempStatus, setTempStatus] = useState<string>("");
+  const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
+  const [showStatusError, setShowStatusError] = useState(false);
 
-  // Edit Gear Modal State
+  // Initialize tempStatus when invoice is opened
+  useEffect(() => {
+    if (selectedInvoice) {
+      setTempStatus(selectedInvoice.status);
+    }
+  }, [selectedInvoice]);
   const [editingItem, setEditingItem] = useState<GearItem | null>(null);
   const [editForm, setEditForm] = useState({
     name: "",
@@ -466,12 +477,63 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
   };
 
   // Rental Order Status Handler
-  const handleStatusUpdate = (
+  const handleStatusUpdate = async (
     orderId: string,
     newStatus: string,
   ) => {
-    // Assuming local state update for now as per previous implementation
-    console.log(`Updating status for ${orderId} to ${newStatus}`);
+    try {
+      toast.loading("Updating order status...");
+      
+      const result = await updateRentalOrderStatusAction(orderId, newStatus);
+      
+      if (result.success) {
+        toast.success("Status Updated", {
+          description: result.message,
+        });
+        router.refresh();
+      } else {
+        toast.error("Update Failed", {
+          description: result.message,
+        });
+      }
+    } catch (error) {
+      toast.error("An error occurred while updating status.");
+    } finally {
+      toast.dismiss();
+    }
+  };
+
+  // Save status update with dedicated button
+  const handleSaveStatusUpdate = async (orderId: string, status: string) => {
+    if (!status) {
+      toast.error("Please select a status");
+      return;
+    }
+    setIsUpdatingStatus(true);
+    
+    try {
+      toast.loading("Saving status update...");
+      
+      const result = await updateRentalOrderStatusAction(orderId, status);
+      
+      if (result.success) {
+        toast.success("Status Updated", {
+          description: result.message,
+        });
+        router.refresh();
+        // Update local state to avoid reopening modal
+        setSelectedInvoice(prev => prev ? { ...prev, status } : null);
+      } else {
+        toast.error("Update Failed", {
+          description: result.message,
+        });
+      }
+    } catch (error) {
+      toast.error("An error occurred while updating status.");
+    } finally {
+      toast.dismiss();
+      setIsUpdatingStatus(false);
+    }
   };
 
   const handleRestockSubmit = async (e: React.FormEvent) => {
@@ -1317,53 +1379,67 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
                   Update Status:
                 </span>
 
-                <Select
-                  value={selectedInvoice.status}
-                  onValueChange={(val) =>
-                    handleStatusUpdate(
-                      selectedInvoice.id,
-                      val as any,
-                    )
-                  }
-                >
-                  <SelectTrigger className="h-7 w-[130px] text-xs rounded-none border-zinc-300 bg-white font-mono">
-                    <SelectValue placeholder="Status" />
-                  </SelectTrigger>
+                <div className="flex items-center gap-2">
+                  <Select
+                    value={tempStatus}
+                    onValueChange={(val) => {
+                      setTempStatus(val);
+                      setShowStatusError(false);
+                    }}
+                  >
+                    <SelectTrigger className="h-7 w-[130px] text-xs rounded-none border-zinc-300 bg-white font-mono">
+                      <SelectValue placeholder="Status" />
+                    </SelectTrigger>
 
-                  <SelectContent className="rounded-none border-zinc-300 text-xs font-mono">
-                    <SelectItem value="PLACED" className="rounded-none text-xs">
-                      PLACED
-                    </SelectItem>
+                    <SelectContent className="rounded-none border-zinc-300 text-xs font-mono">
+                      {STATUS_FLOW.map((statusOption) => {
+                        const currentIndex = STATUS_FLOW.indexOf(selectedInvoice.status);
+                        const optionIndex = STATUS_FLOW.indexOf(statusOption);
+                        const isDisabled =
+                          optionIndex < currentIndex &&
+                          selectedInvoice.status !== "CANCELLED";
 
-                    <SelectItem
-                      value="CONFIRMED"
-                      className="rounded-none text-xs"
-                    >
-                      CONFIRMED
-                    </SelectItem>
+                        return (
+                          <SelectItem
+                            key={statusOption}
+                            value={statusOption}
+                            className="rounded-none text-xs"
+                            disabled={isDisabled}
+                          >
+                            {statusOption.replaceAll("_", " ")}
+                          </SelectItem>
+                        );
+                      })}
 
-                    <SelectItem
-                      value="PICKED_UP"
-                      className="rounded-none text-xs"
-                    >
-                      PICKED UP
-                    </SelectItem>
+                      <SelectItem
+                        value="CANCELLED"
+                        className="rounded-none text-xs text-red-600"
+                        disabled={
+                          selectedInvoice.status === "RETURNED" ||
+                          selectedInvoice.status === "PICKED_UP"
+                        }
+                      >
+                        CANCELLED
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
 
-                    <SelectItem
-                      value="RETURNED"
-                      className="rounded-none text-xs"
-                    >
-                      RETURNED
-                    </SelectItem>
+                  <Button
+                    onClick={() => handleSaveStatusUpdate(selectedInvoice.id, tempStatus)}
+                    className="rounded-none bg-zinc-900 text-white hover:bg-zinc-800 text-xs h-7 px-4 font-mono"
+                    disabled={isUpdatingStatus}
+                  >
+                    {isUpdatingStatus ? "Saving..." : "Save Changes"}
+                  </Button>
+                </div>
 
-                    <SelectItem
-                      value="CANCELLED"
-                      className="rounded-none text-xs text-red-600"
-                    >
-                      CANCELLED
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
+                {showStatusError && (
+                  <p className="text-xs text-red-600 mt-1 ml-4">Please select a status</p>
+                )}
+
+                {showStatusError && (
+                  <p className="text-xs text-red-600 mt-1">Please select a status</p>
+                )}
               </div>
 
               <Button

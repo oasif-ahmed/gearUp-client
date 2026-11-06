@@ -1,5 +1,5 @@
 import React from "react";
-import { getCategories, getProviderRentalOrders } from "@/services/provider.service";
+import { getCategories, getProviderRentalOrders, updateRentalOrderStatusAction } from "@/services/provider.service";
 import { getAllGearItems } from "@/services/gear-item.service";
 import { getMe } from "@/services/getMe";
 import ProviderDashboard from "./ProviderDashboard-aligned";
@@ -42,3 +42,4 @@ const ProviderAsyncPage = async () => {
 };
 
 export default ProviderAsyncPage;
+ 
