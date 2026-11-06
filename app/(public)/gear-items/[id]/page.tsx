@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -9,11 +10,10 @@ import {
   ArrowLeft,
   ShieldCheck,
   Layers,
-  Sparkles,
-  Info,
   Calendar,
   PackageCheck,
   RotateCcw,
+  ShoppingCart,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -25,6 +25,7 @@ import {
   CardDescription,
   CardFooter,
 } from "@/components/ui/card";
+import { toast } from "sonner";
 import Loading from "../loading";
 
 export default function GearItemDetailsPage() {
@@ -35,6 +36,9 @@ export default function GearItemDetailsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedImage, setSelectedImage] = useState<string>("");
+
+  // Track how many units of this item are already in the cart
+  const [cartQuantity, setCartQuantity] = useState(0);
 
   useEffect(() => {
     if (!id) return;
@@ -61,12 +65,83 @@ export default function GearItemDetailsPage() {
             : "Failed to load gear item details",
         );
       } finally {
-        setLoading(false); // 👈 Correctly wrapped in finally block
+        setLoading(false);
       }
     }
 
     fetchItem();
   }, [id]);
+
+  // Read the current item's quantity from localStorage
+  useEffect(() => {
+    if (!gearItem?.id) return;
+
+    try {
+      const existingCart = JSON.parse(
+        localStorage.getItem("gearup_cart") || "[]",
+      );
+
+      const existingItem = Array.isArray(existingCart)
+        ? existingCart.find(
+            (item: any) => item.gearItemId === gearItem.id,
+          )
+        : null;
+
+      setCartQuantity(Number(existingItem?.quantity) || 0);
+    } catch {
+      setCartQuantity(0);
+    }
+  }, [gearItem?.id]);
+
+  // Handle adding item to client-side localStorage cart
+  const handleAddToCart = () => {
+    try {
+      const existingCart = JSON.parse(
+        localStorage.getItem("gearup_cart") || "[]",
+      );
+
+      if (!Array.isArray(existingCart)) {
+        toast.error("Invalid cart data. Please refresh the page.");
+        return;
+      }
+
+      const existingItem = existingCart.find(
+        (item: any) => item.gearItemId === gearItem.id,
+      );
+
+      const currentQuantity = Number(existingItem?.quantity) || 0;
+      const availableQuantity = Number(gearItem.quantity) || 0;
+
+      // Check whether the requested quantity exceeds inventory
+      if (
+        gearItem.status !== "AVAILABLE" ||
+        currentQuantity >= availableQuantity
+      ) {
+        toast.error("Not enough items available!");
+        return;
+      }
+
+      if (existingItem) {
+        existingItem.quantity = currentQuantity + 1;
+      } else {
+        existingCart.push({
+          gearItemId: gearItem.id,
+          quantity: 1,
+          startDate: "",
+          endDate: "",
+        });
+      }
+
+      localStorage.setItem("gearup_cart", JSON.stringify(existingCart));
+
+      // Update the displayed remaining inventory
+      setCartQuantity(currentQuantity + 1);
+
+      toast.success(`${gearItem.name} added to your rental cart!`);
+    } catch (err) {
+      toast.error("Failed to update cart storage.");
+    }
+  };
 
   if (loading) {
     return <Loading />;
@@ -102,8 +177,20 @@ export default function GearItemDetailsPage() {
 
   const images =
     gearItem.images?.length > 0 ? gearItem.images : [selectedImage];
+
   const specs = gearItem.specifications || {};
   const specEntries = Object.entries(specs);
+
+  // Calculate remaining inventory for this customer's cart
+  const availableQuantity = Number(gearItem.quantity) || 0;
+
+  const remainingQuantity = Math.max(
+    0,
+    availableQuantity - cartQuantity,
+  );
+
+  const isOutOfStock =
+    gearItem.status !== "AVAILABLE" || remainingQuantity <= 0;
 
   return (
     <div className="min-h-screen bg-[#FDFBF7] py-10 text-zinc-900">
@@ -129,7 +216,7 @@ export default function GearItemDetailsPage() {
       <div className="max-w-6xl mx-auto px-4 space-y-8">
         {/* Top Hero Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
-          {/* Left: Media Showcase (Set to flex and h-full to match right card) */}
+          {/* Left: Media Showcase */}
           <div className="lg:col-span-7 flex flex-col justify-between bg-white border border-zinc-200 p-6 shadow-xs">
             <div className="relative w-full flex-1 min-h-[380px] overflow-hidden bg-muted mb-4">
               <img
@@ -217,7 +304,7 @@ export default function GearItemDetailsPage() {
               <div className="flex justify-between items-center text-zinc-500 text-[11px] border-t border-zinc-200/60 pt-2">
                 <span>Inventory Status</span>
                 <span className="text-zinc-900 font-semibold">
-                  {gearItem.quantity} units in stock
+                  {remainingQuantity} units available
                 </span>
               </div>
             </div>
@@ -226,17 +313,17 @@ export default function GearItemDetailsPage() {
             <div className="space-y-2 pt-2">
               <Button
                 size="lg"
-                disabled={
-                  gearItem.status !== "AVAILABLE" || gearItem.quantity <= 0
-                }
-                className="w-full rounded-none bg-zinc-900 text-white hover:bg-zinc-800 text-xs font-mono uppercase tracking-wider h-11"
+                onClick={handleAddToCart}
+                disabled={isOutOfStock}
+                className="w-full rounded-none bg-zinc-900 text-white hover:bg-zinc-800 text-xs font-mono uppercase tracking-wider h-11 flex items-center justify-center gap-2"
               >
-                {gearItem.status === "AVAILABLE"
-                  ? `Book Rental — ৳{gearItem.pricePerDay}/Day`
-                  : "Currently Unavailable"}
+                <ShoppingCart className="h-4 w-4" />
+                {isOutOfStock
+                  ? "Out of Stock"
+                  : `Add to Cart — ৳${gearItem.pricePerDay}/Day`}
               </Button>
               <p className="text-[10px] font-mono text-zinc-400 text-center">
-                * Zero hidden fees. Deposit released upon return verification.
+                Zero hidden fees. Deposit released upon return verification.
               </p>
             </div>
           </div>
@@ -244,7 +331,7 @@ export default function GearItemDetailsPage() {
 
         {/* Bottom Section: Clean Technical Specs & Dynamic Policy Rules */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 pt-4">
-          {/* Dynamic Technical Specifications (Only renders if specs exist) */}
+          {/* Dynamic Technical Specifications */}
           <div className="md:col-span-7 bg-white border border-zinc-200 p-8 shadow-xs">
             <h2 className="text-xs font-mono uppercase tracking-widest text-zinc-900 font-semibold mb-6 flex items-center gap-2 border-b border-zinc-100 pb-3">
               <Layers className="h-4 w-4 text-zinc-700" /> Technical

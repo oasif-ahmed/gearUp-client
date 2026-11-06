@@ -53,6 +53,7 @@ const Navbar = ({ user }: NavbarProps) => {
   const userRole = user?.role?.toUpperCase();
   const isProvider = userRole === "PROVIDER";
   const isAdmin = userRole === "ADMIN";
+  const isCustomer = userRole === "CUSTOMER";
 
   return (
     <header className="sticky top-0 z-50 w-full px-4 pt-3 sm:px-6 lg:px-8">
@@ -157,12 +158,21 @@ const Navbar = ({ user }: NavbarProps) => {
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   
-                  {/* Conditionally render Provider Dashboard */}
                   {isProvider && (
                     <DropdownMenuItem asChild>
                       <Link href="/dashboard/provider" className="cursor-pointer text-xs rounded-none">
                         <LayoutDashboard className="mr-2 h-3.5 w-3.5 text-zinc-500" />
                         <span>Provider Dashboard</span>
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
+
+                  {/* Conditionally render Customer Cart */}
+                  {isCustomer && (
+                    <DropdownMenuItem asChild>
+                      <Link href="/customer-cart" className="cursor-pointer text-xs rounded-none">
+                        <LayoutDashboard className="mr-2 h-3.5 w-3.5 text-zinc-500" />
+                        <span>My Cart</span>
                       </Link>
                     </DropdownMenuItem>
                   )}
@@ -267,6 +277,15 @@ const Navbar = ({ user }: NavbarProps) => {
                       onClick={() => setIsOpen(false)}
                     >
                       Provider Dashboard
+                    </Link>
+                  )}
+                  {isCustomer && (
+                    <Link
+                      href="/customer-cart"
+                      className="inline-flex items-center justify-center rounded-none border border-zinc-200 px-3 py-1.5 text-xs font-medium text-zinc-900 hover:bg-zinc-50"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      My Cart
                     </Link>
                   )}
                   {isAdmin && (

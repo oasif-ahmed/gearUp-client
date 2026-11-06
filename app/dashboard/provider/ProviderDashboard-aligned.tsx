@@ -110,7 +110,9 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
 
   useEffect(() => {
     if (orderIdFromUrl && rentalOrders) {
-      const order = rentalOrders.find((o) => o.id === orderIdFromUrl);
+      const order = [...rentalOrders]
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+        .find((o) => o.id === orderIdFromUrl);
       if (order) {
         setSelectedInvoice(order);
         setActiveTab("orders");
@@ -1174,7 +1176,9 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {rentalOrders.map((ord) => (
+              {[...rentalOrders]
+                .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+                .map((ord) => (
                 <div
                   key={ord.id}
                   onClick={() => {
