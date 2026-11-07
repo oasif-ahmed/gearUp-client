@@ -42,15 +42,27 @@ export default function AdminDashboard({
   rentalOrders: any;
   categories: any;
   onUpdateUserStatus?: (userId: string, activeStatus: string) => Promise<any>;
-  onCreateCategory?: (categoryData: { name: string; description: string; image?: string }) => Promise<any>;
+  onCreateCategory?: (categoryData: {
+    name: string;
+    description: string;
+    image?: string;
+  }) => Promise<any>;
 }) {
-  const [activeTab, setActiveTab] = useState<"users" | "gear" | "rentals" | "categories">("users");
-  
+  const [activeTab, setActiveTab] = useState<
+    "users" | "gear" | "rentals" | "categories"
+  >("users");
+
   // Safe array normalization
   const userList = Array.isArray(users) ? users : users?.users || [];
-  const gearList = Array.isArray(gearItems) ? gearItems : gearItems?.gearItems || [];
-  const rentalList = Array.isArray(rentalOrders) ? rentalOrders : rentalOrders?.rentalOrders || [];
-  const categoryList = Array.isArray(categories) ? categories : categories?.categories || [];
+  const gearList = Array.isArray(gearItems)
+    ? gearItems
+    : gearItems?.gearItems || [];
+  const rentalList = Array.isArray(rentalOrders)
+    ? rentalOrders
+    : rentalOrders?.rentalOrders || [];
+  const categoryList = Array.isArray(categories)
+    ? categories
+    : categories?.categories || [];
 
   // Modal States & URL Synchronization
   const [selectedUser, setSelectedUser] = useState<any | null>(null);
@@ -125,7 +137,9 @@ export default function AdminDashboard({
   };
 
   // Interactive Category Accordion State
-  const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({});
+  const [expandedCategories, setExpandedCategories] = useState<
+    Record<string, boolean>
+  >({});
 
   const toggleCategoryExpand = (catId: string) => {
     setExpandedCategories((prev) => ({
@@ -135,22 +149,57 @@ export default function AdminDashboard({
   };
 
   // New Category Form State
+  // Change image state to accept a File object
   const [newCategoryName, setNewCategoryName] = useState("");
   const [newCategoryDesc, setNewCategoryDesc] = useState("");
-  const [newCategoryImg, setNewCategoryImg] = useState("");
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isSubmittingCat, setIsSubmittingCat] = useState(false);
 
   const handleCreateCategorySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newCategoryName.trim()) return alert("Category name is required.");
-    
+
     setIsSubmittingCat(true);
     try {
+      let uploadedImageUrl = "default-category.png";
+
+      // 1. If a file is selected, upload it directly to ImgBB
+      if (selectedFile) {
+        const formData = new FormData();
+        formData.append("image", selectedFile);
+
+        const apiKey = process.env.NEXT_PUBLIC_IMAGE_BB_API_KEY;
+        if (!apiKey) {
+          alert("ImgBB API key is missing in environment variables.");
+          setIsSubmittingCat(false);
+          return;
+        }
+
+        const imgbbRes = await fetch(
+          `https://api.imgbb.com/1/upload?key=${apiKey}`,
+          {
+            method: "POST",
+            body: formData,
+          },
+        );
+
+        const imgbbData = await imgbbRes.json();
+
+        if (imgbbData.success) {
+          uploadedImageUrl = imgbbData.data.url; // Get direct image URL
+        } else {
+          alert("Failed to upload image to ImgBB.");
+          setIsSubmittingCat(false);
+          return;
+        }
+      }
+
+      // 2. Pass the resulting ImgBB URL to your backend server action
       if (onCreateCategory) {
         const payload = {
           name: newCategoryName,
           description: newCategoryDesc,
-          image: newCategoryImg || "default-category.png",
+          image: uploadedImageUrl,
         };
 
         const res = await onCreateCategory(payload);
@@ -158,24 +207,33 @@ export default function AdminDashboard({
           alert("Category created successfully!");
           setNewCategoryName("");
           setNewCategoryDesc("");
-          setNewCategoryImg("");
+          setSelectedFile(null);
           window.location.reload();
         } else {
           alert(res?.message || "Failed to create category.");
         }
       }
     } catch (err) {
-      console.error(err);
-      alert("An error occurred while creating the category.");
+      console.error("Upload/Category Creation Error:", err);
+      alert("An error occurred while uploading or saving the category.");
     } finally {
       setIsSubmittingCat(false);
     }
   };
 
-  const handleStatusToggle = async (userId: string, currentStatus: string, e?: React.MouseEvent) => {
+  const handleStatusToggle = async (
+    userId: string,
+    currentStatus: string,
+    e?: React.MouseEvent,
+  ) => {
     if (e) e.stopPropagation();
     const targetStatus = currentStatus === "SUSPEND" ? "ACTIVE" : "SUSPEND";
-    if (!confirm(`Are you sure you want to change user status to ${targetStatus}?`)) return;
+    if (
+      !confirm(
+        `Are you sure you want to change user status to ${targetStatus}?`,
+      )
+    )
+      return;
 
     try {
       if (onUpdateUserStatus) {
@@ -195,7 +253,6 @@ export default function AdminDashboard({
   return (
     <div className="min-h-screen bg-[#FDFBF7] py-10 text-zinc-900 font-mono text-xs w-full">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-        
         {/* Header & Navigation Tabs */}
         <div className="border-b border-zinc-200 pb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
@@ -211,7 +268,9 @@ export default function AdminDashboard({
             <button
               onClick={() => setActiveTab("users")}
               className={`px-3 py-2 uppercase tracking-wider transition-colors flex items-center gap-1.5 ${
-                activeTab === "users" ? "bg-zinc-900 text-white font-semibold" : "text-zinc-600 hover:bg-zinc-50"
+                activeTab === "users"
+                  ? "bg-zinc-900 text-white font-semibold"
+                  : "text-zinc-600 hover:bg-zinc-50"
               }`}
             >
               <Users className="h-3.5 w-3.5" /> Users ({userList.length})
@@ -219,15 +278,20 @@ export default function AdminDashboard({
             <button
               onClick={() => setActiveTab("gear")}
               className={`px-3 py-2 uppercase tracking-wider transition-colors flex items-center gap-1.5 ${
-                activeTab === "gear" ? "bg-zinc-900 text-white font-semibold" : "text-zinc-600 hover:bg-zinc-50"
+                activeTab === "gear"
+                  ? "bg-zinc-900 text-white font-semibold"
+                  : "text-zinc-600 hover:bg-zinc-50"
               }`}
             >
-              <Package className="h-3.5 w-3.5" /> Gear Directory ({gearList.length})
+              <Package className="h-3.5 w-3.5" /> Gear Directory (
+              {gearList.length})
             </button>
             <button
               onClick={() => setActiveTab("rentals")}
               className={`px-3 py-2 uppercase tracking-wider transition-colors flex items-center gap-1.5 ${
-                activeTab === "rentals" ? "bg-zinc-900 text-white font-semibold" : "text-zinc-600 hover:bg-zinc-50"
+                activeTab === "rentals"
+                  ? "bg-zinc-900 text-white font-semibold"
+                  : "text-zinc-600 hover:bg-zinc-50"
               }`}
             >
               <Receipt className="h-3.5 w-3.5" /> Rentals ({rentalList.length})
@@ -235,10 +299,13 @@ export default function AdminDashboard({
             <button
               onClick={() => setActiveTab("categories")}
               className={`px-3 py-2 uppercase tracking-wider transition-colors flex items-center gap-1.5 ${
-                activeTab === "categories" ? "bg-zinc-900 text-white font-semibold" : "text-zinc-600 hover:bg-zinc-50"
+                activeTab === "categories"
+                  ? "bg-zinc-900 text-white font-semibold"
+                  : "text-zinc-600 hover:bg-zinc-50"
               }`}
             >
-              <Layers className="h-3.5 w-3.5" /> Categories ({categoryList.length})
+              <Layers className="h-3.5 w-3.5" /> Categories (
+              {categoryList.length})
             </button>
           </div>
         </div>
@@ -250,7 +317,9 @@ export default function AdminDashboard({
               <h2 className="text-xs uppercase tracking-widest text-zinc-500 font-semibold">
                 Registered Platform Users ({userList.length})
               </h2>
-              <span className="text-[10px] text-zinc-400">Click any user card for inspection modal</span>
+              <span className="text-[10px] text-zinc-400">
+                Click any user card for inspection modal
+              </span>
             </div>
 
             <div className="grid grid-cols-1 gap-3">
@@ -265,9 +334,13 @@ export default function AdminDashboard({
                     className="bg-white border border-zinc-200 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-zinc-900 cursor-pointer transition-all shadow-xs group"
                   >
                     <div className="flex items-center gap-4">
-                      <div className={`w-10 h-10 flex items-center justify-center border font-bold text-sm uppercase shrink-0 ${
-                        isSuspended ? "bg-red-50 border-red-200 text-red-600" : "bg-zinc-900 border-zinc-900 text-white"
-                      }`}>
+                      <div
+                        className={`w-10 h-10 flex items-center justify-center border font-bold text-sm uppercase shrink-0 ${
+                          isSuspended
+                            ? "bg-red-50 border-red-200 text-red-600"
+                            : "bg-zinc-900 border-zinc-900 text-white"
+                        }`}
+                      >
                         {u.name ? u.name.slice(0, 2).toUpperCase() : "US"}
                       </div>
                       <div className="space-y-0.5">
@@ -276,11 +349,16 @@ export default function AdminDashboard({
                             {u.name || "Unnamed User"}
                             <ExternalLink className="h-3 w-3 opacity-0 group-hover:opacity-100 text-zinc-400 transition-opacity" />
                           </span>
-                          <Badge variant="outline" className="rounded-none text-[9px] uppercase tracking-wider">
+                          <Badge
+                            variant="outline"
+                            className="rounded-none text-[9px] uppercase tracking-wider"
+                          >
                             {u.role || "CUSTOMER"}
                           </Badge>
                         </div>
-                        <p className="text-[11px] text-zinc-500 font-mono">{u.email} • ID: #{u.id.slice(0, 8)}</p>
+                        <p className="text-[11px] text-zinc-500 font-mono">
+                          {u.email} • ID: #{u.id.slice(0, 8)}
+                        </p>
                       </div>
                     </div>
 
@@ -291,7 +369,9 @@ export default function AdminDashboard({
                         ) : (
                           <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
                         )}
-                        <span className={`text-[10px] uppercase font-semibold ${isSuspended ? "text-red-600" : "text-emerald-700"}`}>
+                        <span
+                          className={`text-[10px] uppercase font-semibold ${isSuspended ? "text-red-600" : "text-emerald-700"}`}
+                        >
                           {userStatus}
                         </span>
                       </div>
@@ -301,7 +381,9 @@ export default function AdminDashboard({
                         variant={isSuspended ? "default" : "outline"}
                         onClick={(e) => handleStatusToggle(u.id, userStatus, e)}
                         className={`rounded-none text-[10px] uppercase h-8 px-4 ${
-                          isSuspended ? "bg-zinc-900 text-white hover:bg-zinc-800" : "text-red-600 border-red-200 hover:bg-red-50"
+                          isSuspended
+                            ? "bg-zinc-900 text-white hover:bg-zinc-800"
+                            : "text-red-600 border-red-200 hover:bg-red-50"
                         }`}
                       >
                         {isSuspended ? "Activate Account" : "Suspend Account"}
@@ -326,7 +408,9 @@ export default function AdminDashboard({
               <h2 className="text-xs uppercase tracking-widest text-zinc-500 font-semibold">
                 Global Gear Directory ({gearList.length} items)
               </h2>
-              <span className="text-[10px] text-zinc-400">Click any gear card for specification inspection</span>
+              <span className="text-[10px] text-zinc-400">
+                Click any gear card for specification inspection
+              </span>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {gearList.map((gear: any) => (
@@ -338,23 +422,35 @@ export default function AdminDashboard({
                   <div className="flex gap-3 mb-3">
                     <div className="w-14 h-14 bg-zinc-100 shrink-0 border border-zinc-200 overflow-hidden">
                       <img
-                        src={gear.images?.[0] || "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=200&q=80"}
+                        src={
+                          gear.images?.[0] ||
+                          "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=200&q=80"
+                        }
                         alt={gear.name}
                         className="w-full h-full object-cover"
                       />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <span className="text-[10px] text-zinc-400 uppercase tracking-widest">{gear.brand || "Brand"}</span>
+                      <span className="text-[10px] text-zinc-400 uppercase tracking-widest">
+                        {gear.brand || "Brand"}
+                      </span>
                       <h4 className="text-sm font-medium text-zinc-900 truncate group-hover:underline flex items-center gap-1">
                         {gear.name}
                         <ExternalLink className="h-3 w-3 opacity-0 group-hover:opacity-100 text-zinc-400 transition-opacity" />
                       </h4>
-                      <p className="text-xs font-bold text-zinc-900 mt-0.5">৳{gear.pricePerDay} / day</p>
+                      <p className="text-xs font-bold text-zinc-900 mt-0.5">
+                        ৳{gear.pricePerDay} / day
+                      </p>
                     </div>
                   </div>
                   <div className="flex justify-between items-center text-[10px] text-zinc-500 pt-3 border-t border-zinc-100">
-                    <span>Stock: {gear.quantity} | Dep: ৳{gear.securityDeposit}</span>
-                    <Badge variant="outline" className="rounded-none text-[9px] uppercase">
+                    <span>
+                      Stock: {gear.quantity} | Dep: ৳{gear.securityDeposit}
+                    </span>
+                    <Badge
+                      variant="outline"
+                      className="rounded-none text-[9px] uppercase"
+                    >
                       {gear.status || "AVAILABLE"}
                     </Badge>
                   </div>
@@ -376,7 +472,9 @@ export default function AdminDashboard({
               <h2 className="text-xs uppercase tracking-widest text-zinc-500 font-semibold">
                 Platform Rental Orders Manifest ({rentalList.length})
               </h2>
-              <span className="text-[10px] text-zinc-400">Click any rental order to inspect itemized manifest</span>
+              <span className="text-[10px] text-zinc-400">
+                Click any rental order to inspect itemized manifest
+              </span>
             </div>
             <div className="grid grid-cols-1 gap-3">
               {rentalList.map((ord: any) => (
@@ -391,25 +489,39 @@ export default function AdminDashboard({
                         #{ord.id.slice(0, 8).toUpperCase()}
                         <ExternalLink className="h-3 w-3 opacity-0 group-hover:opacity-100 text-zinc-400 transition-opacity" />
                       </span>
-                      <Badge variant="outline" className="rounded-none text-[10px] uppercase">
+                      <Badge
+                        variant="outline"
+                        className="rounded-none text-[10px] uppercase"
+                      >
                         {ord.status}
                       </Badge>
                     </div>
                     <p className="text-[11px] text-zinc-500">
-                      Customer: <strong className="text-zinc-900">{ord.customer?.name || "N/A"}</strong> ({ord.customer?.email})
+                      Customer:{" "}
+                      <strong className="text-zinc-900">
+                        {ord.customer?.name || "N/A"}
+                      </strong>{" "}
+                      ({ord.customer?.email})
                     </p>
                   </div>
 
                   <div className="flex items-center gap-6 bg-[#FDFBF7] p-3 border border-zinc-200 w-full md:w-auto justify-between">
                     <div>
-                      <span className="text-[10px] text-zinc-400 block uppercase">Rental Window</span>
+                      <span className="text-[10px] text-zinc-400 block uppercase">
+                        Rental Window
+                      </span>
                       <span className="text-zinc-900 font-medium">
-                        {new Date(ord.startDate).toLocaleDateString()} — {new Date(ord.endDate).toLocaleDateString()}
+                        {new Date(ord.startDate).toLocaleDateString()} —{" "}
+                        {new Date(ord.endDate).toLocaleDateString()}
                       </span>
                     </div>
                     <div className="text-right">
-                      <span className="text-[10px] text-zinc-400 block uppercase">Total Amount</span>
-                      <span className="text-base font-bold text-zinc-900">৳{Number(ord.totalAmount).toLocaleString()}</span>
+                      <span className="text-[10px] text-zinc-400 block uppercase">
+                        Total Amount
+                      </span>
+                      <span className="text-base font-bold text-zinc-900">
+                        ৳{Number(ord.totalAmount).toLocaleString()}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -426,7 +538,6 @@ export default function AdminDashboard({
         {/* TAB 4: CATEGORIES */}
         {activeTab === "categories" && (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-            
             {/* Create Category Form */}
             <div className="lg:col-span-4">
               <Card className="rounded-none border-zinc-200 bg-white p-6 shadow-xs space-y-4">
@@ -434,9 +545,14 @@ export default function AdminDashboard({
                   <FolderPlus className="h-4 w-4" /> Create New Category
                 </h2>
 
-                <form onSubmit={handleCreateCategorySubmit} className="space-y-4">
+                <form
+                  onSubmit={handleCreateCategorySubmit}
+                  className="space-y-4"
+                >
                   <div className="space-y-1">
-                    <label className="text-[10px] uppercase text-zinc-500">Category Name</label>
+                    <label className="text-[10px] uppercase text-zinc-500">
+                      Category Name
+                    </label>
                     <Input
                       type="text"
                       placeholder="e.g., GYM, Camping"
@@ -448,7 +564,9 @@ export default function AdminDashboard({
                   </div>
 
                   <div className="space-y-1">
-                    <label className="text-[10px] uppercase text-zinc-500">Description</label>
+                    <label className="text-[10px] uppercase text-zinc-500">
+                      Description
+                    </label>
                     <Input
                       type="text"
                       placeholder="Tents, sleeping bags and camp gear"
@@ -459,13 +577,18 @@ export default function AdminDashboard({
                   </div>
 
                   <div className="space-y-1">
-                    <label className="text-[10px] uppercase text-zinc-500">Image filename/URL</label>
+                    <label className="text-[10px] uppercase text-zinc-500">
+                      Upload Category Image
+                    </label>
                     <Input
-                      type="text"
-                      placeholder="ssgsgsfgs.jpg"
-                      value={newCategoryImg}
-                      onChange={(e) => setNewCategoryImg(e.target.value)}
-                      className="rounded-none border-zinc-200 h-9 text-xs"
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        if (e.target.files && e.target.files[0]) {
+                          setSelectedFile(e.target.files[0]);
+                        }
+                      }}
+                      className="rounded-none border-zinc-200 h-9 text-xs file:bg-zinc-900 file:text-white file:border-0 file:text-[10px] file:uppercase file:px-2 file:h-full file:mr-2 cursor-pointer"
                     />
                   </div>
 
@@ -485,14 +608,17 @@ export default function AdminDashboard({
               <div className="space-y-3">
                 <div className="border-b border-zinc-200 pb-3 flex justify-between items-center">
                   <h2 className="text-xs uppercase tracking-widest text-zinc-500 font-semibold flex items-center gap-1.5">
-                    <Tag className="h-4 w-4" /> Interactive Category Directory ({categoryList.length})
+                    <Tag className="h-4 w-4" /> Interactive Category Directory (
+                    {categoryList.length})
                   </h2>
                 </div>
 
                 {categoryList.map((cat: any) => {
                   const catId = cat.id || cat._id;
                   const isExpanded = !!expandedCategories[catId];
-                  const items = cat.gearItems || gearList.filter((g: any) => g.categoryId === catId);
+                  const items =
+                    cat.gearItems ||
+                    gearList.filter((g: any) => g.categoryId === catId);
 
                   return (
                     <div
@@ -506,17 +632,27 @@ export default function AdminDashboard({
                       >
                         <div className="space-y-1">
                           <div className="flex items-center gap-3">
-                            <span className="font-bold text-zinc-900 text-sm">{cat.name}</span>
+                            <span className="font-bold text-zinc-900 text-sm">
+                              {cat.name}
+                            </span>
                             <Badge className="rounded-none text-[9px] uppercase bg-zinc-100 text-zinc-800 border border-zinc-200">
                               {items.length} Gear Item(s)
                             </Badge>
                           </div>
-                          <p className="text-[11px] text-zinc-500">{cat.description || "No description provided."}</p>
+                          <p className="text-[11px] text-zinc-500">
+                            {cat.description || "No description provided."}
+                          </p>
                         </div>
 
                         <div className="flex items-center gap-2 text-zinc-400">
-                          <span className="text-[10px] uppercase font-mono">{isExpanded ? "Collapse" : "Expand"}</span>
-                          {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                          <span className="text-[10px] uppercase font-mono">
+                            {isExpanded ? "Collapse" : "Expand"}
+                          </span>
+                          {isExpanded ? (
+                            <ChevronUp className="h-4 w-4" />
+                          ) : (
+                            <ChevronDown className="h-4 w-4" />
+                          )}
                         </div>
                       </button>
 
@@ -532,20 +668,32 @@ export default function AdminDashboard({
                                 <div className="flex items-center gap-3 min-w-0">
                                   <div className="w-10 h-10 bg-zinc-100 border border-zinc-200 shrink-0 overflow-hidden">
                                     <img
-                                      src={g.images?.[0] || "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=100&q=80"}
+                                      src={
+                                        g.images?.[0] ||
+                                        "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=100&q=80"
+                                      }
                                       alt={g.name}
                                       className="w-full h-full object-cover"
                                     />
                                   </div>
                                   <div className="min-w-0">
-                                    <p className="text-[9px] uppercase tracking-widest text-zinc-400">{g.brand || "Brand"}</p>
-                                    <h4 className="text-xs font-medium text-zinc-900 truncate">{g.name}</h4>
+                                    <p className="text-[9px] uppercase tracking-widest text-zinc-400">
+                                      {g.brand || "Brand"}
+                                    </p>
+                                    <h4 className="text-xs font-medium text-zinc-900 truncate">
+                                      {g.name}
+                                    </h4>
                                   </div>
                                 </div>
 
                                 <div className="flex items-center gap-4 shrink-0">
-                                  <span className="font-mono font-bold text-zinc-900 text-xs">৳{g.pricePerDay}/day</span>
-                                  <Badge variant="outline" className="rounded-none text-[9px] uppercase">
+                                  <span className="font-mono font-bold text-zinc-900 text-xs">
+                                    ৳{g.pricePerDay}/day
+                                  </span>
+                                  <Badge
+                                    variant="outline"
+                                    className="rounded-none text-[9px] uppercase"
+                                  >
                                     Stock: {g.quantity}
                                   </Badge>
                                 </div>
@@ -569,7 +717,6 @@ export default function AdminDashboard({
                 )}
               </div>
             </div>
-
           </div>
         )}
 
@@ -602,24 +749,35 @@ export default function AdminDashboard({
                   <span className="text-zinc-400 uppercase text-[10px] flex items-center gap-1.5">
                     <Mail className="h-3.5 w-3.5 text-zinc-600" /> Email Address
                   </span>
-                  <span className="font-semibold text-zinc-900">{selectedUser.email}</span>
+                  <span className="font-semibold text-zinc-900">
+                    {selectedUser.email}
+                  </span>
                 </div>
 
                 <div className="flex justify-between items-center border-b border-zinc-100 pb-2">
                   <span className="text-zinc-400 uppercase text-[10px] flex items-center gap-1.5">
-                    <Shield className="h-3.5 w-3.5 text-zinc-600" /> Account Role
+                    <Shield className="h-3.5 w-3.5 text-zinc-600" /> Account
+                    Role
                   </span>
-                  <Badge variant="outline" className="rounded-none text-[10px] uppercase">
+                  <Badge
+                    variant="outline"
+                    className="rounded-none text-[10px] uppercase"
+                  >
                     {selectedUser.role || "CUSTOMER"}
                   </Badge>
                 </div>
 
                 <div className="flex justify-between items-center border-b border-zinc-100 pb-2">
                   <span className="text-zinc-400 uppercase text-[10px] flex items-center gap-1.5">
-                    <UserCheck className="h-3.5 w-3.5 text-zinc-600" /> Active Status
+                    <UserCheck className="h-3.5 w-3.5 text-zinc-600" /> Active
+                    Status
                   </span>
                   <Badge
-                    variant={selectedUser.activeStatus === "SUSPEND" ? "destructive" : "default"}
+                    variant={
+                      selectedUser.activeStatus === "SUSPEND"
+                        ? "destructive"
+                        : "default"
+                    }
                     className="rounded-none text-[10px] uppercase"
                   >
                     {selectedUser.activeStatus || "ACTIVE"}
@@ -628,24 +786,32 @@ export default function AdminDashboard({
 
                 <div className="flex justify-between items-center border-b border-zinc-100 pb-2">
                   <span className="text-zinc-400 uppercase text-[10px] flex items-center gap-1.5">
-                    <Phone className="h-3.5 w-3.5 text-zinc-600" /> Phone Contact
+                    <Phone className="h-3.5 w-3.5 text-zinc-600" /> Phone
+                    Contact
                   </span>
-                  <span className="text-zinc-900">{selectedUser.profile?.phone || "Not provided"}</span>
+                  <span className="text-zinc-900">
+                    {selectedUser.profile?.phone || "Not provided"}
+                  </span>
                 </div>
 
                 <div className="flex justify-between items-center">
                   <span className="text-zinc-400 uppercase text-[10px] flex items-center gap-1.5">
-                    <Calendar className="h-3.5 w-3.5 text-zinc-600" /> Member Since
+                    <Calendar className="h-3.5 w-3.5 text-zinc-600" /> Member
+                    Since
                   </span>
                   <span className="text-zinc-900">
-                    {selectedUser.createdAt ? new Date(selectedUser.createdAt).toLocaleDateString() : "N/A"}
+                    {selectedUser.createdAt
+                      ? new Date(selectedUser.createdAt).toLocaleDateString()
+                      : "N/A"}
                   </span>
                 </div>
               </div>
 
               {selectedUser.profile?.bio && (
                 <div className="space-y-1">
-                  <span className="text-[10px] uppercase tracking-widest text-zinc-400 block">User Bio</span>
+                  <span className="text-[10px] uppercase tracking-widest text-zinc-400 block">
+                    User Bio
+                  </span>
                   <p className="p-3 bg-white border border-zinc-200 text-zinc-700 italic text-[11px]">
                     "{selectedUser.profile.bio}"
                   </p>
@@ -655,9 +821,17 @@ export default function AdminDashboard({
               <div className="pt-2 border-t border-zinc-300 flex justify-between items-center">
                 <Button
                   size="sm"
-                  variant={selectedUser.activeStatus === "SUSPEND" ? "default" : "outline"}
+                  variant={
+                    selectedUser.activeStatus === "SUSPEND"
+                      ? "default"
+                      : "outline"
+                  }
                   onClick={(e) => {
-                    handleStatusToggle(selectedUser.id, selectedUser.activeStatus || "ACTIVE", e);
+                    handleStatusToggle(
+                      selectedUser.id,
+                      selectedUser.activeStatus || "ACTIVE",
+                      e,
+                    );
                     closeModal();
                   }}
                   className={`rounded-none text-[10px] uppercase h-9 px-4 ${
@@ -666,7 +840,9 @@ export default function AdminDashboard({
                       : "text-red-600 border-red-200 hover:bg-red-50"
                   }`}
                 >
-                  {selectedUser.activeStatus === "SUSPEND" ? "Activate Account" : "Suspend Account"}
+                  {selectedUser.activeStatus === "SUSPEND"
+                    ? "Activate Account"
+                    : "Suspend Account"}
                 </Button>
 
                 <Button
@@ -700,20 +876,25 @@ export default function AdminDashboard({
                   Rental Order #{selectedRental.id.slice(0, 8).toUpperCase()}
                 </h2>
                 <p className="text-xs font-mono text-zinc-500">
-                  Customer: {selectedRental.customer?.name} ({selectedRental.customer?.email})
+                  Customer: {selectedRental.customer?.name} (
+                  {selectedRental.customer?.email})
                 </p>
               </div>
 
               <div className="grid grid-cols-2 gap-4 border-b border-zinc-200 pb-6">
                 <div>
-                  <span className="text-zinc-400 block uppercase text-[10px]">Rental Window:</span>
+                  <span className="text-zinc-400 block uppercase text-[10px]">
+                    Rental Window:
+                  </span>
                   <span className="font-semibold text-zinc-900 block mt-0.5">
                     {new Date(selectedRental.startDate).toLocaleDateString()} —{" "}
                     {new Date(selectedRental.endDate).toLocaleDateString()}
                   </span>
                 </div>
                 <div className="text-right">
-                  <span className="text-zinc-400 block uppercase text-[10px]">Fulfillment Status:</span>
+                  <span className="text-zinc-400 block uppercase text-[10px]">
+                    Fulfillment Status:
+                  </span>
                   <Badge
                     variant="outline"
                     className="rounded-none text-xs font-mono uppercase px-2 py-0.5 mt-1"
@@ -730,12 +911,21 @@ export default function AdminDashboard({
                 </span>
                 <div className="space-y-2 max-h-48 overflow-y-auto">
                   {selectedRental.items?.map((item: any) => (
-                    <div key={item.id} className="bg-white border border-zinc-200 p-3 flex justify-between items-center">
+                    <div
+                      key={item.id}
+                      className="bg-white border border-zinc-200 p-3 flex justify-between items-center"
+                    >
                       <div>
-                        <p className="font-medium text-zinc-900">{item.gearItem?.name || "Equipment Item"}</p>
-                        <p className="text-[10px] text-zinc-400 font-mono">Qty: {item.quantity} unit(s)</p>
+                        <p className="font-medium text-zinc-900">
+                          {item.gearItem?.name || "Equipment Item"}
+                        </p>
+                        <p className="text-[10px] text-zinc-400 font-mono">
+                          Qty: {item.quantity} unit(s)
+                        </p>
                       </div>
-                      <span className="font-bold text-zinc-900">৳{Number(item.pricePerDay).toLocaleString()} / day</span>
+                      <span className="font-bold text-zinc-900">
+                        ৳{Number(item.pricePerDay).toLocaleString()} / day
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -747,7 +937,9 @@ export default function AdminDashboard({
                   <span>Admin Verified Audit Log</span>
                 </div>
                 <div className="text-right">
-                  <span className="text-zinc-400 text-[10px] block uppercase">Total Valuation</span>
+                  <span className="text-zinc-400 text-[10px] block uppercase">
+                    Total Valuation
+                  </span>
                   <span className="text-lg font-bold text-zinc-900">
                     ৳{Number(selectedRental.totalAmount).toLocaleString()} BDT
                   </span>
@@ -793,27 +985,47 @@ export default function AdminDashboard({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="h-40 border border-zinc-200 bg-white overflow-hidden">
                   <img
-                    src={selectedGear.images?.[0] || "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=400&q=80"}
+                    src={
+                      selectedGear.images?.[0] ||
+                      "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=400&q=80"
+                    }
                     alt={selectedGear.name}
                     className="w-full h-full object-cover"
                   />
                 </div>
                 <div className="space-y-3 bg-white p-4 border border-zinc-200 flex flex-col justify-center">
                   <div className="flex justify-between border-b border-zinc-100 pb-2">
-                    <span className="text-zinc-400 uppercase text-[10px]">Daily Rate</span>
-                    <span className="font-bold text-zinc-900">৳{selectedGear.pricePerDay}</span>
+                    <span className="text-zinc-400 uppercase text-[10px]">
+                      Daily Rate
+                    </span>
+                    <span className="font-bold text-zinc-900">
+                      ৳{selectedGear.pricePerDay}
+                    </span>
                   </div>
                   <div className="flex justify-between border-b border-zinc-100 pb-2">
-                    <span className="text-zinc-400 uppercase text-[10px]">Security Deposit</span>
-                    <span className="font-bold text-zinc-900">৳{selectedGear.securityDeposit}</span>
+                    <span className="text-zinc-400 uppercase text-[10px]">
+                      Security Deposit
+                    </span>
+                    <span className="font-bold text-zinc-900">
+                      ৳{selectedGear.securityDeposit}
+                    </span>
                   </div>
                   <div className="flex justify-between border-b border-zinc-100 pb-2">
-                    <span className="text-zinc-400 uppercase text-[10px]">Stock Quantity</span>
-                    <span className="font-bold text-zinc-900">{selectedGear.quantity} unit(s)</span>
+                    <span className="text-zinc-400 uppercase text-[10px]">
+                      Stock Quantity
+                    </span>
+                    <span className="font-bold text-zinc-900">
+                      {selectedGear.quantity} unit(s)
+                    </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-zinc-400 uppercase text-[10px]">Asset Status</span>
-                    <Badge variant="outline" className="rounded-none text-[9px] uppercase">
+                    <span className="text-zinc-400 uppercase text-[10px]">
+                      Asset Status
+                    </span>
+                    <Badge
+                      variant="outline"
+                      className="rounded-none text-[9px] uppercase"
+                    >
                       {selectedGear.status}
                     </Badge>
                   </div>
@@ -821,7 +1033,9 @@ export default function AdminDashboard({
               </div>
 
               <div className="space-y-1">
-                <span className="text-[10px] uppercase tracking-widest text-zinc-400 block">Description</span>
+                <span className="text-[10px] uppercase tracking-widest text-zinc-400 block">
+                  Description
+                </span>
                 <p className="p-3 bg-white border border-zinc-200 text-zinc-700 text-[11px] leading-relaxed">
                   {selectedGear.description || "No description provided."}
                 </p>
@@ -838,7 +1052,6 @@ export default function AdminDashboard({
             </div>
           </div>
         )}
-
       </div>
     </div>
   );

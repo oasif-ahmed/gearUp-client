@@ -19,6 +19,9 @@ import {
   Clock,
   Copy,
   Check,
+  Star,
+  MessageSquare,
+  ExternalLink,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -39,6 +42,7 @@ type CustomerCartProps = {
   rentalOrders: any[];
   gearItems: any[];
   paymentHistory: any;
+  myReviews?: any[];
 
   createRentalOrderAction: (payload: any) => Promise<any>;
   cancelRentalOrderAction: (orderId: string) => Promise<any>;
@@ -50,6 +54,7 @@ export default function CustomerCart({
   rentalOrders = [],
   gearItems = [],
   paymentHistory,
+  myReviews = [],
   createRentalOrderAction,
   cancelRentalOrderAction,
   getRentalOrderDetailsAction,
@@ -58,7 +63,8 @@ export default function CustomerCart({
   const router = useRouter();
 
   const [selectedInvoice, setSelectedInvoice] = useState<any | null>(null);
-  const [activeTab, setActiveTab] = useState<"orders" | "cart">("orders");
+  const [selectedReview, setSelectedReview] = useState<any | null>(null);
+  const [activeTab, setActiveTab] = useState<"orders" | "cart" | "reviews">("orders");
 
   const [cartItems, setCartItems] = useState<any[]>([]);
 
@@ -78,7 +84,7 @@ export default function CustomerCart({
   const [copiedField, setCopiedField] = useState<string | null>(null);
 
   // ============================================
-  // CART STORAGE
+  // URL SYNC & INITIALIZATION ON MOUNT
   // ============================================
 
   useEffect(() => {
@@ -88,7 +94,25 @@ export default function CustomerCart({
     } catch (error) {
       console.error("Failed to parse cart storage:", error);
     }
-  }, []);
+
+    // Check URL parameters on load to auto-open invoice or review modal
+    const params = new URLSearchParams(window.location.search);
+    const orderIdParam = params.get("id");
+    const reviewIdParam = params.get("reviewId");
+
+    if (orderIdParam) {
+      const foundOrder = rentalOrders.find((o) => o.id === orderIdParam);
+      if (foundOrder) {
+        setSelectedInvoice(foundOrder);
+      }
+    } else if (reviewIdParam && myReviews.length > 0) {
+      const foundReview = myReviews.find((r) => r.id === reviewIdParam);
+      if (foundReview) {
+        setSelectedReview(foundReview);
+        setActiveTab("reviews");
+      }
+    }
+  }, [rentalOrders, myReviews]);
 
   const syncCartStorage = (updatedCart: any[]) => {
     setCartItems(updatedCart);
@@ -107,23 +131,15 @@ export default function CustomerCart({
   // PAYMENT HISTORY
   // ============================================
 
-  // Your API response:
-  // paymentHistory.data.payments[]
-
   const getPaymentRecords = () => {
     return paymentHistory?.data?.payments || [];
   };
-
-  // Match payment with rental order using:
-  // payment.rentalOrder.id === order.id
 
   const getPaymentForOrder = (order: any) => {
     return getPaymentRecords().find(
       (payment: any) => payment.rentalOrder?.id === order.id,
     );
   };
-
-  // Get payment status.
 
   const getPaymentStatus = (order: any): PaymentStatus => {
     const payment = getPaymentForOrder(order);
@@ -138,17 +154,12 @@ export default function CustomerCart({
       return embeddedStatus;
     }
 
-    // Your backend changes rental order status to PAID
-    // after successful payment.
-
     if (order?.status === "PAID") {
       return "COMPLETED";
     }
 
     return "PENDING";
   };
-
-  // Determine whether payment is allowed.
 
   const canPay = (order: any) => {
     const status = getPaymentStatus(order);
@@ -158,8 +169,6 @@ export default function CustomerCart({
       !["CANCELLED", "RETURNED", "PAID"].includes(order?.status)
     );
   };
-
-  // Format payment date.
 
   const formatPaymentDate = (date: string) => {
     if (!date) return "Not available";
@@ -179,13 +188,9 @@ export default function CustomerCart({
     });
   };
 
-  // Format BDT currency.
-
   const formatCurrency = (amount: any) => {
     return `৳${Number(amount || 0).toLocaleString("en-BD")}`;
   };
-
-  // Copy a value to the clipboard and briefly show a check icon.
 
   const handleCopy = async (value: string, field: string) => {
     try {
@@ -211,8 +216,6 @@ export default function CustomerCart({
 
       const result = await createPaymentAction(orderId);
 
-      console.log("Payment API response:", result);
-
       if (!result.success) {
         toast.error(result.message || "Failed to initiate payment.");
         return;
@@ -221,12 +224,9 @@ export default function CustomerCart({
       const checkoutUrl = result.data?.result?.checkoutUrl;
 
       if (!checkoutUrl) {
-        console.error("Checkout URL missing:", result);
         toast.error("Payment checkout URL was not returned.");
         return;
       }
-
-      // Redirect to Stripe Checkout.
 
       window.location.href = checkoutUrl;
     } catch (error) {
@@ -258,14 +258,6 @@ export default function CustomerCart({
     }
   };
 
-  // Badge colors per rental order status (color only, font/text style unchanged).
-  //   PLACED    → Yellow/Orange
-  //   CONFIRMED → Blue
-  //   PAID      → Purple
-  //   PICKED_UP → Green
-  //   RETURNED  → Gray
-  //   CANCELLED → Red
-
   const getStatusBadgeClass = (status: string) => {
     switch (status) {
       case "PLACED":
@@ -285,10 +277,6 @@ export default function CustomerCart({
         return "bg-zinc-50 text-zinc-600 border-zinc-200 hover:bg-zinc-50";
     }
   };
-
-  // ============================================
-  // PAYMENT BUTTON
-  // ============================================
 
   const getPaymentButtonContent = (order: any) => {
     const status = getPaymentStatus(order);
@@ -346,21 +334,33 @@ export default function CustomerCart({
 
     if (orderId) {
       params.set("id", orderId);
+      params.delete("reviewId");
     } else {
       params.delete("id");
     }
 
     const queryString = params.toString();
+    const newUrl = queryString ? `/customer-cart?${queryString}` : "/customer-cart";
+    window.history.pushState(null, "", newUrl);
+  };
 
-    const newUrl = queryString
-      ? `/customer-cart?${queryString}`
-      : "/customer-cart";
+  const updateReviewUrl = (reviewId?: string) => {
+    const params = new URLSearchParams(window.location.search);
 
+    if (reviewId) {
+      params.set("reviewId", reviewId);
+      params.delete("id");
+    } else {
+      params.delete("reviewId");
+    }
+
+    const queryString = params.toString();
+    const newUrl = queryString ? `/customer-cart?${queryString}` : "/customer-cart";
     window.history.pushState(null, "", newUrl);
   };
 
   // ============================================
-  // INVOICE DETAILS
+  // INVOICE DETAILS & REVIEW MODALS
   // ============================================
 
   const handleViewOrderDetails = async (orderId: string) => {
@@ -375,16 +375,13 @@ export default function CustomerCart({
 
     setSelectedInvoice(existingOrder);
     setLoadingInvoiceId(orderId);
-
     updateOrderUrl(orderId);
 
     try {
       const result = await getRentalOrderDetailsAction(orderId);
 
       if (!result.success || !result.data) {
-        toast.error(
-          result.message || "Failed to load complete invoice details.",
-        );
+        toast.error(result.message || "Failed to load complete invoice details.");
         return;
       }
 
@@ -402,13 +399,22 @@ export default function CustomerCart({
     updateOrderUrl();
   };
 
+  const handleViewReviewDetails = (review: any) => {
+    setSelectedReview(review);
+    updateReviewUrl(review.id);
+  };
+
+  const closeReviewModal = () => {
+    setSelectedReview(null);
+    updateReviewUrl();
+  };
+
   // ============================================
   // CART OPERATIONS
   // ============================================
 
   const removeFromCart = (gearItemId: string) => {
     const updated = cartItems.filter((item) => item.gearItemId !== gearItemId);
-
     syncCartStorage(updated);
   };
 
@@ -439,10 +445,6 @@ export default function CustomerCart({
     syncCartStorage(updated);
   };
 
-  // ============================================
-  // CART BILLING
-  // ============================================
-
   const getCartTotalDays = () => {
     if (!globalStartDate || !globalEndDate) return 1;
 
@@ -468,10 +470,6 @@ export default function CustomerCart({
       return sum + rate * item.quantity * days;
     }, 0);
   };
-
-  // ============================================
-  // CHECKOUT
-  // ============================================
 
   const handleCheckout = async () => {
     if (cartItems.length === 0) {
@@ -517,12 +515,9 @@ export default function CustomerCart({
 
       if (result.success) {
         toast.success(result.message || "Rental order placed successfully!");
-
         localStorage.removeItem("gearup_cart");
-
         setCartItems([]);
         setActiveTab("orders");
-
         router.refresh();
       } else {
         toast.error(result.message || "Failed to place rental order.");
@@ -532,10 +527,6 @@ export default function CustomerCart({
       toast.error("An unexpected error occurred during checkout.");
     }
   };
-
-  // ============================================
-  // CANCEL RENTAL ORDER
-  // ============================================
 
   const handleCancelOrder = async (
     e: React.MouseEvent<HTMLButtonElement>,
@@ -552,7 +543,6 @@ export default function CustomerCart({
 
       if (result.success) {
         toast.success(result.message || "Rental order cancelled successfully!");
-
         router.refresh();
       } else {
         toast.error(result.message || "Failed to cancel this rental order.");
@@ -616,6 +606,18 @@ export default function CustomerCart({
                   )}
                 </span>
               )}
+            </button>
+
+            <button
+              onClick={() => setActiveTab("reviews")}
+              className={`px-4 py-2 text-xs font-mono uppercase tracking-wider transition-colors flex items-center gap-1.5 ${
+                activeTab === "reviews"
+                  ? "bg-zinc-900 text-white font-semibold"
+                  : "text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50"
+              }`}
+            >
+              <MessageSquare className="h-3.5 w-3.5" />
+              My Reviews ({myReviews.length})
             </button>
           </div>
         </div>
@@ -885,8 +887,6 @@ export default function CustomerCart({
               </Card>
             ) : (
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-                {/* CART ITEMS */}
-
                 <div className="lg:col-span-8 space-y-4">
                   <Card className="rounded-none border-zinc-200 bg-white p-6 shadow-xs">
                     <h2 className="text-xs font-mono uppercase tracking-widest text-zinc-500 mb-6 border-b border-zinc-100 pb-3">
@@ -946,8 +946,6 @@ export default function CustomerCart({
                               </div>
                             </div>
 
-                            {/* QUANTITY CONTROLS */}
-
                             <div className="flex items-center gap-4">
                               <div className="flex items-center border border-zinc-200 bg-white h-9">
                                 <button
@@ -1001,8 +999,6 @@ export default function CustomerCart({
                     </div>
                   </Card>
                 </div>
-
-                {/* RENTAL WINDOW & SUMMARY */}
 
                 <div className="lg:col-span-4 space-y-4">
                   <Card className="rounded-none border-zinc-200 bg-white p-6 shadow-xs space-y-4">
@@ -1085,6 +1081,110 @@ export default function CustomerCart({
         )}
 
         {/* ====================================== */}
+        {/* REVIEWS TAB VIEW */}
+        {/* ====================================== */}
+
+        {activeTab === "reviews" && (
+          <div className="space-y-6">
+            {myReviews.length === 0 ? (
+              <Card className="rounded-none border-zinc-200 bg-white p-12 text-center shadow-xs">
+                <CardHeader className="space-y-2">
+                  <MessageSquare className="h-10 w-10 text-zinc-400 mx-auto" />
+
+                  <CardTitle className="text-lg font-mono uppercase tracking-tight">
+                    No Reviews Found
+                  </CardTitle>
+                </CardHeader>
+
+                <CardContent>
+                  <p className="text-xs font-mono text-zinc-500 max-w-sm mx-auto mb-6">
+                    You haven't submitted any reviews for your rented items yet.
+                  </p>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {myReviews.map((review) => {
+                  const reviewGear = review.gearItem || getGearDetails(review.gearItemId);
+                  const gearId = review.gearItemId || reviewGear?.id;
+
+                  return (
+                    <Card
+                      key={review.id}
+                      onClick={() => handleViewReviewDetails(review)}
+                      className="group rounded-none border-zinc-200 bg-white p-5 hover:border-zinc-900 cursor-pointer transition-all flex flex-col justify-between shadow-xs hover:shadow-md"
+                    >
+                      <div>
+                        <div className="flex items-start justify-between border-b border-zinc-100 pb-3 mb-4">
+                          <div>
+                            <span className="text-[10px] font-mono text-zinc-400 uppercase tracking-widest block">
+                              REV #{review.id.slice(0, 8).toUpperCase()}
+                            </span>
+
+                            <div className="flex items-center gap-1 mt-1 text-amber-500">
+                              {Array.from({ length: 5 }).map((_, i) => (
+                                <Star
+                                  key={i}
+                                  className={`h-3.5 w-3.5 ${
+                                    i < (review.rating || 0)
+                                      ? "fill-current text-amber-500"
+                                      : "text-zinc-300"
+                                  }`}
+                                />
+                              ))}
+                            </div>
+                          </div>
+
+                          <Badge className="rounded-none text-[10px] font-mono uppercase px-2 py-0.5 bg-zinc-100 text-zinc-700 border-zinc-300">
+                            {review.rating} Stars
+                          </Badge>
+                        </div>
+
+                        <div className="mb-4">
+                          <p className="text-[10px] font-mono uppercase text-zinc-400">
+                            {reviewGear?.brand || "Equipment"}
+                          </p>
+
+                          <h3 className="text-sm font-medium text-zinc-900 truncate">
+                            {reviewGear?.name || "Gear Item"}
+                          </h3>
+                        </div>
+
+                        <p className="text-xs font-mono text-zinc-600 line-clamp-3 bg-[#FDFBF7] p-3 border border-zinc-200/80">
+                          "{review.comment || review.content || "No comment provided."}"
+                        </p>
+                      </div>
+
+                      <div className="border-t border-zinc-100 pt-3 mt-4 flex items-center justify-between text-[10px] font-mono">
+                        <span className="text-zinc-400">
+                          {review.createdAt
+                            ? new Date(review.createdAt).toLocaleDateString()
+                            : "N/A"}
+                        </span>
+
+                        {gearId && (
+                          <Button
+                            asChild
+                            variant="outline"
+                            size="sm"
+                            onClick={(e) => e.stopPropagation()}
+                            className="h-7 px-2.5 rounded-none text-[10px] font-mono uppercase border-zinc-300 hover:bg-zinc-900 hover:text-white"
+                          >
+                            <a href={`/gear-items/${gearId}`}>
+                              View Product <ExternalLink className="h-3 w-3 ml-1" />
+                            </a>
+                          </Button>
+                        )}
+                      </div>
+                    </Card>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ====================================== */}
         {/* INVOICE MODAL */}
         {/* ====================================== */}
 
@@ -1098,8 +1198,6 @@ export default function CustomerCart({
               >
                 <X className="h-5 w-5" />
               </button>
-
-              {/* INVOICE HEADER */}
 
               <div className="text-center border-b border-zinc-300 pb-6 space-y-1 font-serif">
                 <span className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 block">
@@ -1117,8 +1215,6 @@ export default function CustomerCart({
                     : "Loading..."}
                 </p>
               </div>
-
-              {/* RENTAL WINDOW */}
 
               <div className="grid grid-cols-2 gap-4 border-b border-zinc-200 pb-6">
                 <div>
@@ -1144,8 +1240,6 @@ export default function CustomerCart({
                   </Badge>
                 </div>
               </div>
-
-              {/* ITEMIZED TABLE */}
 
               <div className="space-y-3">
                 <span className="text-[10px] uppercase tracking-widest text-zinc-400 block">
@@ -1182,10 +1276,6 @@ export default function CustomerCart({
                         const rate = Number(item.pricePerDay) || 0;
                         const itemAmount = rate * quantity;
 
-                        const specifications = gear?.specifications
-                          ? Object.entries(gear.specifications).slice(0, 3)
-                          : [];
-
                         return (
                           <tr key={item.id || item.gearItemId}>
                             <td className="py-3 pr-2 text-zinc-900 font-sans">
@@ -1207,27 +1297,6 @@ export default function CustomerCart({
                                     <p className="text-[10px] text-zinc-500 mt-0.5">
                                       {gear.brand}
                                     </p>
-                                  )}
-
-                                  {gear?.condition && (
-                                    <p className="text-[10px] text-zinc-500 mt-0.5">
-                                      Condition: {gear.condition}
-                                    </p>
-                                  )}
-
-                                  {specifications.length > 0 && (
-                                    <div className="mt-1 space-y-0.5">
-                                      {specifications.map(
-                                        ([key, value]: any) => (
-                                          <p
-                                            key={key}
-                                            className="text-[9px] text-zinc-400"
-                                          >
-                                            {key}: {String(value)}
-                                          </p>
-                                        ),
-                                      )}
-                                    </div>
                                   )}
                                 </div>
                               </div>
@@ -1252,8 +1321,6 @@ export default function CustomerCart({
                 )}
               </div>
 
-              {/* INVOICE TOTAL */}
-
               <div className="border-t border-zinc-300 pt-4 flex justify-between items-center">
                 <div className="text-zinc-500 text-[11px] flex items-center gap-1">
                   <ShieldCheck className="h-3.5 w-3.5 text-zinc-700" />
@@ -1270,8 +1337,6 @@ export default function CustomerCart({
                   </span>
                 </div>
               </div>
-
-              {/* PAYMENT HISTORY IN MODAL */}
 
               {(() => {
                 const invoicePayment = getPaymentForOrder(selectedInvoice);
@@ -1374,47 +1439,10 @@ export default function CustomerCart({
                           )}
                         </span>
                       </div>
-
-                      <div className="flex justify-between gap-3">
-                        <span className="text-zinc-500 shrink-0">
-                          Payment ID
-                        </span>
-
-                        <span className="flex items-start justify-end gap-1.5 max-w-[65%]">
-                          <span className="text-right text-zinc-800 break-all">
-                            {invoicePayment.id}
-                          </span>
-
-                          <button
-                            type="button"
-                            onClick={() =>
-                              handleCopy(invoicePayment.id, "paymentId")
-                            }
-                            className="shrink-0 mt-px text-zinc-400 hover:text-zinc-900 transition-colors"
-                            title="Copy payment ID"
-                          >
-                            {copiedField === "paymentId" ? (
-                              <Check className="h-3.5 w-3.5 text-emerald-600" />
-                            ) : (
-                              <Copy className="h-3.5 w-3.5" />
-                            )}
-                          </button>
-                        </span>
-                      </div>
-
                     </div>
-
-                    {isCompleted && (
-                      <div className="flex items-center gap-1.5 pt-2 border-t border-emerald-200/70 text-[10px] text-emerald-700">
-                        <ShieldCheck className="h-3.5 w-3.5" />
-                        Payment successfully verified
-                      </div>
-                    )}
                   </div>
                 );
               })()}
-
-              {/* PAYMENT + CLOSE BUTTONS */}
 
               <div className="pt-2 border-t border-zinc-200 flex items-center justify-between">
                 <Button
@@ -1440,6 +1468,112 @@ export default function CustomerCart({
                   className="rounded-none bg-zinc-900 text-white hover:bg-zinc-800 text-xs font-mono uppercase px-6 h-9"
                 >
                   Close Receipt
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ====================================== */}
+        {/* REVIEW DETAILS MODAL */}
+        {/* ====================================== */}
+
+        {selectedReview && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/60 backdrop-blur-xs p-4">
+            <div className="w-full max-w-lg max-h-[90vh] overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden border border-zinc-300 bg-[#FDFBF7] p-8 rounded-none shadow-2xl space-y-6 relative font-mono text-xs">
+              <button
+                type="button"
+                onClick={closeReviewModal}
+                className="absolute top-6 right-6 text-zinc-400 hover:text-zinc-900 transition-colors"
+              >
+                <X className="h-5 w-5" />
+              </button>
+
+              <div className="text-center border-b border-zinc-300 pb-6 space-y-1">
+                <span className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 block">
+                  GearUp Customer Review Statement
+                </span>
+
+                <h2 className="text-2xl font-normal tracking-tight text-zinc-900 font-serif">
+                  Review Details
+                </h2>
+
+                <p className="text-xs font-mono text-zinc-500">
+                  REV #{selectedReview.id.toUpperCase()} • Submitted:{" "}
+                  {selectedReview.createdAt
+                    ? new Date(selectedReview.createdAt).toLocaleDateString()
+                    : "N/A"}
+                </p>
+              </div>
+
+              {(() => {
+                const reviewGear = selectedReview.gearItem || getGearDetails(selectedReview.gearItemId);
+                const gearId = selectedReview.gearItemId || reviewGear?.id;
+
+                return (
+                  <div className="space-y-4">
+                    <div className="bg-white p-4 border border-zinc-200 space-y-2">
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <p className="text-[10px] font-mono uppercase text-zinc-400">
+                            {reviewGear?.brand || "Equipment Asset"}
+                          </p>
+
+                          <h4 className="text-sm font-medium text-zinc-900">
+                            {reviewGear?.name || "Gear Item"}
+                          </h4>
+                        </div>
+
+                        {gearId && (
+                          <Button
+                            asChild
+                            variant="outline"
+                            size="sm"
+                            className="h-7 px-2.5 rounded-none text-[10px] font-mono uppercase border-zinc-300 hover:bg-zinc-900 hover:text-white"
+                          >
+                            <a href={`/gear-items/${gearId}`}>
+                              View Product <ExternalLink className="h-3 w-3 ml-1" />
+                            </a>
+                          </Button>
+                        )}
+                      </div>
+
+                      <div className="flex items-center gap-1 text-amber-500 pt-1">
+                        {Array.from({ length: 5 }).map((_, i) => (
+                          <Star
+                            key={i}
+                            className={`h-3.5 w-3.5 ${
+                              i < (selectedReview.rating || 0)
+                                ? "fill-current text-amber-500"
+                                : "text-zinc-300"
+                            }`}
+                          />
+                        ))}
+                        <span className="text-xs font-mono font-semibold text-zinc-800 ml-1">
+                          ({selectedReview.rating}/5)
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="space-y-1">
+                      <span className="text-[10px] text-zinc-400 uppercase tracking-widest block">
+                        Review Comment
+                      </span>
+
+                      <div className="bg-white border border-zinc-200 p-4 text-xs font-mono text-zinc-800 leading-relaxed min-h-[100px]">
+                        {selectedReview.comment || selectedReview.content || "No detailed comment provided."}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
+
+              <div className="pt-4 border-t border-zinc-200 flex justify-end">
+                <Button
+                  onClick={closeReviewModal}
+                  className="rounded-none bg-zinc-900 text-white hover:bg-zinc-800 text-xs font-mono uppercase px-6 h-9"
+                >
+                  Close Review
                 </Button>
               </div>
             </div>
