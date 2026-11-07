@@ -81,36 +81,46 @@ export const loginUser = async (prevState: any, formData: FormData) => {
   }
 };
 
+
+// register
 export const registerUser = async (prevState: any, formData: FormData) => {
   const name = formData.get("name") as string;
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
   const role = formData.get("role") as string;
 
-  const res = await fetch(`${process.env.BACKEND_API_URL}/api/user/register`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      name,
-      email,
-      password,
-      role,  
-    }),
-  });
+  try {
+    const res = await fetch(`${process.env.BACKEND_API_URL}/api/user/register`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name,
+        email,
+        password,
+        role,  
+      }),
+    });
 
-  const result = await res.json();
+    const result = await res.json();
 
-  if (!res.ok) {
-    throw new Error(result.message || "Registration failed!");
+    if (!res.ok) {
+      return { success: false, message: result.message || "Registration failed!" };
+    }
+
+    if (result.data?.user || res.ok) {
+      redirect("/login");
+    }
+
+    return { success: true, message: "Registered successfully!" };
+  } catch (error: any) {
+    // Next.js redirect throws a special error that must be re-thrown
+    if (error.message === "NEXT_REDIRECT") {
+      throw error;
+    }
+    return { success: false, message: error.message || "An unexpected error occurred." };
   }
-
-  if(result.data.user){
-    redirect("/login");
-  }
-
-  return result.data.user;
 };
 
 

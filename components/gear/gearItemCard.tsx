@@ -1,6 +1,5 @@
 import React from "react";
-import { Star, MapPin, Calendar, Shield, Package, Tag, Zap } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Package, Tag } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 interface GearItemCardProps {
@@ -18,7 +17,7 @@ interface GearItemCardProps {
     setupTime?: string;
     dimensions?: string;
     waterproof?: boolean;
-    [key: string]: any; // fallback for dynamic spec keys
+    [key: string]: any;
   };
   condition: string;
   pricePerDay: string | number;
@@ -77,102 +76,89 @@ const GearItemCard: React.FC<GearItemCardProps> = ({
     }
   };
 
+  // Collect all available specification attributes dynamically
+  const activeSpecs = Object.entries(specifications || {}).filter(
+    ([_, value]) => value !== undefined && value !== null && value !== ""
+  );
+
   return (
-    <div className="group relative rounded-lg border bg-card shadow-sm transition-all hover:shadow-lg overflow-hidden flex flex-col justify-between">
-      {/* Image Section */}
-      <div className="relative h-56 overflow-hidden bg-muted shrink-0">
+    <div className="group relative rounded-none border border-[#d8d2c6] dark:border-zinc-700 bg-[#ede8df] dark:bg-zinc-800 shadow-sm transition-all hover:border-[#2c2a29] dark:hover:border-zinc-100 hover:shadow-md overflow-hidden flex flex-col h-full font-mono">
+      
+      {/* 1. Compact Image Header Section */}
+      <div className="relative h-40 w-full overflow-hidden bg-[#f4f1ea] dark:bg-zinc-900 shrink-0 border-b border-[#d8d2c6] dark:border-zinc-700">
         <img
           src={imageUrl}
           alt={name}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
         />
-        <div className="absolute top-4 left-4 flex gap-2">
-          <Badge variant={conditionVariant(condition)}>
+        <div className="absolute top-2 left-2 flex gap-1 z-10">
+          <Badge variant={conditionVariant(condition)} className="rounded-none text-[9px] uppercase font-mono px-1.5 py-0">
             {formatCondition(condition)}
           </Badge>
-          <Badge variant={statusVariant(status)}>
+          <Badge variant={statusVariant(status)} className="rounded-none text-[9px] uppercase font-mono px-1.5 py-0">
             {status ? status.charAt(0) + status.slice(1).toLowerCase() : ""}
           </Badge>
         </div>
-        <div className="absolute top-4 right-4">
-          <span className="bg-background/90 backdrop-blur-sm px-3 py-1 text-sm font-semibold rounded-full text-foreground">
-            {category?.name}
+        <div className="absolute top-2 right-2 z-10">
+          <span className="bg-[#ede8df]/90 dark:bg-zinc-900/90 backdrop-blur-sm px-2 py-0.5 text-[10px] font-mono uppercase font-bold text-[#2c2a29] dark:text-zinc-100 border border-[#d8d2c6] dark:border-zinc-700">
+            {category?.name || "General"}
           </span>
         </div>
       </div>
 
-      {/* Content Section */}
-      <div className="p-6 flex flex-col flex-grow justify-between">
-        <div>
-          {/* Header */}
-          <div className="mb-3">
-            <span className="text-xs font-mono uppercase text-muted-foreground tracking-wider">{brand}</span>
-            <h3 className="text-lg font-bold text-card-foreground line-clamp-1 group-hover:text-primary transition-colors">
-              {name}
-            </h3>
-            {/* 🛑 CLAMPED DESCRIPTION TO 2 LINES */}
-            <p className="text-xs text-muted-foreground mt-1 line-clamp-2 leading-relaxed">
-              {description}
+      {/* 2. Packed Content Body */}
+      <div className="p-3.5 flex flex-col flex-1 justify-between space-y-2.5">
+        
+        {/* Title & Brand */}
+        <div className="space-y-0.5">
+          <div className="flex justify-between items-center text-[10px] font-mono text-[#6b655f] dark:text-zinc-400 uppercase tracking-wider">
+            <span>{brand || "Standard Brand"}</span>
+            <span>Ref #{id?.slice(-6)}</span>
+          </div>
+
+          <h3 className="text-sm font-bold text-[#2c2a29] dark:text-white line-clamp-1 group-hover:text-[#5a6b5c] transition-colors font-serif" title={name}>
+            {name}
+          </h3>
+
+          <p className="text-[11px] text-[#6b655f] dark:text-zinc-300 line-clamp-1 leading-relaxed font-mono">
+            {description || "No description provided."}
+          </p>
+        </div>
+
+        {/* Dense 2x2 Specifications Grid (Shows up to 4 specs packed tightly) */}
+        <div className="grid grid-cols-2 gap-1 text-[10px] font-mono text-[#6b655f] dark:text-zinc-400 bg-[#f4f1ea] dark:bg-zinc-900 p-2 border border-[#d8d2c6] dark:border-zinc-700">
+          {activeSpecs.length > 0 ? (
+            activeSpecs.slice(0, 4).map(([key, val]) => (
+              <div key={key} className="flex items-center gap-1 truncate">
+                <Tag className="h-2.5 w-2.5 shrink-0 text-[#5a6b5c]" />
+                <span className="truncate capitalize font-mono text-[10px]">
+                  <strong className="text-[#2c2a29] dark:text-zinc-200">{key}:</strong> {String(val)}
+                </span>
+              </div>
+            ))
+          ) : (
+            <div className="col-span-2 text-center text-[10px] text-[#a39c94] italic">
+              Standard specifications apply
+            </div>
+          )}
+        </div>
+
+        {/* Financial & Inventory Footer */}
+        <div className="pt-2 mt-auto border-t border-[#d8d2c6] dark:border-zinc-700 flex items-center justify-between">
+          <div>
+            <p className="text-[9px] text-[#a39c94] uppercase font-mono">Rate / Deposit</p>
+            <p className="text-xs font-bold text-[#2c2a29] dark:text-white font-mono">
+              {formatPrice(pricePerDay)}<span className="text-[10px] font-normal text-[#6b655f]">/d</span>
+              <span className="text-[10px] font-normal text-[#a39c94] ml-1">(Dep: {formatPrice(securityDeposit)})</span>
             </p>
           </div>
 
-          {/* Specifications Grid */}
-          <div className="grid grid-cols-2 gap-2 mb-4 text-xs">
-            {specifications.color && (
-              <div className="flex items-center gap-1.5 text-muted-foreground truncate">
-                <Tag className="h-3.5 w-3.5 shrink-0" />
-                <span className="truncate">{specifications.color}</span>
-              </div>
-            )}
-            {specifications.capacity && (
-              <div className="flex items-center gap-1.5 text-muted-foreground truncate">
-                <Package className="h-3.5 w-3.5 shrink-0" />
-                <span className="truncate">{specifications.capacity}P Capacity</span>
-              </div>
-            )}
-            {specifications.seasons && (
-              <div className="flex items-center gap-1.5 text-muted-foreground truncate">
-                <Zap className="h-3.5 w-3.5 shrink-0" />
-                <span className="truncate">{specifications.seasons} Season</span>
-              </div>
-            )}
-            {typeof specifications.waterproof === "boolean" && (
-              <div className="flex items-center gap-1.5 text-muted-foreground truncate">
-                <Shield className="h-3.5 w-3.5 shrink-0" />
-                <span className="truncate">{specifications.waterproof ? "Waterproof" : "Not Waterproof"}</span>
-              </div>
-            )}
+          <div className="flex items-center gap-1 text-[10px] text-[#6b655f] dark:text-zinc-400 font-mono shrink-0">
+            <Package className="h-3 w-3 text-[#5a6b5c]" />
+            <span>{quantity} left</span>
           </div>
         </div>
 
-        <div>
-          {/* Price Section */}
-          <div className="border-t border-border pt-3 mb-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-[11px] text-muted-foreground uppercase font-mono">Daily Rate</p>
-                <p className="text-xl font-bold text-primary">
-                  {formatPrice(pricePerDay)}
-                </p>
-              </div>
-              <div className="text-right">
-                <p className="text-[11px] text-muted-foreground uppercase font-mono">Deposit</p>
-                <p className="text-sm font-semibold text-card-foreground">
-                  {formatPrice(securityDeposit)}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Quantity & Action */}
-          <div className="flex items-center justify-between pt-1">
-            <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-mono">
-              <Package className="h-3.5 w-3.5" />
-              <span>{quantity} in stock</span>
-            </div>
-            <Button size="sm">Rent Now</Button>
-          </div>
-        </div>
       </div>
     </div>
   );
