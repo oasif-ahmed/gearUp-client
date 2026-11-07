@@ -7,13 +7,20 @@ import {
 
 import { getAllGearItems } from "@/services/gear-item.service";
 
+import {
+  createPaymentAction,
+  getPaymentHistoryAction,
+} from "@/services/payment.service";
+
 import CustomerCart from "./customerCart";
 
 export default async function CustomerCartPage() {
-  const [rentalOrders, gearItemsResponse] = await Promise.all([
-    getCustomerRentalOrders(),
-    getAllGearItems(),
-  ]);
+  const [rentalOrders, gearItemsResponse, paymentHistory] =
+    await Promise.all([
+      getCustomerRentalOrders(),
+      getAllGearItems(),
+      getPaymentHistoryAction(),
+    ]);
 
   const gearItems =
     gearItemsResponse.data?.gearItems ||
@@ -25,9 +32,11 @@ export default async function CustomerCartPage() {
       <CustomerCart
         rentalOrders={rentalOrders}
         gearItems={gearItems}
+        paymentHistory={paymentHistory}
         createRentalOrderAction={createRentalOrder}
         cancelRentalOrderAction={cancelRentalOrder}
         getRentalOrderDetailsAction={getRentalOrderDetailsAction}
+        createPaymentAction={createPaymentAction}
       />
     </main>
   );

@@ -99,7 +99,7 @@ interface RentalOrder {
   rentalWindow: string;
   dailyRate: number;
   totalDays: number;
-  status: "PLACED" | "CONFIRMED" | "PICKED_UP" | "RETURNED" | "CANCELLED";
+  status: "PLACED" | "CONFIRMED" | "CANCELLED" | "PAID" | "PICKED_UP" | "RETURNED";
   createdAt: string;
 }
 

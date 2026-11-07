@@ -1,10 +1,9 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 import {
-  ArrowUpRight,
   X,
   Package,
   Calendar,
@@ -15,70 +14,233 @@ import {
   CreditCard,
   LayoutDashboard,
   ShoppingCart,
+  CheckCircle2,
+  Loader2,
+  Clock,
+  Copy,
+  Check,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+} from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 
-export default function CustomerCart({
-  rentalOrders = [],
-  gearItems = [],
-  createRentalOrderAction,
-  cancelRentalOrderAction,
-  getRentalOrderDetailsAction,
-}: {
+type PaymentStatus = "PENDING" | "COMPLETED" | "FAILED";
+
+type CustomerCartProps = {
   rentalOrders: any[];
   gearItems: any[];
+  paymentHistory: any;
+
   createRentalOrderAction: (payload: any) => Promise<any>;
   cancelRentalOrderAction: (orderId: string) => Promise<any>;
   getRentalOrderDetailsAction: (orderId: string) => Promise<any>;
-}) {
+  createPaymentAction: (orderId: string) => Promise<any>;
+};
+
+export default function CustomerCart({
+  rentalOrders = [],
+  gearItems = [],
+  paymentHistory,
+  createRentalOrderAction,
+  cancelRentalOrderAction,
+  getRentalOrderDetailsAction,
+  createPaymentAction,
+}: CustomerCartProps) {
   const router = useRouter();
-  const searchParams = useSearchParams();
 
   const [selectedInvoice, setSelectedInvoice] = useState<any | null>(null);
   const [activeTab, setActiveTab] = useState<"orders" | "cart">("orders");
 
-  // Cart state
   const [cartItems, setCartItems] = useState<any[]>([]);
 
-  // Global rental dates
-  const [globalStartDate, setGlobalStartDate] = useState<string>("");
-  const [globalEndDate, setGlobalEndDate] = useState<string>("");
+  const [globalStartDate, setGlobalStartDate] = useState("");
+  const [globalEndDate, setGlobalEndDate] = useState("");
 
-  // Loading states
   const [cancellingOrderId, setCancellingOrderId] = useState<string | null>(
     null,
   );
+
   const [loadingInvoiceId, setLoadingInvoiceId] = useState<string | null>(null);
 
-  // Load cart items from localStorage
+  const [processingPaymentId, setProcessingPaymentId] = useState<string | null>(
+    null,
+  );
+
+  const [copiedField, setCopiedField] = useState<string | null>(null);
+
+  // ============================================
+  // CART STORAGE
+  // ============================================
+
   useEffect(() => {
     try {
       const savedCart = JSON.parse(localStorage.getItem("gearup_cart") || "[]");
-
       setCartItems(savedCart);
-    } catch (err) {
-      console.error("Failed to parse cart storage:", err);
+    } catch (error) {
+      console.error("Failed to parse cart storage:", error);
     }
   }, []);
 
-  // Sync cart state and localStorage
   const syncCartStorage = (updatedCart: any[]) => {
     setCartItems(updatedCart);
     localStorage.setItem("gearup_cart", JSON.stringify(updatedCart));
   };
 
-  // Find gear details
+  // ============================================
+  // GEAR DETAILS
+  // ============================================
+
   const getGearDetails = (gearItemId: string) => {
     return gearItems.find((gear: any) => gear.id === gearItemId);
   };
 
-  // Rental order progress
+  // ============================================
+  // PAYMENT HISTORY
+  // ============================================
+
+  // Your API response:
+  // paymentHistory.data.payments[]
+
+  const getPaymentRecords = () => {
+    return paymentHistory?.data?.payments || [];
+  };
+
+  // Match payment with rental order using:
+  // payment.rentalOrder.id === order.id
+
+  const getPaymentForOrder = (order: any) => {
+    return getPaymentRecords().find(
+      (payment: any) => payment.rentalOrder?.id === order.id,
+    );
+  };
+
+  // Get payment status.
+
+  const getPaymentStatus = (order: any): PaymentStatus => {
+    const payment = getPaymentForOrder(order);
+
+    if (payment?.status) {
+      return payment.status;
+    }
+
+    const embeddedStatus = order?.payment?.status || order?.paymentStatus;
+
+    if (embeddedStatus) {
+      return embeddedStatus;
+    }
+
+    // Your backend changes rental order status to PAID
+    // after successful payment.
+
+    if (order?.status === "PAID") {
+      return "COMPLETED";
+    }
+
+    return "PENDING";
+  };
+
+  // Determine whether payment is allowed.
+
+  const canPay = (order: any) => {
+    const status = getPaymentStatus(order);
+
+    return (
+      ["PENDING", "FAILED"].includes(status) &&
+      !["CANCELLED", "RETURNED", "PAID"].includes(order?.status)
+    );
+  };
+
+  // Format payment date.
+
+  const formatPaymentDate = (date: string) => {
+    if (!date) return "Not available";
+
+    const parsedDate = new Date(date);
+
+    if (Number.isNaN(parsedDate.getTime())) {
+      return "Not available";
+    }
+
+    return parsedDate.toLocaleString("en-BD", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
+  // Format BDT currency.
+
+  const formatCurrency = (amount: any) => {
+    return `৳${Number(amount || 0).toLocaleString("en-BD")}`;
+  };
+
+  // Copy a value to the clipboard and briefly show a check icon.
+
+  const handleCopy = async (value: string, field: string) => {
+    try {
+      await navigator.clipboard.writeText(value);
+      setCopiedField(field);
+      toast.success("Copied to clipboard");
+      setTimeout(() => setCopiedField(null), 1500);
+    } catch (error) {
+      console.error("Copy failed:", error);
+      toast.error("Could not copy to clipboard.");
+    }
+  };
+
+  // ============================================
+  // PAYMENT HANDLER
+  // ============================================
+
+  const handlePayment = async (orderId: string) => {
+    if (processingPaymentId) return;
+
+    try {
+      setProcessingPaymentId(orderId);
+
+      const result = await createPaymentAction(orderId);
+
+      console.log("Payment API response:", result);
+
+      if (!result.success) {
+        toast.error(result.message || "Failed to initiate payment.");
+        return;
+      }
+
+      const checkoutUrl = result.data?.result?.checkoutUrl;
+
+      if (!checkoutUrl) {
+        console.error("Checkout URL missing:", result);
+        toast.error("Payment checkout URL was not returned.");
+        return;
+      }
+
+      // Redirect to Stripe Checkout.
+
+      window.location.href = checkoutUrl;
+    } catch (error) {
+      console.error("Payment error:", error);
+      toast.error("Something went wrong while initiating payment.");
+    } finally {
+      setProcessingPaymentId(null);
+    }
+  };
+
+  // ============================================
+  // RENTAL ORDER STATUS
+  // ============================================
+
   const getStatusStep = (status: string) => {
     switch (status) {
       case "PLACED":
@@ -89,28 +251,96 @@ export default function CustomerCart({
         return 75;
       case "RETURNED":
         return 100;
+      case "PAID":
+        return 50;
       default:
         return 10;
     }
   };
 
-  // Rental status badge
-  const getStatusBadgeVariant = (status: string) => {
+  // Badge colors per rental order status (color only, font/text style unchanged).
+  //   PLACED    → Yellow/Orange
+  //   CONFIRMED → Blue
+  //   PAID      → Purple
+  //   PICKED_UP → Green
+  //   RETURNED  → Gray
+  //   CANCELLED → Red
+
+  const getStatusBadgeClass = (status: string) => {
     switch (status) {
-      case "RETURNED":
-        return "secondary";
-      case "PICKED_UP":
-        return "default";
+      case "PLACED":
+      case "PENDING":
+        return "bg-amber-50 text-amber-800 border-amber-300 hover:bg-amber-50";
       case "CONFIRMED":
-        return "outline";
+        return "bg-sky-50 text-sky-800 border-sky-300 hover:bg-sky-50";
+      case "PAID":
+        return "bg-violet-50 text-violet-800 border-violet-300 hover:bg-violet-50";
+      case "PICKED_UP":
+        return "bg-emerald-50 text-emerald-800 border-emerald-300 hover:bg-emerald-50";
+      case "RETURNED":
+        return "bg-zinc-100 text-zinc-700 border-zinc-300 hover:bg-zinc-100";
       case "CANCELLED":
-        return "destructive";
+        return "bg-rose-50 text-rose-800 border-rose-300 hover:bg-rose-50";
       default:
-        return "outline";
+        return "bg-zinc-50 text-zinc-600 border-zinc-200 hover:bg-zinc-50";
     }
   };
 
-  // Update URL without triggering a Next.js navigation
+  // ============================================
+  // PAYMENT BUTTON
+  // ============================================
+
+  const getPaymentButtonContent = (order: any) => {
+    const status = getPaymentStatus(order);
+
+    if (processingPaymentId === order.id) {
+      return (
+        <>
+          <Loader2 className="h-3 w-3 animate-spin mr-1" />
+          Processing
+        </>
+      );
+    }
+
+    if (status === "COMPLETED") {
+      return (
+        <>
+          <CheckCircle2 className="h-3 w-3 mr-1" />
+          Completed
+        </>
+      );
+    }
+
+    if (status === "FAILED") {
+      return "Retry";
+    }
+
+    return (
+      <>
+        <CreditCard className="h-3 w-3 mr-1" />
+        Pay Now
+      </>
+    );
+  };
+
+  const getPaymentButtonClass = (order: any) => {
+    const status = getPaymentStatus(order);
+
+    if (status === "COMPLETED") {
+      return "bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-50 cursor-not-allowed";
+    }
+
+    if (status === "FAILED") {
+      return "bg-red-50 text-red-700 border border-red-200 hover:bg-red-100";
+    }
+
+    return "bg-zinc-900 text-white hover:bg-zinc-800";
+  };
+
+  // ============================================
+  // URL MANAGEMENT
+  // ============================================
+
   const updateOrderUrl = (orderId?: string) => {
     const params = new URLSearchParams(window.location.search);
 
@@ -129,53 +359,59 @@ export default function CustomerCart({
     window.history.pushState(null, "", newUrl);
   };
 
-  // Fetch rental order details and open invoice
+  // ============================================
+  // INVOICE DETAILS
+  // ============================================
+
   const handleViewOrderDetails = async (orderId: string) => {
-    // Prevent duplicate clicks for the same loading request
     if (loadingInvoiceId) return;
 
+    const existingOrder = rentalOrders.find((order) => order.id === orderId);
+
+    if (!existingOrder) {
+      toast.error("Rental order not found.");
+      return;
+    }
+
+    setSelectedInvoice(existingOrder);
+    setLoadingInvoiceId(orderId);
+
+    updateOrderUrl(orderId);
+
     try {
-      setLoadingInvoiceId(orderId);
-
-      // Update URL
-      updateOrderUrl(orderId);
-
-      // Make only one API request
       const result = await getRentalOrderDetailsAction(orderId);
 
       if (!result.success || !result.data) {
-        toast.error(result.message || "Failed to load rental order details!");
-
-        updateOrderUrl();
+        toast.error(
+          result.message || "Failed to load complete invoice details.",
+        );
         return;
       }
 
       setSelectedInvoice(result.data);
     } catch (error) {
       console.error("Failed to fetch rental order details:", error);
-
       toast.error("Something went wrong while loading order details.");
-
-      updateOrderUrl();
     } finally {
       setLoadingInvoiceId(null);
     }
   };
 
-  // Close invoice and remove ID from URL
   const closeInvoice = () => {
     setSelectedInvoice(null);
     updateOrderUrl();
   };
 
-  // Remove item from cart
+  // ============================================
+  // CART OPERATIONS
+  // ============================================
+
   const removeFromCart = (gearItemId: string) => {
     const updated = cartItems.filter((item) => item.gearItemId !== gearItemId);
 
     syncCartStorage(updated);
   };
 
-  // Update quantity with inventory validation
   const updateQuantity = (gearItemId: string, quantity: number) => {
     if (quantity <= 0) {
       removeFromCart(gearItemId);
@@ -203,7 +439,10 @@ export default function CustomerCart({
     syncCartStorage(updated);
   };
 
-  // Calculate billing days
+  // ============================================
+  // CART BILLING
+  // ============================================
+
   const getCartTotalDays = () => {
     if (!globalStartDate || !globalEndDate) return 1;
 
@@ -219,7 +458,6 @@ export default function CustomerCart({
     return Math.max(1, diff + 1);
   };
 
-  // Calculate cart total
   const calculateCartTotal = () => {
     const days = getCartTotalDays();
 
@@ -231,19 +469,26 @@ export default function CustomerCart({
     }, 0);
   };
 
-  // Checkout
+  // ============================================
+  // CHECKOUT
+  // ============================================
+
   const handleCheckout = async () => {
     if (cartItems.length === 0) {
-      return alert("Your cart is empty.");
+      toast.error("Your cart is empty.");
+      return;
     }
 
     if (!globalStartDate || !globalEndDate) {
-      return alert(
-        "Please select a global rental start and end date for your order.",
-      );
+      toast.error("Please select a global rental start and end date.");
+      return;
     }
 
-    // Validate inventory
+    if (new Date(globalEndDate) < new Date(globalStartDate)) {
+      toast.error("End date cannot be before start date.");
+      return;
+    }
+
     for (const item of cartItems) {
       const gear = getGearDetails(item.gearItemId);
 
@@ -271,25 +516,27 @@ export default function CustomerCart({
       const result = await createRentalOrderAction(payload);
 
       if (result.success) {
-        alert(result.message);
+        toast.success(result.message || "Rental order placed successfully!");
 
         localStorage.removeItem("gearup_cart");
 
         setCartItems([]);
         setActiveTab("orders");
 
-        window.location.reload();
+        router.refresh();
       } else {
-        alert(result.message || "Failed to place rental order.");
+        toast.error(result.message || "Failed to place rental order.");
       }
     } catch (error) {
       console.error("Checkout error:", error);
-
-      alert("An unexpected error occurred during checkout.");
+      toast.error("An unexpected error occurred during checkout.");
     }
   };
 
-  // Cancel rental order
+  // ============================================
+  // CANCEL RENTAL ORDER
+  // ============================================
+
   const handleCancelOrder = async (
     e: React.MouseEvent<HTMLButtonElement>,
     orderId: string,
@@ -304,25 +551,29 @@ export default function CustomerCart({
       const result = await cancelRentalOrderAction(orderId);
 
       if (result.success) {
-        alert(result.message || "Rental order cancelled successfully!");
+        toast.success(result.message || "Rental order cancelled successfully!");
 
-        window.location.reload();
+        router.refresh();
       } else {
-        alert(result.message || "Failed to cancel this rental order.");
+        toast.error(result.message || "Failed to cancel this rental order.");
       }
     } catch (error) {
       console.error("Failed to cancel order:", error);
-
-      alert("An unexpected error occurred while cancelling the order.");
+      toast.error("An unexpected error occurred while cancelling.");
     } finally {
       setCancellingOrderId(null);
     }
   };
 
+  // ============================================
+  // UI
+  // ============================================
+
   return (
     <div className="min-h-screen bg-[#FDFBF7] py-10 text-zinc-900">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         {/* HEADER */}
+
         <div className="border-b border-zinc-200 pb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
             <span className="text-xs font-mono uppercase tracking-widest text-zinc-500">
@@ -358,15 +609,21 @@ export default function CustomerCart({
               <ShoppingCart className="h-3.5 w-3.5" />
               Cart
               {cartItems.length > 0 && (
-                <span className="ml-1 px-1.5 py-0.2 bg-emerald-600 text-white text-[10px] rounded-full">
-                  {cartItems.reduce((sum, i) => sum + Number(i.quantity), 0)}
+                <span className="ml-1 px-1.5 py-0.5 bg-emerald-600 text-white text-[10px] rounded-full">
+                  {cartItems.reduce(
+                    (sum, item) => sum + Number(item.quantity),
+                    0,
+                  )}
                 </span>
               )}
             </button>
           </div>
         </div>
 
-        {/* TAB 1: RENTAL ORDERS */}
+        {/* ====================================== */}
+        {/* RENTAL ORDERS */}
+        {/* ====================================== */}
+
         {activeTab === "orders" && (
           <div className="space-y-6">
             {rentalOrders.length === 0 && (
@@ -406,10 +663,11 @@ export default function CustomerCart({
                   firstGear?.images?.[0] ||
                   "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=400&q=80";
 
-                const totalQty = order.items?.reduce(
-                  (sum: number, item: any) => sum + Number(item.quantity),
-                  0,
-                );
+                const totalQty =
+                  order.items?.reduce(
+                    (sum: number, item: any) => sum + Number(item.quantity),
+                    0,
+                  ) ?? 0;
 
                 const uniqueItems = order.items?.length || 0;
 
@@ -432,6 +690,8 @@ export default function CustomerCart({
                     className="group rounded-none border-zinc-200 bg-white p-5 hover:border-zinc-900 cursor-pointer transition-all flex flex-col justify-between shadow-xs hover:shadow-md"
                   >
                     <div>
+                      {/* ORDER HEADER */}
+
                       <div className="flex items-start justify-between border-b border-zinc-100 pb-3 mb-4">
                         <div>
                           <span className="text-[10px] font-mono text-zinc-400 uppercase tracking-widest block">
@@ -445,8 +705,7 @@ export default function CustomerCart({
 
                         <div className="flex items-center gap-1.5">
                           <Badge
-                            variant={getStatusBadgeVariant(order.status) as any}
-                            className="rounded-none text-[10px] font-mono uppercase px-2 py-0.5"
+                            className={`rounded-none text-[10px] font-mono uppercase px-2 py-0.5 ${getStatusBadgeClass(order.status)}`}
                           >
                             {order.status}
                           </Badge>
@@ -465,9 +724,7 @@ export default function CustomerCart({
                               title="Cancel order"
                             >
                               {cancellingOrderId === order.id ? (
-                                <span className="text-[10px] font-mono">
-                                  ...
-                                </span>
+                                <Loader2 className="h-3.5 w-3.5 animate-spin" />
                               ) : (
                                 <X className="h-4 w-4" />
                               )}
@@ -475,6 +732,8 @@ export default function CustomerCart({
                           )}
                         </div>
                       </div>
+
+                      {/* GEAR INFORMATION */}
 
                       <div className="flex items-center gap-3 mb-4">
                         <div className="w-14 h-14 shrink-0 border border-zinc-200 overflow-hidden bg-zinc-50">
@@ -497,10 +756,13 @@ export default function CustomerCart({
                         </div>
                       </div>
 
+                      {/* ORDER SUMMARY */}
+
                       <div className="space-y-2 bg-[#FDFBF7] p-3 border border-zinc-200/80 font-mono text-[11px] text-zinc-600 mb-4">
                         <div className="flex justify-between items-center">
                           <span className="text-zinc-400 flex items-center gap-1">
-                            <Package className="h-3 w-3" /> Quantity
+                            <Package className="h-3 w-3" />
+                            Quantity
                           </span>
 
                           <span className="font-medium text-zinc-900">
@@ -510,13 +772,33 @@ export default function CustomerCart({
 
                         <div className="flex justify-between items-center">
                           <span className="text-zinc-400 flex items-center gap-1">
-                            <Calendar className="h-3 w-3" /> Duration
+                            <Calendar className="h-3 w-3" />
+                            Duration
                           </span>
 
                           <span>{rentalDays} Billing Day(s)</span>
                         </div>
+
+                        <div className="flex justify-between items-center">
+                          <span className="text-zinc-400">Rental Start</span>
+
+                          <span className="text-zinc-900">
+                            {startDate.toLocaleDateString()}
+                          </span>
+                        </div>
+
+                        <div className="flex justify-between items-center">
+                          <span className="text-zinc-400">Rental End</span>
+
+                          <span className="text-zinc-900">
+                            {endDate.toLocaleDateString()}
+                          </span>
+                        </div>
                       </div>
+
                     </div>
+
+                    {/* FULFILLMENT PROGRESS */}
 
                     <div className="space-y-1.5 border-t border-zinc-100 pt-3">
                       <div className="flex justify-between text-[10px] font-mono text-zinc-400 uppercase">
@@ -533,6 +815,8 @@ export default function CustomerCart({
                       />
                     </div>
 
+                    {/* TOTAL + PAYMENT BUTTON */}
+
                     <div className="flex items-center justify-between border-t border-zinc-100 pt-3 mt-3">
                       <div>
                         <span className="text-[10px] font-mono uppercase text-zinc-400 block">
@@ -540,19 +824,27 @@ export default function CustomerCart({
                         </span>
 
                         <span className="text-base font-bold text-zinc-900 font-mono">
-                          ৳{Number(order.totalAmount).toLocaleString()}
+                          {formatCurrency(order.totalAmount)}
                         </span>
                       </div>
 
-                      <span className="text-xs font-mono text-zinc-900 font-medium group-hover:underline flex items-center gap-0.5">
-                        {loadingInvoiceId === order.id ? (
-                          "Loading..."
-                        ) : (
-                          <>
-                            Receipt <ArrowUpRight className="h-3 w-3" />
-                          </>
-                        )}
-                      </span>
+                      <Button
+                        type="button"
+                        size="sm"
+                        disabled={
+                          processingPaymentId === order.id || !canPay(order)
+                        }
+                        onClick={(e) => {
+                          e.stopPropagation();
+
+                          if (canPay(order)) {
+                            handlePayment(order.id);
+                          }
+                        }}
+                        className={`h-8 px-3 rounded-none text-[10px] font-mono uppercase ${getPaymentButtonClass(order)}`}
+                      >
+                        {getPaymentButtonContent(order)}
+                      </Button>
                     </div>
                   </Card>
                 );
@@ -561,7 +853,10 @@ export default function CustomerCart({
           </div>
         )}
 
-        {/* TAB 2: CART & CHECKOUT */}
+        {/* ====================================== */}
+        {/* CART & CHECKOUT */}
+        {/* ====================================== */}
+
         {activeTab === "cart" && (
           <div className="space-y-6">
             {cartItems.length === 0 ? (
@@ -590,7 +885,8 @@ export default function CustomerCart({
               </Card>
             ) : (
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-                {/* Cart Items List */}
+                {/* CART ITEMS */}
+
                 <div className="lg:col-span-8 space-y-4">
                   <Card className="rounded-none border-zinc-200 bg-white p-6 shadow-xs">
                     <h2 className="text-xs font-mono uppercase tracking-widest text-zinc-500 mb-6 border-b border-zinc-100 pb-3">
@@ -633,7 +929,7 @@ export default function CustomerCart({
                                 </h4>
 
                                 <p className="text-xs font-mono text-zinc-600">
-                                  ৳{rate.toLocaleString()} / day
+                                  {formatCurrency(rate)} / day
                                 </p>
 
                                 <p className="text-[10px] font-mono text-zinc-400 mt-1">
@@ -650,7 +946,8 @@ export default function CustomerCart({
                               </div>
                             </div>
 
-                            {/* Quantity Controls */}
+                            {/* QUANTITY CONTROLS */}
+
                             <div className="flex items-center gap-4">
                               <div className="flex items-center border border-zinc-200 bg-white h-9">
                                 <button
@@ -682,13 +979,8 @@ export default function CustomerCart({
                                       item.quantity + 1,
                                     )
                                   }
-                                  className="px-2.5 hover:bg-zinc-100 text-zinc-600 h-full flex items-center justify-center border-l border-zinc-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white"
-                                  title={
-                                    isUnavailable ||
-                                    Number(item.quantity) >= availableQuantity
-                                      ? "Maximum available quantity reached"
-                                      : "Increase quantity"
-                                  }
+                                  className="px-2.5 hover:bg-zinc-100 text-zinc-600 h-full flex items-center justify-center border-l border-zinc-200 disabled:opacity-40 disabled:cursor-not-allowed"
+                                  title="Increase quantity"
                                 >
                                   <Plus className="h-3 w-3" />
                                 </button>
@@ -710,7 +1002,8 @@ export default function CustomerCart({
                   </Card>
                 </div>
 
-                {/* Date Selector & Checkout Summary */}
+                {/* RENTAL WINDOW & SUMMARY */}
+
                 <div className="lg:col-span-4 space-y-4">
                   <Card className="rounded-none border-zinc-200 bg-white p-6 shadow-xs space-y-4">
                     <h2 className="text-xs font-mono uppercase tracking-widest text-zinc-500 border-b border-zinc-100 pb-2">
@@ -751,7 +1044,7 @@ export default function CustomerCart({
 
                         <span className="font-semibold text-zinc-900">
                           {cartItems.reduce(
-                            (sum, i) => sum + Number(i.quantity),
+                            (sum, item) => sum + Number(item.quantity),
                             0,
                           )}{" "}
                           units
@@ -769,9 +1062,7 @@ export default function CustomerCart({
                       <div className="flex justify-between text-sm font-bold text-zinc-900 border-t border-zinc-200 pt-3">
                         <span>Combined Total</span>
 
-                        <span>
-                          ৳{calculateCartTotal().toLocaleString()} BDT
-                        </span>
+                        <span>{formatCurrency(calculateCartTotal())} BDT</span>
                       </div>
                     </div>
 
@@ -793,7 +1084,10 @@ export default function CustomerCart({
           </div>
         )}
 
-        {/* PAPER INVOICE DETAIL MODAL */}
+        {/* ====================================== */}
+        {/* INVOICE MODAL */}
+        {/* ====================================== */}
+
         {selectedInvoice && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/60 backdrop-blur-xs p-4">
             <div className="w-full max-w-xl max-h-[90vh] overflow-y-auto border border-zinc-300 bg-[#FDFBF7] p-8 rounded-none shadow-2xl space-y-6 relative font-mono text-xs">
@@ -804,6 +1098,8 @@ export default function CustomerCart({
               >
                 <X className="h-5 w-5" />
               </button>
+
+              {/* INVOICE HEADER */}
 
               <div className="text-center border-b border-zinc-300 pb-6 space-y-1 font-serif">
                 <span className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 block">
@@ -816,9 +1112,13 @@ export default function CustomerCart({
 
                 <p className="text-xs font-mono text-zinc-500">
                   INV #{selectedInvoice.id.slice(0, 8).toUpperCase()} • Issued:{" "}
-                  {new Date(selectedInvoice.createdAt).toLocaleDateString()}
+                  {selectedInvoice.createdAt
+                    ? new Date(selectedInvoice.createdAt).toLocaleDateString()
+                    : "Loading..."}
                 </p>
               </div>
+
+              {/* RENTAL WINDOW */}
 
               <div className="grid grid-cols-2 gap-4 border-b border-zinc-200 pb-6">
                 <div>
@@ -827,8 +1127,8 @@ export default function CustomerCart({
                   </span>
 
                   <span className="font-semibold text-zinc-900 block mt-0.5">
-                    {new Date(selectedInvoice.startDate).toLocaleDateString()} —{" "}
-                    {new Date(selectedInvoice.endDate).toLocaleDateString()}
+                    {new Date(selectedInvoice.startDate).toLocaleDateString()}{" "}
+                    — {new Date(selectedInvoice.endDate).toLocaleDateString()}
                   </span>
                 </div>
 
@@ -838,107 +1138,121 @@ export default function CustomerCart({
                   </span>
 
                   <Badge
-                    variant={
-                      getStatusBadgeVariant(selectedInvoice.status) as any
-                    }
-                    className="rounded-none text-xs font-mono uppercase px-2 py-0.5 mt-1"
+                    className={`rounded-none text-xs font-mono uppercase px-2 py-0.5 mt-1 ${getStatusBadgeClass(selectedInvoice.status)}`}
                   >
                     {selectedInvoice.status}
                   </Badge>
                 </div>
               </div>
 
-              {/* Itemized Table */}
+              {/* ITEMIZED TABLE */}
+
               <div className="space-y-3">
                 <span className="text-[10px] uppercase tracking-widest text-zinc-400 block">
                   Itemized Manifest
                 </span>
 
-                <table className="w-full border-collapse">
-                  <thead>
-                    <tr className="border-b border-zinc-300 text-left text-zinc-500">
-                      <th className="pb-2 font-medium">Item</th>
-                      <th className="pb-2 font-medium text-center">Qty</th>
-                      <th className="pb-2 font-medium text-right">Rate/Day</th>
-                      <th className="pb-2 font-medium text-right">Amount</th>
-                    </tr>
-                  </thead>
+                {loadingInvoiceId === selectedInvoice.id ? (
+                  <div className="flex items-center justify-center gap-2 py-10 text-zinc-400">
+                    <Loader2 className="h-4 w-4 animate-spin" />
 
-                  <tbody className="divide-y divide-zinc-200">
-                    {selectedInvoice.items?.map((item: any) => {
-                      const gear =
-                        item.gearItem || getGearDetails(item.gearItemId);
+                    <span className="text-xs font-mono uppercase">
+                      Loading invoice details...
+                    </span>
+                  </div>
+                ) : (
+                  <table className="w-full border-collapse">
+                    <thead>
+                      <tr className="border-b border-zinc-300 text-left text-zinc-500">
+                        <th className="pb-2 font-medium">Item</th>
+                        <th className="pb-2 font-medium text-center">Qty</th>
+                        <th className="pb-2 font-medium text-right">
+                          Rate/Day
+                        </th>
+                        <th className="pb-2 font-medium text-right">Amount</th>
+                      </tr>
+                    </thead>
 
-                      const quantity = Number(item.quantity) || 0;
-                      const rate = Number(item.pricePerDay) || 0;
-                      const itemAmount = rate * quantity;
+                    <tbody className="divide-y divide-zinc-200">
+                      {selectedInvoice.items?.map((item: any) => {
+                        const gear =
+                          item.gearItem || getGearDetails(item.gearItemId);
 
-                      const specifications = gear?.specifications
-                        ? Object.entries(gear.specifications).slice(0, 3)
-                        : [];
+                        const quantity = Number(item.quantity) || 0;
+                        const rate = Number(item.pricePerDay) || 0;
+                        const itemAmount = rate * quantity;
 
-                      return (
-                        <tr key={item.id || item.gearItemId}>
-                          <td className="py-3 pr-2 text-zinc-900 font-sans">
-                            <div className="flex items-start gap-2">
-                              {gear?.images?.[0] && (
-                                <img
-                                  src={gear.images[0]}
-                                  alt={gear.name || "Gear"}
-                                  className="w-12 h-12 object-cover border border-zinc-200 shrink-0"
-                                />
-                              )}
+                        const specifications = gear?.specifications
+                          ? Object.entries(gear.specifications).slice(0, 3)
+                          : [];
 
-                              <div className="min-w-0">
-                                <p className="font-medium">
-                                  {gear?.name || "Equipment Item"}
-                                </p>
+                        return (
+                          <tr key={item.id || item.gearItemId}>
+                            <td className="py-3 pr-2 text-zinc-900 font-sans">
+                              <div className="flex items-start gap-2">
+                                {gear?.images?.[0] && (
+                                  <img
+                                    src={gear.images[0]}
+                                    alt={gear.name || "Gear"}
+                                    className="w-12 h-12 object-cover border border-zinc-200 shrink-0"
+                                  />
+                                )}
 
-                                {gear?.brand && (
-                                  <p className="text-[10px] text-zinc-500 mt-0.5">
-                                    {gear.brand}
+                                <div className="min-w-0">
+                                  <p className="font-medium">
+                                    {gear?.name || "Equipment Item"}
                                   </p>
-                                )}
 
-                                {gear?.condition && (
-                                  <p className="text-[10px] text-zinc-500 mt-0.5">
-                                    Condition: {gear.condition}
-                                  </p>
-                                )}
+                                  {gear?.brand && (
+                                    <p className="text-[10px] text-zinc-500 mt-0.5">
+                                      {gear.brand}
+                                    </p>
+                                  )}
 
-                                {specifications.length > 0 && (
-                                  <div className="mt-1 space-y-0.5">
-                                    {specifications.map(([key, value]) => (
-                                      <p
-                                        key={key}
-                                        className="text-[9px] text-zinc-400"
-                                      >
-                                        {key}: {String(value)}
-                                      </p>
-                                    ))}
-                                  </div>
-                                )}
+                                  {gear?.condition && (
+                                    <p className="text-[10px] text-zinc-500 mt-0.5">
+                                      Condition: {gear.condition}
+                                    </p>
+                                  )}
+
+                                  {specifications.length > 0 && (
+                                    <div className="mt-1 space-y-0.5">
+                                      {specifications.map(
+                                        ([key, value]: any) => (
+                                          <p
+                                            key={key}
+                                            className="text-[9px] text-zinc-400"
+                                          >
+                                            {key}: {String(value)}
+                                          </p>
+                                        ),
+                                      )}
+                                    </div>
+                                  )}
+                                </div>
                               </div>
-                            </div>
-                          </td>
+                            </td>
 
-                          <td className="py-3 text-center text-zinc-600">
-                            {quantity}
-                          </td>
+                            <td className="py-3 text-center text-zinc-600">
+                              {quantity}
+                            </td>
 
-                          <td className="py-3 text-right text-zinc-600 whitespace-nowrap">
-                            ৳{rate.toLocaleString()}
-                          </td>
+                            <td className="py-3 text-right text-zinc-600 whitespace-nowrap">
+                              {formatCurrency(rate)}
+                            </td>
 
-                          <td className="py-3 text-right font-semibold text-zinc-900 whitespace-nowrap">
-                            ৳{itemAmount.toLocaleString()}
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
+                            <td className="py-3 text-right font-semibold text-zinc-900 whitespace-nowrap">
+                              {formatCurrency(itemAmount)}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                )}
               </div>
+
+              {/* INVOICE TOTAL */}
 
               <div className="border-t border-zinc-300 pt-4 flex justify-between items-center">
                 <div className="text-zinc-500 text-[11px] flex items-center gap-1">
@@ -952,12 +1266,175 @@ export default function CustomerCart({
                   </span>
 
                   <span className="text-lg font-bold text-zinc-900">
-                    ৳{Number(selectedInvoice.totalAmount).toLocaleString()} BDT
+                    {formatCurrency(selectedInvoice.totalAmount)} BDT
                   </span>
                 </div>
               </div>
 
-              <div className="pt-2 border-t border-zinc-200 flex justify-end">
+              {/* PAYMENT HISTORY IN MODAL */}
+
+              {(() => {
+                const invoicePayment = getPaymentForOrder(selectedInvoice);
+
+                if (!invoicePayment) {
+                  return (
+                    <div className="border border-zinc-200 bg-zinc-50 p-4 text-[10px] text-zinc-500">
+                      No payment transaction has been recorded for this rental
+                      order yet.
+                    </div>
+                  );
+                }
+
+                const isCompleted = invoicePayment.status === "COMPLETED";
+
+                return (
+                  <div
+                    className={`border p-4 space-y-3 ${
+                      isCompleted
+                        ? "border-emerald-200 bg-emerald-50/70"
+                        : invoicePayment.status === "FAILED"
+                          ? "border-red-200 bg-red-50/70"
+                          : "border-zinc-200 bg-zinc-50"
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        {isCompleted ? (
+                          <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+                        ) : (
+                          <CreditCard className="h-4 w-4 text-zinc-500" />
+                        )}
+
+                        <span className="text-[10px] uppercase tracking-widest text-zinc-600">
+                          Payment History
+                        </span>
+                      </div>
+
+                      <Badge
+                        className={`rounded-none ${
+                          isCompleted
+                            ? "bg-emerald-50 text-emerald-800 border-emerald-300 hover:bg-emerald-50"
+                            : invoicePayment.status === "FAILED"
+                              ? "bg-rose-50 text-rose-800 border-rose-300 hover:bg-rose-50"
+                              : "bg-zinc-100 text-zinc-700 border-zinc-300 hover:bg-zinc-100"
+                        }`}
+                      >
+                        {invoicePayment.status}
+                      </Badge>
+                    </div>
+
+                    <div className="flex justify-between border-b border-zinc-200 pb-2">
+                      <span className="text-zinc-500">Amount Paid</span>
+
+                      <span className="font-bold text-zinc-900">
+                        {formatCurrency(invoicePayment.amount)}
+                      </span>
+                    </div>
+
+                    <div className="space-y-2 text-[10px]">
+                      <div className="flex justify-between gap-3">
+                        <span className="text-zinc-500 flex items-center">
+                          <Clock className="h-3 w-3 inline mr-1" />
+                          Paid At
+                        </span>
+
+                        <span className="text-right text-zinc-800">
+                          {formatPaymentDate(invoicePayment.paidAt)}
+                        </span>
+                      </div>
+
+                      <div className="flex justify-between gap-3">
+                        <span className="text-zinc-500 shrink-0">
+                          Transaction ID
+                        </span>
+
+                        <span className="flex items-start justify-end gap-1.5 max-w-[65%]">
+                          <span className="text-right text-zinc-800 break-all">
+                            {invoicePayment.transactionId || "Not available"}
+                          </span>
+
+                          {invoicePayment.transactionId && (
+                            <button
+                              type="button"
+                              onClick={() =>
+                                handleCopy(
+                                  invoicePayment.transactionId,
+                                  "transactionId",
+                                )
+                              }
+                              className="shrink-0 mt-px text-zinc-400 hover:text-zinc-900 transition-colors"
+                              title="Copy transaction ID"
+                            >
+                              {copiedField === "transactionId" ? (
+                                <Check className="h-3.5 w-3.5 text-emerald-600" />
+                              ) : (
+                                <Copy className="h-3.5 w-3.5" />
+                              )}
+                            </button>
+                          )}
+                        </span>
+                      </div>
+
+                      <div className="flex justify-between gap-3">
+                        <span className="text-zinc-500 shrink-0">
+                          Payment ID
+                        </span>
+
+                        <span className="flex items-start justify-end gap-1.5 max-w-[65%]">
+                          <span className="text-right text-zinc-800 break-all">
+                            {invoicePayment.id}
+                          </span>
+
+                          <button
+                            type="button"
+                            onClick={() =>
+                              handleCopy(invoicePayment.id, "paymentId")
+                            }
+                            className="shrink-0 mt-px text-zinc-400 hover:text-zinc-900 transition-colors"
+                            title="Copy payment ID"
+                          >
+                            {copiedField === "paymentId" ? (
+                              <Check className="h-3.5 w-3.5 text-emerald-600" />
+                            ) : (
+                              <Copy className="h-3.5 w-3.5" />
+                            )}
+                          </button>
+                        </span>
+                      </div>
+
+                    </div>
+
+                    {isCompleted && (
+                      <div className="flex items-center gap-1.5 pt-2 border-t border-emerald-200/70 text-[10px] text-emerald-700">
+                        <ShieldCheck className="h-3.5 w-3.5" />
+                        Payment successfully verified
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
+
+              {/* PAYMENT + CLOSE BUTTONS */}
+
+              <div className="pt-2 border-t border-zinc-200 flex items-center justify-between">
+                <Button
+                  type="button"
+                  size="sm"
+                  disabled={
+                    loadingInvoiceId === selectedInvoice.id ||
+                    processingPaymentId === selectedInvoice.id ||
+                    !canPay(selectedInvoice)
+                  }
+                  onClick={() => {
+                    if (canPay(selectedInvoice)) {
+                      handlePayment(selectedInvoice.id);
+                    }
+                  }}
+                  className={`h-9 px-4 rounded-none text-xs font-mono uppercase ${getPaymentButtonClass(selectedInvoice)}`}
+                >
+                  {getPaymentButtonContent(selectedInvoice)}
+                </Button>
+
                 <Button
                   onClick={closeInvoice}
                   className="rounded-none bg-zinc-900 text-white hover:bg-zinc-800 text-xs font-mono uppercase px-6 h-9"

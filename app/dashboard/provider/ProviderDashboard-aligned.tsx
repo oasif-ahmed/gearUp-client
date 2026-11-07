@@ -64,7 +64,7 @@ const GearStatus = {
   NOT_AVAILABLE: "NOT_AVAILABLE",
 } as const;
 
-const STATUS_FLOW = ["PLACED", "CONFIRMED", "PICKED_UP", "RETURNED"];
+const STATUS_FLOW = ["PLACED", "CONFIRMED", "PAID", "PICKED_UP", "RETURNED"];
 
 type GearStatusType = (typeof GearStatus)[keyof typeof GearStatus];
 
@@ -1399,9 +1399,15 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
                       {STATUS_FLOW.map((statusOption) => {
                         const currentIndex = STATUS_FLOW.indexOf(selectedInvoice.status);
                         const optionIndex = STATUS_FLOW.indexOf(statusOption);
+
+                        // PAID is set automatically by the payment flow, so it is
+                        // never a manual choice (it still shows when it is the
+                        // current status). Earlier steps are locked once the order
+                        // has moved past them.
                         const isDisabled =
-                          optionIndex < currentIndex &&
-                          selectedInvoice.status !== "CANCELLED";
+                          statusOption === "PAID" ||
+                          (optionIndex < currentIndex &&
+                            selectedInvoice.status !== "CANCELLED");
 
                         return (
                           <SelectItem
