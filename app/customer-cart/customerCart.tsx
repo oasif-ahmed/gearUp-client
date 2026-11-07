@@ -1090,7 +1090,7 @@ export default function CustomerCart({
 
         {selectedInvoice && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/60 backdrop-blur-xs p-4">
-            <div className="w-full max-w-xl max-h-[90vh] overflow-y-auto border border-zinc-300 bg-[#FDFBF7] p-8 rounded-none shadow-2xl space-y-6 relative font-mono text-xs">
+            <div className="w-full max-w-xl max-h-[90vh] overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden border border-zinc-300 bg-[#FDFBF7] p-8 rounded-none shadow-2xl space-y-6 relative font-mono text-xs">
               <button
                 type="button"
                 onClick={closeInvoice}

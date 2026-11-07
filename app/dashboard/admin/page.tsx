@@ -1,9 +1,32 @@
-// app/(dashboard)/customer/page.tsx
-export default function AdminDashboardPage() {
+import AdminDashboard from "./adminClient";
+import {
+  getAllUsers,
+  updateUserStatus,
+  getAllAdminGear,
+  getAllAdminRentalOrders,
+  createCategory,
+  getCategoriesWithGear,
+} from "@/services/admin.service";
+
+export default async function AdminDashboardPage() {
+  // Fetch all required administrative data concurrently on the server
+  const [users, gearItems, rentalOrders, categories] = await Promise.all([
+    getAllUsers(),
+    getAllAdminGear(),
+    getAllAdminRentalOrders(),
+    getCategoriesWithGear(),
+  ]);
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <h1 className="text-4xl font-bold">Admin Dashboard</h1>
-      <p className="mt-4">Welcome to your admin dashboard!</p>
+    <main className="min-h-screen bg-background">
+      <AdminDashboard
+        users={users}
+        gearItems={gearItems}
+        rentalOrders={rentalOrders}
+        categories={categories}
+        onUpdateUserStatus={updateUserStatus}
+        onCreateCategory={createCategory}
+      />
     </main>
   );
 }

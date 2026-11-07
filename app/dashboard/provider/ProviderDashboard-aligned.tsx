@@ -107,6 +107,7 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
   const searchParams = useSearchParams();
   const orderIdFromUrl = searchParams.get("orderId");
   const [activeTab, setActiveTab] = useState<"gear" | "orders">("gear");
+  const [gearView, setGearView] = useState<"add" | "inventory">("add");
 
   useEffect(() => {
     if (orderIdFromUrl && rentalOrders) {
@@ -589,24 +590,41 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
           </h1>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-1 bg-white border border-zinc-200 p-1">
           <button
-            onClick={() => setActiveTab("gear")}
-            className={`px-4 py-2 text-xs font-mono uppercase tracking-wider rounded-none border transition-colors ${
-              activeTab === "gear"
-                ? "bg-zinc-900 text-white border-zinc-900"
-                : "bg-white text-zinc-700 border-zinc-200 hover:bg-zinc-50"
+            onClick={() => {
+              setActiveTab("gear");
+              setGearView("add");
+            }}
+            className={`px-3 py-2 text-xs font-mono uppercase tracking-wider transition-colors ${
+              activeTab === "gear" && gearView === "add"
+                ? "bg-zinc-900 text-white font-semibold"
+                : "text-zinc-600 hover:bg-zinc-50"
             }`}
           >
-            Gear Inventory
+            Add Equipment
+          </button>
+
+          <button
+            onClick={() => {
+              setActiveTab("gear");
+              setGearView("inventory");
+            }}
+            className={`px-3 py-2 text-xs font-mono uppercase tracking-wider transition-colors ${
+              activeTab === "gear" && gearView === "inventory"
+                ? "bg-zinc-900 text-white font-semibold"
+                : "text-zinc-600 hover:bg-zinc-50"
+            }`}
+          >
+            Active Inventory ({inventory.length})
           </button>
 
           <button
             onClick={() => setActiveTab("orders")}
-            className={`px-4 py-2 text-xs font-mono uppercase tracking-wider rounded-none border transition-colors ${
+            className={`px-3 py-2 text-xs font-mono uppercase tracking-wider transition-colors ${
               activeTab === "orders"
-                ? "bg-zinc-900 text-white border-zinc-900"
-                : "bg-white text-zinc-700 border-zinc-200 hover:bg-zinc-50"
+                ? "bg-zinc-900 text-white font-semibold"
+                : "text-zinc-600 hover:bg-zinc-50"
             }`}
           >
             Rental Invoices & Orders
@@ -623,6 +641,7 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
       {activeTab === "gear" && (
         <div className="w-full max-w-[1340px] mx-auto space-y-6">
           {/* Add New Gear Form */}
+          {gearView === "add" && (
           <div className="min-w-0 border border-zinc-200 bg-white p-5 sm:p-6 lg:p-8 rounded-none shadow-sm">
             <div className="mb-6 border-b border-zinc-100 pb-4">
               <h2 className="text-sm font-mono uppercase tracking-tight text-zinc-900 flex items-center gap-2">
@@ -1041,8 +1060,10 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
               </div>
             </form>
           </div>
+          )}
 
           {/* Inventory Table */}
+          {gearView === "inventory" && (
           <div className="w-full min-w-0 border border-zinc-200 bg-white p-5 sm:p-6 lg:p-6 2xl:p-8 rounded-none shadow-sm">
             <div className="mb-6 flex items-center justify-between border-b border-zinc-100 pb-4">
               <div>
@@ -1151,6 +1172,7 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
               </Table>
             </div>
           </div>
+          )}
         </div>
       )}
 
