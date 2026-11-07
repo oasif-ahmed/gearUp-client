@@ -327,16 +327,17 @@ export default function GearDetailsClient({
 
           {/* Invoice Summary & Cart Action */}
           <div className="lg:col-span-5 flex flex-col justify-between bg-white border border-zinc-200 p-8 shadow-xs">
-            <div>
-              <div className="flex items-center gap-2 mb-2">
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
                 <span className="uppercase tracking-wider text-zinc-500">{gearItem.brand}</span>
                 <span className="text-zinc-300">•</span>
                 <span className="uppercase text-zinc-500">Condition: {gearItem.condition || "Standard"}</span>
               </div>
-              <h1 className="text-2xl font-normal tracking-tight text-zinc-900 mb-3 font-serif">
+              <h1 className="text-2xl font-normal tracking-tight text-zinc-900 font-serif">
                 {gearItem.name}
               </h1>
-              <p className="text-xs text-zinc-600 leading-relaxed border-b border-zinc-100 pb-6 line-clamp-3">
+              {/* Removed line-clamp-3 so long descriptions flow cleanly without getting clipped */}
+              <p className="text-xs text-zinc-600 leading-relaxed border-b border-zinc-100 pb-6 whitespace-pre-line">
                 {gearItem.description}
               </p>
             </div>
@@ -364,7 +365,7 @@ export default function GearDetailsClient({
                 className="w-full rounded-none bg-zinc-900 text-white hover:bg-zinc-800 text-xs uppercase tracking-wider h-11 flex items-center justify-center gap-2"
               >
                 <ShoppingCart className="h-4 w-4" />
-                {isOutOfStock ? "Out of Stock" : `Add to Cart — ৳${gearItem.pricePerDay}/Day`}
+                {isOutOfStock ? "Out of Stock" : `Add to Cart — ৳{gearItem.pricePerDay}/Day`}
               </Button>
               <p className="text-[10px] text-zinc-400 text-center">
                 Zero hidden fees. Deposit released upon return verification.
@@ -374,13 +375,14 @@ export default function GearDetailsClient({
         </div>
 
         {/* Technical Specs & Safeguards */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 pt-4">
-          <div className="md:col-span-7 bg-white border border-zinc-200 p-8 shadow-xs">
-            <h2 className="uppercase tracking-widest text-zinc-900 font-semibold mb-6 flex items-center gap-2 border-b border-zinc-100 pb-3">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 pt-4 items-start">
+          {/* Added max height and vertical scrolling for specs so it doesn't leave huge empty gaps on the right if specifications are long */}
+          <div className="md:col-span-7 bg-white border border-zinc-200 p-8 shadow-xs flex flex-col">
+            <h2 className="uppercase tracking-widest text-zinc-900 font-semibold mb-6 flex items-center gap-2 border-b border-zinc-100 pb-3 shrink-0">
               <Layers className="h-4 w-4 text-zinc-700" /> Technical Specifications
             </h2>
             {specEntries.length > 0 ? (
-              <div className="divide-y divide-zinc-100">
+              <div className="divide-y divide-zinc-100 max-h-[420px] overflow-y-auto pr-2">
                 {specEntries.map(([key, value]) => (
                   <div key={key} className="py-2.5 flex justify-between items-center gap-4">
                     <span className="text-zinc-500 capitalize">{key.replace(/([A-Z])/g, " $1")}</span>
@@ -554,7 +556,7 @@ export default function GearDetailsClient({
                             onClick={() => handleUpdateReview(rev.id)}
                             className="rounded-none bg-zinc-900 text-white hover:bg-zinc-800 text-[10px] uppercase h-7 px-3 flex items-center gap-1"
                           >
-                            <Check className="h-3 w-3" /> {isUpdatingReview ? "Saving..." : "Save Changes"}
+                            <Check className="h-3.5 w-3.5" /> {isUpdatingReview ? "Saving..." : "Save Changes"}
                           </Button>
                         </div>
                       </div>
