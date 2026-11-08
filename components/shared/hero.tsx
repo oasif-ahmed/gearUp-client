@@ -111,15 +111,15 @@ export default function Hero() {
               {/* Line Items */}
               <div className="space-y-3 font-sans text-xs">
                 <div className="flex justify-between py-2 border-b border-zinc-100 text-zinc-600">
-                  <span>Equipment Rental Escrow (Carbon Trek V4)</span>
+                  <span>Manduka PRO Premium Yoga and Exercise Mat</span>
                   <span className="font-mono font-medium text-zinc-900">$1,450.00</span>
                 </div>
                 <div className="flex justify-between py-2 border-b border-zinc-100 text-zinc-600">
-                  <span>Dynamic Rate Limiting & Token Bucket API</span>
+                  <span>CAP Barbell 30kg Rubber Coated Hex Dumbbell Set</span>
                   <span className="font-mono font-medium text-zinc-900">$320.00</span>
                 </div>
                 <div className="flex justify-between py-2 border-b border-zinc-100 text-zinc-600">
-                  <span>Automated Gateway Settlement Fee (1.2%)</span>
+                  <span>Reebok Professional Adjustable Weight Bench</span>
                   <span className="font-mono font-medium text-zinc-900">$21.84</span>
                 </div>
               </div>
