@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState, useTransition } from "react";
+import React, { useState, useEffect, useTransition } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Menu, X, Rocket, User, Settings, LogOut, LayoutDashboard, ShieldAlert } from "lucide-react";
-import { logoutUser } from "@/services/auth.service"; // Adjust import path if needed
+import { logoutUser } from "@/services/auth.service";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -29,9 +30,20 @@ interface NavbarProps {
   user?: User | null;
 }
 
-const Navbar = ({ user }: NavbarProps) => {
+export default function Navbar({ user }: NavbarProps) {
+  const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const [isPending, startTransition] = useTransition();
+
+  // Scroll compression effect
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const handleLogout = () => {
     startTransition(async () => {
@@ -49,77 +61,76 @@ const Navbar = ({ user }: NavbarProps) => {
     );
   };
 
-  // Role checks (case-insensitive for safety)
+  // Role checks
   const userRole = user?.role?.toUpperCase();
   const isProvider = userRole === "PROVIDER";
   const isAdmin = userRole === "ADMIN";
   const isCustomer = userRole === "CUSTOMER";
 
+  // Helper for active link highlighting
+  const isActive = (path: string) => pathname === path;
+
+  const navLinks = [
+    { name: "Home", href: "/" },
+    { name: "Gear Items", href: "/gear-items" },
+    { name: "Features", href: "/features" },
+    { name: "About", href: "/about" },
+  ];
+
   return (
-    <header className="sticky top-0 z-50 w-full px-4 pt-3 sm:px-6 lg:px-8">
-      {/* Contained Floating / Island Navbar */}
-      <nav className="mx-auto max-w-6xl border border-black-200 bg-background/90 px-4 py-2.5 shadow-xs backdrop-blur-md">
+    <header className="sticky top-0 z-50 w-full px-4 pt-3 sm:px-6 lg:px-8 transition-all duration-300">
+      <nav
+        className={`mx-auto max-w-6xl border border-zinc-200/80 bg-[#FDFBF7]/90 backdrop-blur-md text-zinc-900 px-4 transition-all duration-300 rounded-none shadow-xs ${
+          isScrolled ? "py-2" : "py-3"
+        }`}
+      >
         <div className="flex items-center justify-between">
           
           {/* Logo */}
           <div className="flex items-center gap-2">
-            <Link href="/" className="flex items-center space-x-2">
-              <div className="flex h-8 w-8 items-center justify-center bg-zinc-900 text-white shadow-xs rounded-none">
+            <Link href="/" className="flex items-center space-x-2 group">
+              <div className="flex h-8 w-8 items-center justify-center bg-zinc-900 text-white shadow-xs rounded-none group-hover:bg-zinc-800 transition-colors">
                 <Rocket className="h-4 w-4" />
               </div>
-              <span className="text-sm font-bold tracking-tight text-zinc-900">
+              <span className="text-sm font-bold tracking-tight text-zinc-900 font-mono">
                 Gear Up
               </span>
             </Link>
           </div>
 
-          {/* Desktop Links */}
-          <div className="hidden items-center space-x-6 md:flex">
-            <Link
-              href="/"
-              className="text-xs font-medium text-zinc-600 transition-colors hover:text-zinc-900"
-            >
-              Home
-            </Link>
-            <Link
-              href="/gear-items"
-              className="text-xs font-medium text-zinc-600 transition-colors hover:text-zinc-900"
-            >
-              Gear Items
-            </Link>
-            <Link
-              href="#features"
-              className="text-xs font-medium text-zinc-600 transition-colors hover:text-zinc-900"
-            >
-              Features
-            </Link>
-            <Link
-              href="#pricing"
-              className="text-xs font-medium text-zinc-600 transition-colors hover:text-zinc-900"
-            >
-              Pricing
-            </Link>
-            <Link
-              href="#about"
-              className="text-xs font-medium text-zinc-600 transition-colors hover:text-zinc-900"
-            >
-              About
-            </Link>
+          {/* Desktop Navigation Links */}
+          <div className="hidden items-center space-x-1.5 md:flex font-mono text-xs">
+            {navLinks.map((link) => {
+              const active = isActive(link.href);
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`px-3 py-1.5 uppercase transition-all rounded-none ${
+                    active
+                      ? "bg-zinc-900 text-white font-semibold shadow-2xs"
+                      : "text-zinc-600 hover:text-zinc-900 hover:bg-zinc-200/50"
+                  }`}
+                >
+                  {link.name}
+                </Link>
+              );
+            })}
           </div>
 
-          {/* Actions & Profile (Desktop) */}
-          <div className="hidden items-center space-x-2 md:flex">
+          {/* Actions & User Profile */}
+          <div className="hidden items-center space-x-3 md:flex font-mono">
             {!user ? (
               <>
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="text-xs font-medium text-zinc-600 hover:text-zinc-900 h-8 px-3 rounded-none"
+                  className="text-xs font-medium h-8 px-3 rounded-none text-zinc-600 hover:text-zinc-900 hover:bg-zinc-200/50 uppercase"
                   asChild
                 >
                   <Link href="/login">Log in</Link>
                 </Button>
-                <Button size="sm" className="h-8 text-xs bg-zinc-900 text-white hover:bg-zinc-800 rounded-none px-3">
+                <Button size="sm" className="h-8 text-xs bg-zinc-900 text-white hover:bg-zinc-800 rounded-none px-3 uppercase tracking-wider font-semibold">
                   <Link href="/register">Register</Link>
                 </Button>
               </>
@@ -128,9 +139,9 @@ const Navbar = ({ user }: NavbarProps) => {
                 <DropdownMenuTrigger asChild>
                   <Button
                     variant="ghost"
-                    className="relative h-8 w-8 rounded-none p-0 focus-visible:ring-0"
+                    className="relative h-8 w-8 rounded-none p-0 focus-visible:ring-0 border border-zinc-300"
                   >
-                    <div className="h-8 w-8 rounded-none border border-zinc-200 bg-zinc-100 flex items-center justify-center overflow-hidden">
+                    <div className="h-8 w-8 rounded-none bg-zinc-100 flex items-center justify-center overflow-hidden">
                       {user?.profile?.profilePhoto ? (
                         <img
                           src={user?.profile?.profilePhoto}
@@ -138,49 +149,47 @@ const Navbar = ({ user }: NavbarProps) => {
                           className="h-full w-full object-cover"
                         />
                       ) : (
-                        <span className="text-xs font-medium font-mono text-zinc-800">
+                        <span className="text-xs font-semibold font-mono text-zinc-900">
                           {getInitials(user?.name || "User")}
                         </span>
                       )}
                     </div>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56 rounded-none border-zinc-200" align="end" forceMount>
+                <DropdownMenuContent className="w-56 rounded-none border-zinc-200 bg-[#FDFBF7] text-zinc-900 font-mono text-xs shadow-md" align="end" forceMount>
                   <DropdownMenuLabel className="font-normal">
                     <div className="flex flex-col space-y-1">
-                      <p className="text-xs font-medium leading-none text-zinc-900">
+                      <p className="text-xs font-bold leading-none text-zinc-900">
                         {user?.name || "User"}
                       </p>
-                      <p className="text-[10px] font-mono leading-none text-zinc-500">
+                      <p className="text-[10px] leading-none text-zinc-500">
                         {user?.email || "user@example.com"}
                       </p>
                     </div>
                   </DropdownMenuLabel>
-                  <DropdownMenuSeparator />
+                  <DropdownMenuSeparator className="bg-zinc-200" />
                   
                   {isProvider && (
                     <DropdownMenuItem asChild>
-                      <Link href="/dashboard/provider" className="cursor-pointer text-xs rounded-none">
+                      <Link href="/dashboard/provider" className="cursor-pointer text-xs rounded-none hover:bg-zinc-100 focus:bg-zinc-100">
                         <LayoutDashboard className="mr-2 h-3.5 w-3.5 text-zinc-500" />
                         <span>Provider Dashboard</span>
                       </Link>
                     </DropdownMenuItem>
                   )}
 
-                  {/* Conditionally render Customer Cart */}
                   {isCustomer && (
                     <DropdownMenuItem asChild>
-                      <Link href="/customer-cart" className="cursor-pointer text-xs rounded-none">
+                      <Link href="/customer-cart" className="cursor-pointer text-xs rounded-none hover:bg-zinc-100 focus:bg-zinc-100">
                         <LayoutDashboard className="mr-2 h-3.5 w-3.5 text-zinc-500" />
                         <span>My Cart</span>
                       </Link>
                     </DropdownMenuItem>
                   )}
 
-                  {/* Conditionally render Admin Dashboard */}
                   {isAdmin && (
                     <DropdownMenuItem asChild>
-                      <Link href="/dashboard/admin" className="cursor-pointer text-xs rounded-none">
+                      <Link href="/dashboard/admin" className="cursor-pointer text-xs rounded-none hover:bg-zinc-100 focus:bg-zinc-100">
                         <ShieldAlert className="mr-2 h-3.5 w-3.5 text-zinc-500" />
                         <span>Admin Dashboard</span>
                       </Link>
@@ -188,18 +197,18 @@ const Navbar = ({ user }: NavbarProps) => {
                   )}
 
                   <DropdownMenuItem asChild>
-                    <Link href="/profile" className="cursor-pointer text-xs rounded-none">
+                    <Link href="/profile" className="cursor-pointer text-xs rounded-none hover:bg-zinc-100 focus:bg-zinc-100">
                       <User className="mr-2 h-3.5 w-3.5 text-zinc-500" />
                       <span>Profile</span>
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link href="/settings" className="cursor-pointer text-xs rounded-none">
+                    <Link href="/settings" className="cursor-pointer text-xs rounded-none hover:bg-zinc-100 focus:bg-zinc-100">
                       <Settings className="mr-2 h-3.5 w-3.5 text-zinc-500" />
                       <span>Settings</span>
                     </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuSeparator />
+                  <DropdownMenuSeparator className="bg-zinc-200" />
                   <DropdownMenuItem
                     className="cursor-pointer text-xs text-red-600 focus:bg-red-50 focus:text-red-600 rounded-none"
                     disabled={isPending}
@@ -218,7 +227,7 @@ const Navbar = ({ user }: NavbarProps) => {
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8 rounded-none"
+              className="h-8 w-8 rounded-none text-zinc-900 hover:bg-zinc-200/50"
               onClick={() => setIsOpen(!isOpen)}
               aria-label="Toggle Menu"
             >
@@ -227,53 +236,36 @@ const Navbar = ({ user }: NavbarProps) => {
           </div>
         </div>
 
-        {/* Mobile Menu Dropdown Inside the Container */}
+        {/* Mobile Menu Dropdown */}
         {isOpen && (
-          <div className="mt-3 border-t border-zinc-200 pt-3 md:hidden">
+          <div className="mt-3 border-t border-zinc-200 pt-3 md:hidden font-mono text-xs">
             <div className="flex flex-col space-y-1">
-              <Link
-                href="/"
-                className="px-3 py-1.5 text-xs font-medium text-zinc-600 hover:bg-zinc-100"
-                onClick={() => setIsOpen(false)}
-              >
-                Home
-              </Link>
-              <Link
-                href="/gear-items"
-                className="px-3 py-1.5 text-xs font-medium text-zinc-600 hover:bg-zinc-100"
-                onClick={() => setIsOpen(false)}
-              >
-                Gear Items
-              </Link>
-              <Link
-                href="#features"
-                className="px-3 py-1.5 text-xs font-medium text-zinc-600 hover:bg-zinc-100"
-                onClick={() => setIsOpen(false)}
-              >
-                Features
-              </Link>
-              <Link
-                href="#pricing"
-                className="px-3 py-1.5 text-xs font-medium text-zinc-600 hover:bg-zinc-100"
-                onClick={() => setIsOpen(false)}
-              >
-                Pricing
-              </Link>
-              <Link
-                href="#about"
-                className="px-3 py-1.5 text-xs font-medium text-zinc-600 hover:bg-zinc-100"
-                onClick={() => setIsOpen(false)}
-              >
-                About
-              </Link>
+              {navLinks.map((link) => {
+                const active = isActive(link.href);
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className={`px-3 py-2 uppercase transition-all ${
+                      active
+                        ? "bg-zinc-900 text-white font-bold"
+                        : "text-zinc-600 hover:bg-zinc-200/50 hover:text-zinc-900"
+                    }`}
+                    onClick={() => setIsOpen(false)}
+                  >
+                    {link.name}
+                  </Link>
+                );
+              })}
             </div>
+            
             <div className="mt-3 flex flex-col gap-2 border-t border-zinc-200 pt-3">
               {user ? (
                 <>
                   {isProvider && (
                     <Link
                       href="/dashboard/provider"
-                      className="inline-flex items-center justify-center rounded-none border border-zinc-200 px-3 py-1.5 text-xs font-medium text-zinc-900 hover:bg-zinc-50"
+                      className="inline-flex items-center justify-center border border-zinc-300 px-3 py-2 text-xs font-medium text-zinc-900 hover:bg-zinc-100 uppercase"
                       onClick={() => setIsOpen(false)}
                     >
                       Provider Dashboard
@@ -282,7 +274,7 @@ const Navbar = ({ user }: NavbarProps) => {
                   {isCustomer && (
                     <Link
                       href="/customer-cart"
-                      className="inline-flex items-center justify-center rounded-none border border-zinc-200 px-3 py-1.5 text-xs font-medium text-zinc-900 hover:bg-zinc-50"
+                      className="inline-flex items-center justify-center border border-zinc-300 px-3 py-2 text-xs font-medium text-zinc-900 hover:bg-zinc-100 uppercase"
                       onClick={() => setIsOpen(false)}
                     >
                       My Cart
@@ -291,7 +283,7 @@ const Navbar = ({ user }: NavbarProps) => {
                   {isAdmin && (
                     <Link
                       href="/dashboard/admin"
-                      className="inline-flex items-center justify-center rounded-none border border-zinc-200 px-3 py-1.5 text-xs font-medium text-zinc-900 hover:bg-zinc-50"
+                      className="inline-flex items-center justify-center border border-zinc-300 px-3 py-2 text-xs font-medium text-zinc-900 hover:bg-zinc-100 uppercase"
                       onClick={() => setIsOpen(false)}
                     >
                       Admin Dashboard
@@ -299,14 +291,14 @@ const Navbar = ({ user }: NavbarProps) => {
                   )}
                   <Link
                     href="/profile"
-                    className="inline-flex items-center justify-center rounded-none border border-zinc-200 px-3 py-1.5 text-xs font-medium text-zinc-900 hover:bg-zinc-50"
+                    className="inline-flex items-center justify-center border border-zinc-300 px-3 py-2 text-xs font-medium text-zinc-900 hover:bg-zinc-100 uppercase"
                     onClick={() => setIsOpen(false)}
                   >
                     My Profile
                   </Link>
                   <button
                     disabled={isPending}
-                    className="inline-flex items-center justify-center rounded-none bg-red-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-red-700 disabled:opacity-50"
+                    className="inline-flex items-center justify-center bg-red-600 px-3 py-2 text-xs font-medium text-white hover:bg-red-700 disabled:opacity-50 uppercase"
                     onClick={() => {
                       setIsOpen(false);
                       handleLogout();
@@ -319,14 +311,14 @@ const Navbar = ({ user }: NavbarProps) => {
                 <>
                   <Link
                     href="/login"
-                    className="inline-flex items-center justify-center rounded-none border border-zinc-200 px-3 py-1.5 text-xs font-medium text-zinc-900 hover:bg-zinc-50"
+                    className="inline-flex items-center justify-center border border-zinc-300 px-3 py-2 text-xs font-medium text-zinc-900 hover:bg-zinc-100 uppercase"
                     onClick={() => setIsOpen(false)}
                   >
                     Log in
                   </Link>
                   <Link
                     href="/register"
-                    className="inline-flex items-center justify-center rounded-none bg-zinc-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-zinc-800"
+                    className="inline-flex items-center justify-center bg-zinc-900 text-white px-3 py-2 text-xs font-bold hover:bg-zinc-800 uppercase"
                     onClick={() => setIsOpen(false)}
                   >
                     Register
@@ -339,6 +331,4 @@ const Navbar = ({ user }: NavbarProps) => {
       </nav>
     </header>
   );
-};
-
-export default Navbar;
+}
