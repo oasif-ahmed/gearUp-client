@@ -43,19 +43,20 @@ export const loginUser = async (prevState: any, formData: FormData) => {
   if (result.success && result.data) {
     const cookieStore = await cookies();
 
+    // Changed sameSite to "lax" and secure to conditionally follow the environment
     cookieStore.set("accessToken", result.data.jwtAccessToken, {
       httpOnly: true,
       maxAge: 60 * 60 * 24,
-      sameSite: "none",
-      secure: true, // Required for HTTPS (Vercel backend)
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
       path: "/",
     });
 
     cookieStore.set("refreshToken", result.data.jwtRefreshToken, {
       httpOnly: true,
       maxAge: 60 * 60 * 24 * 7,
-      sameSite: "none",
-      secure: true, // Required for HTTPS (Vercel backend)
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
       path: "/",
     });
 
@@ -73,14 +74,14 @@ export const loginUser = async (prevState: any, formData: FormData) => {
     if (payload.role === "CUSTOMER") {
       redirect("/");
     } else if (payload.role === "PROVIDER") {
-      redirect("dashboard/provider");
+      // Added leading slash to ensure absolute path resolution
+      redirect("/dashboard/provider");
     } else if (payload.role === "ADMIN") {
       redirect("/dashboard/admin");
     }
     return result.data.user;
   }
 };
-
 
 // register
 export const registerUser = async (prevState: any, formData: FormData) => {
@@ -89,40 +90,55 @@ export const registerUser = async (prevState: any, formData: FormData) => {
   const password = formData.get("password") as string;
   const role = formData.get("role") as string;
 
+  let isSuccess = false;
+
   try {
-    const res = await fetch(`${process.env.BACKEND_API_URL}/api/user/register`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
+    const res = await fetch(
+      `${process.env.BACKEND_API_URL}/api/user/register`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name,
+          email,
+          password,
+          role,
+        }),
       },
-      body: JSON.stringify({
-        name,
-        email,
-        password,
-        role,  
-      }),
-    });
+    );
 
     const result = await res.json();
 
     if (!res.ok) {
-      return { success: false, message: result.message || "Registration failed!" };
+      return {
+        success: false,
+        message: result.message || "Registration failed!",
+      };
     }
 
-    if (result.data?.user || res.ok) {
-      redirect("/login");
+    if (result.success || res.ok) {
+      isSuccess = true;
     }
-
-    return { success: true, message: "Registered successfully!" };
   } catch (error: any) {
-    // Next.js redirect throws a special error that must be re-thrown
-    if (error.message === "NEXT_REDIRECT") {
+    // If it's a redirect error from a nested call, re-throw it
+    if (error.message?.includes("NEXT_REDIRECT")) {
       throw error;
     }
-    return { success: false, message: error.message || "An unexpected error occurred." };
+    return {
+      success: false,
+      message: error.message || "An unexpected error occurred.",
+    };
   }
-};
 
+  // Call redirect OUTSIDE the try/catch block for reliability
+  if (isSuccess) {
+    redirect("/login");
+  }
+
+  return { success: true, message: "Registered successfully!" };
+};
 
 export async function logoutUser() {
   const cookieStore = await cookies();
@@ -133,15 +149,17 @@ export async function logoutUser() {
   redirect("/");
 }
 
-
 interface UpdateProfilePayload {
   name?: string;
   bio?: string;
   profilePhoto?: string;
 }
 
-
-export const updateProfile = async (payload: { name: string; bio: string; profilePhoto: string }) => {
+export const updateProfile = async (payload: {
+  name: string;
+  bio: string;
+  profilePhoto: string;
+}) => {
   try {
     const cookieStore = await cookies();
     const accessToken = cookieStore.get("accessToken")?.value;
@@ -152,7 +170,7 @@ export const updateProfile = async (payload: { name: string; bio: string; profil
         "Content-Type": "application/json",
         Authorization: `Bearer ${accessToken}`,
       },
-      
+
       body: JSON.stringify({
         name: payload.name,
         bio: payload.bio,
@@ -164,7 +182,10 @@ export const updateProfile = async (payload: { name: string; bio: string; profil
     const result = await res.json();
 
     if (!res.ok || !result.success) {
-      return { success: false, message: result.message || "Failed to update profile." };
+      return {
+        success: false,
+        message: result.message || "Failed to update profile.",
+      };
     }
 
     revalidatePath("/", "layout");

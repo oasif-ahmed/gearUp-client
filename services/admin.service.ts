@@ -30,7 +30,7 @@ export async function updateUserStatus(userId: string, activeStatus: string) {
     const cookieStore = await cookies();
     const token = cookieStore.get("accessToken")?.value;
 
-    const res = await fetch(`https://gear-up-ivory-nine.vercel.app/api/admin/users/${userId}`, {
+    const res = await fetch(`${process.env.BACKEND_API_URL}/api/admin/users/${userId}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
