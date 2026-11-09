@@ -28,9 +28,10 @@ interface User {
 
 interface NavbarProps {
   user?: User | null;
+  k?: number
 }
 
-export default function Navbar({ user }: NavbarProps) {
+export default function Navbar({ user, k }: NavbarProps) {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);

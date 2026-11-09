@@ -1,7 +1,7 @@
 "use client";
 
+import Navbar from "@/components/shared/navbar";
 import React, { useEffect, useRef, useState } from "react";
-import LumenNavbar from "./LumenNavbar";
 
 export default function LumenHero() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -189,7 +189,7 @@ export default function LumenHero() {
 
   return (
     <main className="relative h-[100svh] min-h-[520px] overflow-hidden isolate bg-[#0b1426]">
-      <LumenNavbar k={kVal} />
+      <Navbar k={kVal} />
 
       {/* 1. Sky Layer */}
       <div className="absolute inset-0 w-full h-full">

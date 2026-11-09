@@ -27,11 +27,13 @@ const initialState = {
 const LoginForm = () => {
   const [state, action, pending] = useActionState(loginUser, initialState);
 
-  {state && state.message && !state.success && (
-  <div className="p-2.5 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 text-rose-700 dark:text-rose-400 text-xs font-mono">
-    {state.message}
-  </div>
-)}
+  {
+    state && state.message && !state.success && (
+      <div className="p-2.5 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 text-rose-700 dark:text-rose-400 text-xs font-mono">
+        {state.message}
+      </div>
+    );
+  }
 
   return (
     <div className="w-full max-w-md mx-auto relative z-10 font-mono">

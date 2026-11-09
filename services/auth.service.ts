@@ -17,7 +17,6 @@ export interface RegisterPayload {
   role: string;
 }
 
-
 export const loginUser = async (prevState: any, formData: FormData) => {
   if (!formData || !formData.get("email")) {
     return prevState;
@@ -26,26 +25,23 @@ export const loginUser = async (prevState: any, formData: FormData) => {
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
 
-  const res = await fetch(
-    `${process.env.BACKEND_API_URL}/api/auth/login`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email, password }),
-    }
-  );
+  const res = await fetch(`${process.env.BACKEND_API_URL}/api/auth/login`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ email, password }),
+  });
 
   const result = await res.json();
 
   if (!res.ok) {
-  return {
-    success: false,
-    statusCode: res.status,
-    message: result.message || "Invalid email or password",
-  };
-}
+    return {
+      success: false,
+      statusCode: res.status,
+      message: result.message || "Invalid email or password",
+    };
+  }
 
   if (result.success && result.data) {
     const accessToken = result.data.jwtAccessToken;
@@ -77,7 +73,7 @@ export const loginUser = async (prevState: any, formData: FormData) => {
 
     const decodedToken = jwtUtils.verifyToken(
       accessToken,
-      process.env.JWT_ACCESS_SECRET!
+      process.env.JWT_ACCESS_SECRET!,
     );
 
     if (!decodedToken.success) {
@@ -101,7 +97,6 @@ export const loginUser = async (prevState: any, formData: FormData) => {
 
   throw new Error(result.message || "Login failed!");
 };
-
 
 // register
 export const registerUser = async (prevState: any, formData: FormData) => {
@@ -134,7 +129,8 @@ export const registerUser = async (prevState: any, formData: FormData) => {
     if (!res.ok) {
       return {
         success: false,
-        message: result.message || "Registration failed!",
+        statusCode: res.status,
+        message: result.message || "Invalid email or password",
       };
     }
 
