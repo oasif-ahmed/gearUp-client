@@ -17,8 +17,8 @@ export interface RegisterPayload {
   role: string;
 }
 
+
 export const loginUser = async (prevState: any, formData: FormData) => {
-  // Handle SSR - return prevState when no form data (initial render)
   if (!formData || !formData.get("email")) {
     return prevState;
   }
@@ -26,13 +26,16 @@ export const loginUser = async (prevState: any, formData: FormData) => {
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
 
-  const res = await fetch(`${process.env.BACKEND_API_URL}/api/auth/login`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ email, password }),
-  });
+  const res = await fetch(
+    `${process.env.BACKEND_API_URL}/api/auth/login`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email, password }),
+    }
+  );
 
   const result = await res.json();
 
@@ -41,10 +44,16 @@ export const loginUser = async (prevState: any, formData: FormData) => {
   }
 
   if (result.success && result.data) {
+    const accessToken = result.data.jwtAccessToken;
+    const refreshToken = result.data.jwtRefreshToken;
+
+    if (!accessToken) {
+      throw new Error("Access token not found in login response");
+    }
+
     const cookieStore = await cookies();
 
-    // Changed sameSite to "lax" and secure to conditionally follow the environment
-    cookieStore.set("accessToken", result.data.jwtAccessToken, {
+    cookieStore.set("accessToken", accessToken, {
       httpOnly: true,
       maxAge: 60 * 60 * 24,
       sameSite: "lax",
@@ -52,20 +61,24 @@ export const loginUser = async (prevState: any, formData: FormData) => {
       path: "/",
     });
 
-    cookieStore.set("refreshToken", result.data.jwtRefreshToken, {
-      httpOnly: true,
-      maxAge: 60 * 60 * 24 * 7,
-      sameSite: "lax",
-      secure: process.env.NODE_ENV === "production",
-      path: "/",
-    });
+    if (refreshToken) {
+      cookieStore.set("refreshToken", refreshToken, {
+        httpOnly: true,
+        maxAge: 60 * 60 * 24 * 7,
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production",
+        path: "/",
+      });
+    }
 
     const decodedToken = jwtUtils.verifyToken(
-      result.data.jwtAccessToken,
-      process.env.JWT_ACCESS_SECRET!,
+      accessToken,
+      process.env.JWT_ACCESS_SECRET!
     );
 
     if (!decodedToken.success) {
+      cookieStore.delete("accessToken");
+      cookieStore.delete("refreshToken");
       throw new Error(decodedToken.error);
     }
 
@@ -74,14 +87,17 @@ export const loginUser = async (prevState: any, formData: FormData) => {
     if (payload.role === "CUSTOMER") {
       redirect("/");
     } else if (payload.role === "PROVIDER") {
-      // Added leading slash to ensure absolute path resolution
       redirect("/dashboard/provider");
     } else if (payload.role === "ADMIN") {
       redirect("/dashboard/admin");
     }
+
     return result.data.user;
   }
+
+  throw new Error(result.message || "Login failed!");
 };
+
 
 // register
 export const registerUser = async (prevState: any, formData: FormData) => {
