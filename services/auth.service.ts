@@ -40,8 +40,12 @@ export const loginUser = async (prevState: any, formData: FormData) => {
   const result = await res.json();
 
   if (!res.ok) {
-    throw new Error(result.message || "Login failed!");
-  }
+  return {
+    success: false,
+    statusCode: res.status,
+    message: result.message || "Invalid email or password",
+  };
+}
 
   if (result.success && result.data) {
     const accessToken = result.data.jwtAccessToken;

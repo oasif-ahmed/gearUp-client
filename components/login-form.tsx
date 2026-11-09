@@ -27,6 +27,12 @@ const initialState = {
 const LoginForm = () => {
   const [state, action, pending] = useActionState(loginUser, initialState);
 
+  {state && state.message && !state.success && (
+  <div className="p-2.5 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 text-rose-700 dark:text-rose-400 text-xs font-mono">
+    {state.message}
+  </div>
+)}
+
   return (
     <div className="w-full max-w-md mx-auto relative z-10 font-mono">
       <Card className="bg-[#ede8df] dark:bg-zinc-800 border border-[#d8d2c6] dark:border-zinc-700 rounded-none shadow-sm text-[#2c2a29] dark:text-[#f4f1ea]">
@@ -38,7 +44,7 @@ const LoginForm = () => {
             Enter your credentials to access your dashboard
           </CardDescription>
         </CardHeader>
-        
+
         <CardContent className="pt-6">
           {/* Explicitly ensure form action and proper pointer interactivity */}
           <form action={action} className="space-y-4 relative">
@@ -49,7 +55,10 @@ const LoginForm = () => {
             )}
 
             <div className="space-y-1.5">
-              <Label htmlFor="email" className="text-xs font-mono uppercase text-[#6b655f] dark:text-zinc-300">
+              <Label
+                htmlFor="email"
+                className="text-xs font-mono uppercase text-[#6b655f] dark:text-zinc-300"
+              >
                 Email Address
               </Label>
               <Input
@@ -63,22 +72,50 @@ const LoginForm = () => {
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="password" className="text-xs font-mono uppercase text-[#6b655f] dark:text-zinc-300">
+              <Label
+                htmlFor="password"
+                className="text-xs font-mono uppercase text-[#6b655f] dark:text-zinc-300"
+              >
                 Password
               </Label>
+
               <Input
                 name="password"
                 id="password"
                 type="password"
                 placeholder="••••••••"
                 required
-                className="h-9 rounded-none text-xs border-[#d8d2c6] dark:border-zinc-700 bg-[#f4f1ea] dark:bg-zinc-900 text-[#2c2a29] dark:text-white relative z-20 font-mono"
+                aria-invalid={!!state?.message && !state.success}
+                aria-describedby={
+                  state?.message && !state.success
+                    ? "password-error"
+                    : undefined
+                }
+                className={`h-9 rounded-none text-xs bg-[#f4f1ea] dark:bg-zinc-900 text-[#2c2a29] dark:text-white relative z-20 font-mono ${
+                  state?.message && !state.success
+                    ? "border-rose-500 focus-visible:ring-rose-500"
+                    : "border-[#d8d2c6] dark:border-zinc-700"
+                }`}
               />
+
+              {state?.message && !state.success && (
+                <p
+                  id="password-error"
+                  className="text-xs text-rose-600 dark:text-rose-400 font-mono"
+                  role="alert"
+                >
+                  {state.message}
+                </p>
+              )}
             </div>
 
             <div className="flex items-center justify-between pt-1">
               <div className="flex items-center space-x-2">
-                <Checkbox id="remember-me" name="remember" className="rounded-none border-[#d8d2c6] dark:border-zinc-700 bg-[#f4f1ea] dark:bg-zinc-900" />
+                <Checkbox
+                  id="remember-me"
+                  name="remember"
+                  className="rounded-none border-[#d8d2c6] dark:border-zinc-700 bg-[#f4f1ea] dark:bg-zinc-900"
+                />
                 <Label
                   htmlFor="remember-me"
                   className="text-xs text-[#6b655f] dark:text-zinc-400 font-normal leading-none cursor-pointer font-mono"
@@ -96,9 +133,9 @@ const LoginForm = () => {
             </div>
 
             {/* Ensured button is fully clickable with proper stacking context */}
-            <Button 
-              type="submit" 
-              className="w-full h-9 rounded-none bg-[#2c2a29] text-[#f4f1ea] hover:bg-[#43403e] dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200 text-xs font-medium cursor-pointer relative z-20 font-mono uppercase tracking-wider" 
+            <Button
+              type="submit"
+              className="w-full h-9 rounded-none bg-[#2c2a29] text-[#f4f1ea] hover:bg-[#43403e] dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200 text-xs font-medium cursor-pointer relative z-20 font-mono uppercase tracking-wider"
               disabled={pending}
             >
               {pending ? <Spinner /> : "Login"}
@@ -119,10 +156,18 @@ const LoginForm = () => {
           </div>
 
           <div className="grid grid-cols-2 gap-3 w-full pt-2">
-            <Button variant="outline" type="button" className="h-9 rounded-none text-xs border-[#d8d2c6] dark:border-zinc-700 bg-[#f4f1ea] dark:bg-zinc-900 hover:bg-[#e2ddd3] dark:hover:bg-zinc-800 cursor-pointer font-mono">
+            <Button
+              variant="outline"
+              type="button"
+              className="h-9 rounded-none text-xs border-[#d8d2c6] dark:border-zinc-700 bg-[#f4f1ea] dark:bg-zinc-900 hover:bg-[#e2ddd3] dark:hover:bg-zinc-800 cursor-pointer font-mono"
+            >
               Google
             </Button>
-            <Button variant="outline" type="button" className="h-9 rounded-none text-xs border-[#d8d2c6] dark:border-zinc-700 bg-[#f4f1ea] dark:bg-zinc-900 hover:bg-[#e2ddd3] dark:hover:bg-zinc-800 cursor-pointer font-mono">
+            <Button
+              variant="outline"
+              type="button"
+              className="h-9 rounded-none text-xs border-[#d8d2c6] dark:border-zinc-700 bg-[#f4f1ea] dark:bg-zinc-900 hover:bg-[#e2ddd3] dark:hover:bg-zinc-800 cursor-pointer font-mono"
+            >
               GitHub
             </Button>
           </div>
