@@ -21,7 +21,7 @@ const isRoute = (pathname: string, routes: string[]) => {
 const getDashboardRoute = (role: string | null) => {
   switch (role) {
     case "CUSTOMER":
-      return "/customer";
+      return "/customer-cart";
 
     case "PROVIDER":
       return "/dashboard/provider";
@@ -74,7 +74,7 @@ export function proxy(request: NextRequest) {
   // 6. Protect all remaining routes
   if (!isAuthenticated) {
     const response = NextResponse.redirect(
-      new URL("/auth/login", request.url)
+      new URL("/login", request.url)
     );
 
     if (accessToken) {
@@ -86,7 +86,7 @@ export function proxy(request: NextRequest) {
 
   // 7. Role-based authorization
   if (
-    pathname.startsWith("/customer") &&
+    pathname.startsWith("/customer-cart") &&
     userRole !== "CUSTOMER"
   ) {
     return NextResponse.redirect(
