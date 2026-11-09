@@ -24,7 +24,7 @@ export default async function RootLayout({
       <body className={`${inter.className} bg-background text-foreground antialiased selection:bg-zinc-900 selection:text-[#FDFBF7]`}>
         <Navbar user={user} />
         <main className="min-h-screen pb-16 md:pb-0">{children}
-           <Toaster richColors position="top-center" /> {/* Add this line */}
+           <Toaster richColors position="top-center" />
         </main>
         <Footer />
       </body>
