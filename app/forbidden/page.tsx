@@ -1,10 +1,9 @@
-
 import Link from "next/link";
 import { ShieldAlert, ArrowLeft, Home } from "lucide-react";
 
 export default function ForbiddenPage() {
   return (
-    <main className="flex min-h-[80vh] items-center justify-center px-6">
+    <main className="flex min-h-[80vh] items-center justify-center px-6 bg-background">
       <div className="w-full max-w-xl text-center">
         <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-red-500/10">
           <ShieldAlert className="h-10 w-10 text-red-500" />
@@ -14,7 +13,7 @@ export default function ForbiddenPage() {
           Access Denied
         </p>
 
-        <h1 className="mt-4 text-3xl font-bold">
+        <h1 className="mt-4 text-3xl font-bold text-foreground">
           403 - Forbidden
         </h1>
 
@@ -33,8 +32,8 @@ export default function ForbiddenPage() {
           </Link>
 
           <Link
-            href="/auth/login"
-            className="inline-flex items-center gap-2 rounded-lg border px-6 py-3 font-medium transition hover:bg-muted"
+            href="/login"
+            className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-6 py-3 font-medium text-foreground transition hover:bg-accent/50"
           >
             <ArrowLeft size={18} />
             Login with another account

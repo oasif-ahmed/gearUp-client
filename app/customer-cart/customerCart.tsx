@@ -270,11 +270,11 @@ export default function CustomerCart({
       case "PICKED_UP":
         return "bg-emerald-50 text-emerald-800 border-emerald-300 hover:bg-emerald-50";
       case "RETURNED":
-        return "bg-zinc-100 text-zinc-700 border-zinc-300 hover:bg-zinc-100";
+        return "bg-muted text-foreground border-border hover:bg-muted";
       case "CANCELLED":
         return "bg-rose-50 text-rose-800 border-rose-300 hover:bg-rose-50";
       default:
-        return "bg-zinc-50 text-zinc-600 border-zinc-200 hover:bg-zinc-50";
+        return "bg-muted text-muted-foreground border-border hover:bg-muted";
     }
   };
 
@@ -322,7 +322,7 @@ export default function CustomerCart({
       return "bg-red-50 text-red-700 border border-red-200 hover:bg-red-100";
     }
 
-    return "bg-zinc-900 text-white hover:bg-zinc-800";
+    return "bg-primary text-white hover:bg-primary/90";
   };
 
   // ============================================
@@ -560,28 +560,28 @@ export default function CustomerCart({
   // ============================================
 
   return (
-    <div className="min-h-screen bg-[#FDFBF7] py-10 text-zinc-900">
+    <div className="min-h-screen bg-background py-10 text-foreground">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         {/* HEADER */}
 
-        <div className="border-b border-zinc-200 pb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div className="border-b border-border pb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
-            <span className="text-xs font-mono uppercase tracking-widest text-zinc-500">
+            <span className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
               [ Customer Portal ]
             </span>
 
-            <h1 className="text-3xl font-light tracking-tight text-zinc-900 mt-1">
+            <h1 className="text-3xl font-light tracking-tight text-foreground mt-1">
               My Rental Portal
             </h1>
           </div>
 
-          <div className="flex items-center gap-2 bg-white border border-zinc-200 p-1">
+          <div className="flex items-center gap-2 bg-card border border-border p-1">
             <button
               onClick={() => setActiveTab("orders")}
               className={`px-4 py-2 text-xs font-mono uppercase tracking-wider transition-colors flex items-center gap-1.5 ${
                 activeTab === "orders"
-                  ? "bg-zinc-900 text-white font-semibold"
-                  : "text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50"
+                  ? "bg-primary text-primary-foreground font-semibold"
+                  : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
               }`}
             >
               <LayoutDashboard className="h-3.5 w-3.5" />
@@ -592,8 +592,8 @@ export default function CustomerCart({
               onClick={() => setActiveTab("cart")}
               className={`px-4 py-2 text-xs font-mono uppercase tracking-wider transition-colors flex items-center gap-1.5 ${
                 activeTab === "cart"
-                  ? "bg-zinc-900 text-white font-semibold"
-                  : "text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50"
+                  ? "bg-primary text-primary-foreground font-semibold"
+                  : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
               }`}
             >
               <ShoppingCart className="h-3.5 w-3.5" />
@@ -612,8 +612,8 @@ export default function CustomerCart({
               onClick={() => setActiveTab("reviews")}
               className={`px-4 py-2 text-xs font-mono uppercase tracking-wider transition-colors flex items-center gap-1.5 ${
                 activeTab === "reviews"
-                  ? "bg-zinc-900 text-white font-semibold"
-                  : "text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50"
+                  ? "bg-primary text-primary-foreground font-semibold"
+                  : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
               }`}
             >
               <MessageSquare className="h-3.5 w-3.5" />
@@ -629,9 +629,9 @@ export default function CustomerCart({
         {activeTab === "orders" && (
           <div className="space-y-6">
             {rentalOrders.length === 0 && (
-              <Card className="rounded-none border-zinc-200 bg-white p-12 text-center shadow-xs">
+              <Card className="rounded-none border-border bg-card p-12 text-center shadow-xs">
                 <CardHeader className="space-y-2">
-                  <Package className="h-10 w-10 text-zinc-400 mx-auto" />
+                  <Package className="h-10 w-10 text-muted-foreground mx-auto" />
 
                   <CardTitle className="text-lg font-mono uppercase tracking-tight">
                     No Active Rentals Found
@@ -639,13 +639,13 @@ export default function CustomerCart({
                 </CardHeader>
 
                 <CardContent>
-                  <p className="text-xs font-mono text-zinc-500 max-w-sm mx-auto mb-6">
+                  <p className="text-xs font-mono text-muted-foreground max-w-sm mx-auto mb-6">
                     You haven't reserved or rented any gear equipment yet.
                   </p>
 
                   <Button
                     asChild
-                    className="rounded-none bg-zinc-900 text-white hover:bg-zinc-800 text-xs font-mono uppercase px-6"
+                    className="rounded-none bg-primary text-white hover:bg-primary/90 text-xs font-mono uppercase px-6"
                   >
                     <a href="/gear-items">Browse Gear Directory</a>
                   </Button>
@@ -689,18 +689,18 @@ export default function CustomerCart({
                   <Card
                     key={order.id}
                     onClick={() => handleViewOrderDetails(order.id)}
-                    className="group rounded-none border-zinc-200 bg-white p-5 hover:border-zinc-900 cursor-pointer transition-all flex flex-col justify-between shadow-xs hover:shadow-md"
+                    className="group rounded-none border-border bg-card p-5 hover:border-primary cursor-pointer transition-all flex flex-col justify-between shadow-xs hover:shadow-md"
                   >
                     <div>
                       {/* ORDER HEADER */}
 
-                      <div className="flex items-start justify-between border-b border-zinc-100 pb-3 mb-4">
+                      <div className="flex items-start justify-between border-b border-border pb-3 mb-4">
                         <div>
-                          <span className="text-[10px] font-mono text-zinc-400 uppercase tracking-widest block">
+                          <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest block">
                             INV #{order.id.slice(0, 8).toUpperCase()}
                           </span>
 
-                          <span className="text-xs font-mono font-semibold text-zinc-900">
+                          <span className="text-xs font-mono font-semibold text-foreground">
                             {order.invoiceNo || `ORD-${order.id.slice(-4)}`}
                           </span>
                         </div>
@@ -722,7 +722,7 @@ export default function CustomerCart({
                                 loadingInvoiceId === order.id
                               }
                               onClick={(e) => handleCancelOrder(e, order.id)}
-                              className="p-1 text-zinc-400 hover:text-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                              className="p-1 text-muted-foreground hover:text-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                               title="Cancel order"
                             >
                               {cancellingOrderId === order.id ? (
@@ -738,7 +738,7 @@ export default function CustomerCart({
                       {/* GEAR INFORMATION */}
 
                       <div className="flex items-center gap-3 mb-4">
-                        <div className="w-14 h-14 shrink-0 border border-zinc-200 overflow-hidden bg-zinc-50">
+                        <div className="w-14 h-14 shrink-0 border border-border overflow-hidden bg-muted">
                           <img
                             src={firstImage}
                             alt={firstGear?.name || "Gear"}
@@ -747,11 +747,11 @@ export default function CustomerCart({
                         </div>
 
                         <div className="min-w-0 flex-1">
-                          <p className="text-xs font-mono uppercase text-zinc-400">
+                          <p className="text-xs font-mono uppercase text-muted-foreground">
                             {firstGear?.brand || "Equipment"}
                           </p>
 
-                          <h3 className="text-sm font-medium text-zinc-900 truncate">
+                          <h3 className="text-sm font-medium text-foreground truncate">
                             {firstGear?.name ||
                               `Gear Asset (${uniqueItems} items)`}
                           </h3>
@@ -760,20 +760,20 @@ export default function CustomerCart({
 
                       {/* ORDER SUMMARY */}
 
-                      <div className="space-y-2 bg-[#FDFBF7] p-3 border border-zinc-200/80 font-mono text-[11px] text-zinc-600 mb-4">
+                      <div className="space-y-2 bg-background p-3 border border-border/80 font-mono text-[11px] text-muted-foreground mb-4">
                         <div className="flex justify-between items-center">
-                          <span className="text-zinc-400 flex items-center gap-1">
+                          <span className="text-muted-foreground flex items-center gap-1">
                             <Package className="h-3 w-3" />
                             Quantity
                           </span>
 
-                          <span className="font-medium text-zinc-900">
+                          <span className="font-medium text-foreground">
                             {totalQty} unit(s)
                           </span>
                         </div>
 
                         <div className="flex justify-between items-center">
-                          <span className="text-zinc-400 flex items-center gap-1">
+                          <span className="text-muted-foreground flex items-center gap-1">
                             <Calendar className="h-3 w-3" />
                             Duration
                           </span>
@@ -782,17 +782,17 @@ export default function CustomerCart({
                         </div>
 
                         <div className="flex justify-between items-center">
-                          <span className="text-zinc-400">Rental Start</span>
+                          <span className="text-muted-foreground">Rental Start</span>
 
-                          <span className="text-zinc-900">
+                          <span className="text-foreground">
                             {startDate.toLocaleDateString()}
                           </span>
                         </div>
 
                         <div className="flex justify-between items-center">
-                          <span className="text-zinc-400">Rental End</span>
+                          <span className="text-muted-foreground">Rental End</span>
 
-                          <span className="text-zinc-900">
+                          <span className="text-foreground">
                             {endDate.toLocaleDateString()}
                           </span>
                         </div>
@@ -802,30 +802,30 @@ export default function CustomerCart({
 
                     {/* FULFILLMENT PROGRESS */}
 
-                    <div className="space-y-1.5 border-t border-zinc-100 pt-3">
-                      <div className="flex justify-between text-[10px] font-mono text-zinc-400 uppercase">
+                    <div className="space-y-1.5 border-t border-border pt-3">
+                      <div className="flex justify-between text-[10px] font-mono text-muted-foreground uppercase">
                         <span>Fulfillment Status</span>
 
-                        <span className="text-zinc-900 font-semibold">
+                        <span className="text-foreground font-semibold">
                           {order.status}
                         </span>
                       </div>
 
                       <Progress
                         value={getStatusStep(order.status)}
-                        className="h-1 rounded-none bg-zinc-100"
+                        className="h-1 rounded-none bg-muted"
                       />
                     </div>
 
                     {/* TOTAL + PAYMENT BUTTON */}
 
-                    <div className="flex items-center justify-between border-t border-zinc-100 pt-3 mt-3">
+                    <div className="flex items-center justify-between border-t border-border pt-3 mt-3">
                       <div>
-                        <span className="text-[10px] font-mono uppercase text-zinc-400 block">
+                        <span className="text-[10px] font-mono uppercase text-muted-foreground block">
                           Total Fee
                         </span>
 
-                        <span className="text-base font-bold text-zinc-900 font-mono">
+                        <span className="text-base font-bold text-foreground font-mono">
                           {formatCurrency(order.totalAmount)}
                         </span>
                       </div>
@@ -862,9 +862,9 @@ export default function CustomerCart({
         {activeTab === "cart" && (
           <div className="space-y-6">
             {cartItems.length === 0 ? (
-              <Card className="rounded-none border-zinc-200 bg-white p-12 text-center shadow-xs">
+              <Card className="rounded-none border-border bg-card p-12 text-center shadow-xs">
                 <CardHeader className="space-y-2">
-                  <ShoppingCart className="h-10 w-10 text-zinc-400 mx-auto" />
+                  <ShoppingCart className="h-10 w-10 text-muted-foreground mx-auto" />
 
                   <CardTitle className="text-lg font-mono uppercase tracking-tight">
                     Your Cart is Empty
@@ -872,14 +872,14 @@ export default function CustomerCart({
                 </CardHeader>
 
                 <CardContent>
-                  <p className="text-xs font-mono text-zinc-500 max-w-sm mx-auto mb-6">
+                  <p className="text-xs font-mono text-muted-foreground max-w-sm mx-auto mb-6">
                     Browse the directory and add items to your cart to create a
                     combined rental manifest.
                   </p>
 
                   <Button
                     asChild
-                    className="rounded-none bg-zinc-900 text-white hover:bg-zinc-800 text-xs font-mono uppercase px-6"
+                    className="rounded-none bg-primary text-white hover:bg-primary/90 text-xs font-mono uppercase px-6"
                   >
                     <a href="/gear-items">Browse Gear Directory</a>
                   </Button>
@@ -888,8 +888,8 @@ export default function CustomerCart({
             ) : (
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
                 <div className="lg:col-span-8 space-y-4">
-                  <Card className="rounded-none border-zinc-200 bg-white p-6 shadow-xs">
-                    <h2 className="text-xs font-mono uppercase tracking-widest text-zinc-500 mb-6 border-b border-zinc-100 pb-3">
+                  <Card className="rounded-none border-border bg-card p-6 shadow-xs">
+                    <h2 className="text-xs font-mono uppercase tracking-widest text-muted-foreground mb-6 border-b border-border pb-3">
                       Selected Cart Assets ({cartItems.length})
                     </h2>
 
@@ -905,10 +905,10 @@ export default function CustomerCart({
                         return (
                           <div
                             key={item.gearItemId}
-                            className="flex items-center justify-between gap-4 border-b border-zinc-100 pb-4 last:border-0 last:pb-0"
+                            className="flex items-center justify-between gap-4 border-b border-border pb-4 last:border-0 last:pb-0"
                           >
                             <div className="flex items-center gap-3">
-                              <div className="w-16 h-16 shrink-0 border border-zinc-200 overflow-hidden bg-zinc-50">
+                              <div className="w-16 h-16 shrink-0 border border-border overflow-hidden bg-muted">
                                 <img
                                   src={
                                     gear?.images?.[0] ||
@@ -920,19 +920,19 @@ export default function CustomerCart({
                               </div>
 
                               <div>
-                                <p className="text-[10px] font-mono uppercase text-zinc-400">
+                                <p className="text-[10px] font-mono uppercase text-muted-foreground">
                                   {gear?.brand || "Equipment"}
                                 </p>
 
-                                <h4 className="text-sm font-medium text-zinc-900">
+                                <h4 className="text-sm font-medium text-foreground">
                                   {gear?.name || "Gear Asset"}
                                 </h4>
 
-                                <p className="text-xs font-mono text-zinc-600">
+                                <p className="text-xs font-mono text-muted-foreground">
                                   {formatCurrency(rate)} / day
                                 </p>
 
-                                <p className="text-[10px] font-mono text-zinc-400 mt-1">
+                                <p className="text-[10px] font-mono text-muted-foreground mt-1">
                                   {isUnavailable
                                     ? "Currently unavailable"
                                     : `${availableQuantity} unit(s) in inventory`}
@@ -947,7 +947,7 @@ export default function CustomerCart({
                             </div>
 
                             <div className="flex items-center gap-4">
-                              <div className="flex items-center border border-zinc-200 bg-white h-9">
+                              <div className="flex items-center border border-border bg-card h-9">
                                 <button
                                   type="button"
                                   onClick={() =>
@@ -956,12 +956,12 @@ export default function CustomerCart({
                                       item.quantity - 1,
                                     )
                                   }
-                                  className="px-2.5 hover:bg-zinc-100 text-zinc-600 h-full flex items-center justify-center border-r border-zinc-200"
+                                  className="px-2.5 hover:bg-muted text-muted-foreground h-full flex items-center justify-center border-r border-border"
                                 >
                                   <Minus className="h-3 w-3" />
                                 </button>
 
-                                <span className="w-8 text-center text-xs font-mono font-medium text-zinc-900">
+                                <span className="w-8 text-center text-xs font-mono font-medium text-foreground">
                                   {item.quantity}
                                 </span>
 
@@ -977,7 +977,7 @@ export default function CustomerCart({
                                       item.quantity + 1,
                                     )
                                   }
-                                  className="px-2.5 hover:bg-zinc-100 text-zinc-600 h-full flex items-center justify-center border-l border-zinc-200 disabled:opacity-40 disabled:cursor-not-allowed"
+                                  className="px-2.5 hover:bg-muted text-muted-foreground h-full flex items-center justify-center border-l border-border disabled:opacity-40 disabled:cursor-not-allowed"
                                   title="Increase quantity"
                                 >
                                   <Plus className="h-3 w-3" />
@@ -987,7 +987,7 @@ export default function CustomerCart({
                               <button
                                 type="button"
                                 onClick={() => removeFromCart(item.gearItemId)}
-                                className="text-zinc-400 hover:text-red-600 p-1.5 transition-colors"
+                                className="text-muted-foreground hover:text-red-600 p-1.5 transition-colors"
                                 title="Remove item"
                               >
                                 <Trash2 className="h-4 w-4" />
@@ -1001,14 +1001,14 @@ export default function CustomerCart({
                 </div>
 
                 <div className="lg:col-span-4 space-y-4">
-                  <Card className="rounded-none border-zinc-200 bg-white p-6 shadow-xs space-y-4">
-                    <h2 className="text-xs font-mono uppercase tracking-widest text-zinc-500 border-b border-zinc-100 pb-2">
+                  <Card className="rounded-none border-border bg-card p-6 shadow-xs space-y-4">
+                    <h2 className="text-xs font-mono uppercase tracking-widest text-muted-foreground border-b border-border pb-2">
                       Rental Window & Summary
                     </h2>
 
                     <div className="space-y-3 font-mono">
                       <div className="space-y-1">
-                        <label className="text-[10px] uppercase text-zinc-400">
+                        <label className="text-[10px] uppercase text-muted-foreground">
                           Start Date (All Items)
                         </label>
 
@@ -1016,12 +1016,12 @@ export default function CustomerCart({
                           type="date"
                           value={globalStartDate}
                           onChange={(e) => setGlobalStartDate(e.target.value)}
-                          className="h-9 text-xs rounded-none border-zinc-200 bg-white font-mono"
+                          className="h-9 text-xs rounded-none border-border bg-card font-mono"
                         />
                       </div>
 
                       <div className="space-y-1">
-                        <label className="text-[10px] uppercase text-zinc-400">
+                        <label className="text-[10px] uppercase text-muted-foreground">
                           End Date (All Items)
                         </label>
 
@@ -1029,16 +1029,16 @@ export default function CustomerCart({
                           type="date"
                           value={globalEndDate}
                           onChange={(e) => setGlobalEndDate(e.target.value)}
-                          className="h-9 text-xs rounded-none border-zinc-200 bg-white font-mono"
+                          className="h-9 text-xs rounded-none border-border bg-card font-mono"
                         />
                       </div>
                     </div>
 
-                    <div className="space-y-2 font-mono text-xs text-zinc-600 border-t border-zinc-100 pt-3">
+                    <div className="space-y-2 font-mono text-xs text-muted-foreground border-t border-border pt-3">
                       <div className="flex justify-between">
                         <span>Total Items</span>
 
-                        <span className="font-semibold text-zinc-900">
+                        <span className="font-semibold text-foreground">
                           {cartItems.reduce(
                             (sum, item) => sum + Number(item.quantity),
                             0,
@@ -1050,12 +1050,12 @@ export default function CustomerCart({
                       <div className="flex justify-between">
                         <span>Billing Window</span>
 
-                        <span className="font-semibold text-zinc-900">
+                        <span className="font-semibold text-foreground">
                           {getCartTotalDays()} Day(s)
                         </span>
                       </div>
 
-                      <div className="flex justify-between text-sm font-bold text-zinc-900 border-t border-zinc-200 pt-3">
+                      <div className="flex justify-between text-sm font-bold text-foreground border-t border-border pt-3">
                         <span>Combined Total</span>
 
                         <span>{formatCurrency(calculateCartTotal())} BDT</span>
@@ -1064,13 +1064,13 @@ export default function CustomerCart({
 
                     <Button
                       onClick={handleCheckout}
-                      className="w-full rounded-none bg-zinc-900 text-white hover:bg-zinc-800 text-xs font-mono uppercase h-10 tracking-wider flex items-center justify-center gap-2"
+                      className="w-full rounded-none bg-primary text-white hover:bg-primary/90 text-xs font-mono uppercase h-10 tracking-wider flex items-center justify-center gap-2"
                     >
                       <CreditCard className="h-4 w-4" />
                       Checkout & Place Combined Order
                     </Button>
 
-                    <p className="text-[10px] font-mono text-zinc-400 text-center">
+                    <p className="text-[10px] font-mono text-muted-foreground text-center">
                       * Applies shared schedule to all cart assets.
                     </p>
                   </Card>
@@ -1087,9 +1087,9 @@ export default function CustomerCart({
         {activeTab === "reviews" && (
           <div className="space-y-6">
             {myReviews.length === 0 ? (
-              <Card className="rounded-none border-zinc-200 bg-white p-12 text-center shadow-xs">
+              <Card className="rounded-none border-border bg-card p-12 text-center shadow-xs">
                 <CardHeader className="space-y-2">
-                  <MessageSquare className="h-10 w-10 text-zinc-400 mx-auto" />
+                  <MessageSquare className="h-10 w-10 text-muted-foreground mx-auto" />
 
                   <CardTitle className="text-lg font-mono uppercase tracking-tight">
                     No Reviews Found
@@ -1097,7 +1097,7 @@ export default function CustomerCart({
                 </CardHeader>
 
                 <CardContent>
-                  <p className="text-xs font-mono text-zinc-500 max-w-sm mx-auto mb-6">
+                  <p className="text-xs font-mono text-muted-foreground max-w-sm mx-auto mb-6">
                     You haven't submitted any reviews for your rented items yet.
                   </p>
                 </CardContent>
@@ -1112,12 +1112,12 @@ export default function CustomerCart({
                     <Card
                       key={review.id}
                       onClick={() => handleViewReviewDetails(review)}
-                      className="group rounded-none border-zinc-200 bg-white p-5 hover:border-zinc-900 cursor-pointer transition-all flex flex-col justify-between shadow-xs hover:shadow-md"
+                      className="group rounded-none border-border bg-card p-5 hover:border-primary cursor-pointer transition-all flex flex-col justify-between shadow-xs hover:shadow-md"
                     >
                       <div>
-                        <div className="flex items-start justify-between border-b border-zinc-100 pb-3 mb-4">
+                        <div className="flex items-start justify-between border-b border-border pb-3 mb-4">
                           <div>
-                            <span className="text-[10px] font-mono text-zinc-400 uppercase tracking-widest block">
+                            <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest block">
                               REV #{review.id.slice(0, 8).toUpperCase()}
                             </span>
 
@@ -1128,35 +1128,35 @@ export default function CustomerCart({
                                   className={`h-3.5 w-3.5 ${
                                     i < (review.rating || 0)
                                       ? "fill-current text-amber-500"
-                                      : "text-zinc-300"
+                                      : "text-muted-foreground"
                                   }`}
                                 />
                               ))}
                             </div>
                           </div>
 
-                          <Badge className="rounded-none text-[10px] font-mono uppercase px-2 py-0.5 bg-zinc-100 text-zinc-700 border-zinc-300">
+                          <Badge className="rounded-none text-[10px] font-mono uppercase px-2 py-0.5 bg-muted text-foreground border-border">
                             {review.rating} Stars
                           </Badge>
                         </div>
 
                         <div className="mb-4">
-                          <p className="text-[10px] font-mono uppercase text-zinc-400">
+                          <p className="text-[10px] font-mono uppercase text-muted-foreground">
                             {reviewGear?.brand || "Equipment"}
                           </p>
 
-                          <h3 className="text-sm font-medium text-zinc-900 truncate">
+                          <h3 className="text-sm font-medium text-foreground truncate">
                             {reviewGear?.name || "Gear Item"}
                           </h3>
                         </div>
 
-                        <p className="text-xs font-mono text-zinc-600 line-clamp-3 bg-[#FDFBF7] p-3 border border-zinc-200/80">
+                        <p className="text-xs font-mono text-muted-foreground line-clamp-3 bg-background p-3 border border-border/80">
                           "{review.comment || review.content || "No comment provided."}"
                         </p>
                       </div>
 
-                      <div className="border-t border-zinc-100 pt-3 mt-4 flex items-center justify-between text-[10px] font-mono">
-                        <span className="text-zinc-400">
+                      <div className="border-t border-border pt-3 mt-4 flex items-center justify-between text-[10px] font-mono">
+                        <span className="text-muted-foreground">
                           {review.createdAt
                             ? new Date(review.createdAt).toLocaleDateString()
                             : "N/A"}
@@ -1168,7 +1168,7 @@ export default function CustomerCart({
                             variant="outline"
                             size="sm"
                             onClick={(e) => e.stopPropagation()}
-                            className="h-7 px-2.5 rounded-none text-[10px] font-mono uppercase border-zinc-300 hover:bg-zinc-900 hover:text-white"
+                            className="h-7 px-2.5 rounded-none text-[10px] font-mono uppercase border-border hover:bg-primary hover:text-white"
                           >
                             <a href={`/gear-items/${gearId}`}>
                               View Product <ExternalLink className="h-3 w-3 ml-1" />
@@ -1189,26 +1189,26 @@ export default function CustomerCart({
         {/* ====================================== */}
 
         {selectedInvoice && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/60 backdrop-blur-xs p-4">
-            <div className="w-full max-w-xl max-h-[90vh] overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden border border-zinc-300 bg-[#FDFBF7] p-8 rounded-none shadow-2xl space-y-6 relative font-mono text-xs">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-primary/60 backdrop-blur-xs p-4">
+            <div className="w-full max-w-xl max-h-[90vh] overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden border border-border bg-background p-8 rounded-none shadow-2xl space-y-6 relative font-mono text-xs">
               <button
                 type="button"
                 onClick={closeInvoice}
-                className="absolute top-6 right-6 text-zinc-400 hover:text-zinc-900 transition-colors"
+                className="absolute top-6 right-6 text-muted-foreground hover:text-foreground transition-colors"
               >
                 <X className="h-5 w-5" />
               </button>
 
-              <div className="text-center border-b border-zinc-300 pb-6 space-y-1 font-serif">
-                <span className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 block">
+              <div className="text-center border-b border-border pb-6 space-y-1 font-serif">
+                <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground block">
                   GearUp Rental Corp — Official Receipt
                 </span>
 
-                <h2 className="text-2xl font-normal tracking-tight text-zinc-900">
+                <h2 className="text-2xl font-normal tracking-tight text-foreground">
                   Equipment Rental Statement
                 </h2>
 
-                <p className="text-xs font-mono text-zinc-500">
+                <p className="text-xs font-mono text-muted-foreground">
                   INV #{selectedInvoice.id.slice(0, 8).toUpperCase()} • Issued:{" "}
                   {selectedInvoice.createdAt
                     ? new Date(selectedInvoice.createdAt).toLocaleDateString()
@@ -1216,20 +1216,20 @@ export default function CustomerCart({
                 </p>
               </div>
 
-              <div className="grid grid-cols-2 gap-4 border-b border-zinc-200 pb-6">
+              <div className="grid grid-cols-2 gap-4 border-b border-border pb-6">
                 <div>
-                  <span className="text-zinc-400 block uppercase text-[10px]">
+                  <span className="text-muted-foreground block uppercase text-[10px]">
                     Rental Window:
                   </span>
 
-                  <span className="font-semibold text-zinc-900 block mt-0.5">
+                  <span className="font-semibold text-foreground block mt-0.5">
                     {new Date(selectedInvoice.startDate).toLocaleDateString()}{" "}
                     — {new Date(selectedInvoice.endDate).toLocaleDateString()}
                   </span>
                 </div>
 
                 <div className="text-right">
-                  <span className="text-zinc-400 block uppercase text-[10px]">
+                  <span className="text-muted-foreground block uppercase text-[10px]">
                     Order Status:
                   </span>
 
@@ -1242,12 +1242,12 @@ export default function CustomerCart({
               </div>
 
               <div className="space-y-3">
-                <span className="text-[10px] uppercase tracking-widest text-zinc-400 block">
+                <span className="text-[10px] uppercase tracking-widest text-muted-foreground block">
                   Itemized Manifest
                 </span>
 
                 {loadingInvoiceId === selectedInvoice.id ? (
-                  <div className="flex items-center justify-center gap-2 py-10 text-zinc-400">
+                  <div className="flex items-center justify-center gap-2 py-10 text-muted-foreground">
                     <Loader2 className="h-4 w-4 animate-spin" />
 
                     <span className="text-xs font-mono uppercase">
@@ -1257,7 +1257,7 @@ export default function CustomerCart({
                 ) : (
                   <table className="w-full border-collapse">
                     <thead>
-                      <tr className="border-b border-zinc-300 text-left text-zinc-500">
+                      <tr className="border-b border-border text-left text-muted-foreground">
                         <th className="pb-2 font-medium">Item</th>
                         <th className="pb-2 font-medium text-center">Qty</th>
                         <th className="pb-2 font-medium text-right">
@@ -1267,7 +1267,7 @@ export default function CustomerCart({
                       </tr>
                     </thead>
 
-                    <tbody className="divide-y divide-zinc-200">
+                    <tbody className="divide-y divide-border">
                       {selectedInvoice.items?.map((item: any) => {
                         const gear =
                           item.gearItem || getGearDetails(item.gearItemId);
@@ -1278,13 +1278,13 @@ export default function CustomerCart({
 
                         return (
                           <tr key={item.id || item.gearItemId}>
-                            <td className="py-3 pr-2 text-zinc-900 font-sans">
+                            <td className="py-3 pr-2 text-foreground font-sans">
                               <div className="flex items-start gap-2">
                                 {gear?.images?.[0] && (
                                   <img
                                     src={gear.images[0]}
                                     alt={gear.name || "Gear"}
-                                    className="w-12 h-12 object-cover border border-zinc-200 shrink-0"
+                                    className="w-12 h-12 object-cover border border-border shrink-0"
                                   />
                                 )}
 
@@ -1294,7 +1294,7 @@ export default function CustomerCart({
                                   </p>
 
                                   {gear?.brand && (
-                                    <p className="text-[10px] text-zinc-500 mt-0.5">
+                                    <p className="text-[10px] text-muted-foreground mt-0.5">
                                       {gear.brand}
                                     </p>
                                   )}
@@ -1302,15 +1302,15 @@ export default function CustomerCart({
                               </div>
                             </td>
 
-                            <td className="py-3 text-center text-zinc-600">
+                            <td className="py-3 text-center text-muted-foreground">
                               {quantity}
                             </td>
 
-                            <td className="py-3 text-right text-zinc-600 whitespace-nowrap">
+                            <td className="py-3 text-right text-muted-foreground whitespace-nowrap">
                               {formatCurrency(rate)}
                             </td>
 
-                            <td className="py-3 text-right font-semibold text-zinc-900 whitespace-nowrap">
+                            <td className="py-3 text-right font-semibold text-foreground whitespace-nowrap">
                               {formatCurrency(itemAmount)}
                             </td>
                           </tr>
@@ -1321,18 +1321,18 @@ export default function CustomerCart({
                 )}
               </div>
 
-              <div className="border-t border-zinc-300 pt-4 flex justify-between items-center">
-                <div className="text-zinc-500 text-[11px] flex items-center gap-1">
-                  <ShieldCheck className="h-3.5 w-3.5 text-zinc-700" />
+              <div className="border-t border-border pt-4 flex justify-between items-center">
+                <div className="text-muted-foreground text-[11px] flex items-center gap-1">
+                  <ShieldCheck className="h-3.5 w-3.5 text-foreground" />
                   <span>Verified Deposit Protection</span>
                 </div>
 
                 <div className="text-right">
-                  <span className="text-zinc-400 text-[10px] block uppercase">
+                  <span className="text-muted-foreground text-[10px] block uppercase">
                     Total Statement
                   </span>
 
-                  <span className="text-lg font-bold text-zinc-900">
+                  <span className="text-lg font-bold text-foreground">
                     {formatCurrency(selectedInvoice.totalAmount)} BDT
                   </span>
                 </div>
@@ -1343,7 +1343,7 @@ export default function CustomerCart({
 
                 if (!invoicePayment) {
                   return (
-                    <div className="border border-zinc-200 bg-zinc-50 p-4 text-[10px] text-zinc-500">
+                    <div className="border border-border bg-muted p-4 text-[10px] text-muted-foreground">
                       No payment transaction has been recorded for this rental
                       order yet.
                     </div>
@@ -1359,7 +1359,7 @@ export default function CustomerCart({
                         ? "border-emerald-200 bg-emerald-50/70"
                         : invoicePayment.status === "FAILED"
                           ? "border-red-200 bg-red-50/70"
-                          : "border-zinc-200 bg-zinc-50"
+                          : "border-border bg-muted"
                     }`}
                   >
                     <div className="flex items-center justify-between">
@@ -1367,10 +1367,10 @@ export default function CustomerCart({
                         {isCompleted ? (
                           <CheckCircle2 className="h-4 w-4 text-emerald-600" />
                         ) : (
-                          <CreditCard className="h-4 w-4 text-zinc-500" />
+                          <CreditCard className="h-4 w-4 text-muted-foreground" />
                         )}
 
-                        <span className="text-[10px] uppercase tracking-widest text-zinc-600">
+                        <span className="text-[10px] uppercase tracking-widest text-muted-foreground">
                           Payment History
                         </span>
                       </div>
@@ -1381,40 +1381,40 @@ export default function CustomerCart({
                             ? "bg-emerald-50 text-emerald-800 border-emerald-300 hover:bg-emerald-50"
                             : invoicePayment.status === "FAILED"
                               ? "bg-rose-50 text-rose-800 border-rose-300 hover:bg-rose-50"
-                              : "bg-zinc-100 text-zinc-700 border-zinc-300 hover:bg-zinc-100"
+                              : "bg-muted text-foreground border-border hover:bg-muted"
                         }`}
                       >
                         {invoicePayment.status}
                       </Badge>
                     </div>
 
-                    <div className="flex justify-between border-b border-zinc-200 pb-2">
-                      <span className="text-zinc-500">Amount Paid</span>
+                    <div className="flex justify-between border-b border-border pb-2">
+                      <span className="text-muted-foreground">Amount Paid</span>
 
-                      <span className="font-bold text-zinc-900">
+                      <span className="font-bold text-foreground">
                         {formatCurrency(invoicePayment.amount)}
                       </span>
                     </div>
 
                     <div className="space-y-2 text-[10px]">
                       <div className="flex justify-between gap-3">
-                        <span className="text-zinc-500 flex items-center">
+                        <span className="text-muted-foreground flex items-center">
                           <Clock className="h-3 w-3 inline mr-1" />
                           Paid At
                         </span>
 
-                        <span className="text-right text-zinc-800">
+                        <span className="text-right text-foreground">
                           {formatPaymentDate(invoicePayment.paidAt)}
                         </span>
                       </div>
 
                       <div className="flex justify-between gap-3">
-                        <span className="text-zinc-500 shrink-0">
+                        <span className="text-muted-foreground shrink-0">
                           Transaction ID
                         </span>
 
                         <span className="flex items-start justify-end gap-1.5 max-w-[65%]">
-                          <span className="text-right text-zinc-800 break-all">
+                          <span className="text-right text-foreground break-all">
                             {invoicePayment.transactionId || "Not available"}
                           </span>
 
@@ -1427,7 +1427,7 @@ export default function CustomerCart({
                                   "transactionId",
                                 )
                               }
-                              className="shrink-0 mt-px text-zinc-400 hover:text-zinc-900 transition-colors"
+                              className="shrink-0 mt-px text-muted-foreground hover:text-foreground transition-colors"
                               title="Copy transaction ID"
                             >
                               {copiedField === "transactionId" ? (
@@ -1444,7 +1444,7 @@ export default function CustomerCart({
                 );
               })()}
 
-              <div className="pt-2 border-t border-zinc-200 flex items-center justify-between">
+              <div className="pt-2 border-t border-border flex items-center justify-between">
                 <Button
                   type="button"
                   size="sm"
@@ -1465,7 +1465,7 @@ export default function CustomerCart({
 
                 <Button
                   onClick={closeInvoice}
-                  className="rounded-none bg-zinc-900 text-white hover:bg-zinc-800 text-xs font-mono uppercase px-6 h-9"
+                  className="rounded-none bg-primary text-white hover:bg-primary/90 text-xs font-mono uppercase px-6 h-9"
                 >
                   Close Receipt
                 </Button>
@@ -1479,26 +1479,26 @@ export default function CustomerCart({
         {/* ====================================== */}
 
         {selectedReview && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/60 backdrop-blur-xs p-4">
-            <div className="w-full max-w-lg max-h-[90vh] overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden border border-zinc-300 bg-[#FDFBF7] p-8 rounded-none shadow-2xl space-y-6 relative font-mono text-xs">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-primary/60 backdrop-blur-xs p-4">
+            <div className="w-full max-w-lg max-h-[90vh] overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden border border-border bg-background p-8 rounded-none shadow-2xl space-y-6 relative font-mono text-xs">
               <button
                 type="button"
                 onClick={closeReviewModal}
-                className="absolute top-6 right-6 text-zinc-400 hover:text-zinc-900 transition-colors"
+                className="absolute top-6 right-6 text-muted-foreground hover:text-foreground transition-colors"
               >
                 <X className="h-5 w-5" />
               </button>
 
-              <div className="text-center border-b border-zinc-300 pb-6 space-y-1">
-                <span className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 block">
+              <div className="text-center border-b border-border pb-6 space-y-1">
+                <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground block">
                   GearUp Customer Review Statement
                 </span>
 
-                <h2 className="text-2xl font-normal tracking-tight text-zinc-900 font-serif">
+                <h2 className="text-2xl font-normal tracking-tight text-foreground font-serif">
                   Review Details
                 </h2>
 
-                <p className="text-xs font-mono text-zinc-500">
+                <p className="text-xs font-mono text-muted-foreground">
                   REV #{selectedReview.id.toUpperCase()} • Submitted:{" "}
                   {selectedReview.createdAt
                     ? new Date(selectedReview.createdAt).toLocaleDateString()
@@ -1512,14 +1512,14 @@ export default function CustomerCart({
 
                 return (
                   <div className="space-y-4">
-                    <div className="bg-white p-4 border border-zinc-200 space-y-2">
+                    <div className="bg-card p-4 border border-border space-y-2">
                       <div className="flex items-start justify-between">
                         <div>
-                          <p className="text-[10px] font-mono uppercase text-zinc-400">
+                          <p className="text-[10px] font-mono uppercase text-muted-foreground">
                             {reviewGear?.brand || "Equipment Asset"}
                           </p>
 
-                          <h4 className="text-sm font-medium text-zinc-900">
+                          <h4 className="text-sm font-medium text-foreground">
                             {reviewGear?.name || "Gear Item"}
                           </h4>
                         </div>
@@ -1529,7 +1529,7 @@ export default function CustomerCart({
                             asChild
                             variant="outline"
                             size="sm"
-                            className="h-7 px-2.5 rounded-none text-[10px] font-mono uppercase border-zinc-300 hover:bg-zinc-900 hover:text-white"
+                            className="h-7 px-2.5 rounded-none text-[10px] font-mono uppercase border-border hover:bg-primary hover:text-white"
                           >
                             <a href={`/gear-items/${gearId}`}>
                               View Product <ExternalLink className="h-3 w-3 ml-1" />
@@ -1545,22 +1545,22 @@ export default function CustomerCart({
                             className={`h-3.5 w-3.5 ${
                               i < (selectedReview.rating || 0)
                                 ? "fill-current text-amber-500"
-                                : "text-zinc-300"
+                                : "text-muted-foreground"
                             }`}
                           />
                         ))}
-                        <span className="text-xs font-mono font-semibold text-zinc-800 ml-1">
+                        <span className="text-xs font-mono font-semibold text-foreground ml-1">
                           ({selectedReview.rating}/5)
                         </span>
                       </div>
                     </div>
 
                     <div className="space-y-1">
-                      <span className="text-[10px] text-zinc-400 uppercase tracking-widest block">
+                      <span className="text-[10px] text-muted-foreground uppercase tracking-widest block">
                         Review Comment
                       </span>
 
-                      <div className="bg-white border border-zinc-200 p-4 text-xs font-mono text-zinc-800 leading-relaxed min-h-[100px]">
+                      <div className="bg-card border border-border p-4 text-xs font-mono text-foreground leading-relaxed min-h-[100px]">
                         {selectedReview.comment || selectedReview.content || "No detailed comment provided."}
                       </div>
                     </div>
@@ -1568,10 +1568,10 @@ export default function CustomerCart({
                 );
               })()}
 
-              <div className="pt-4 border-t border-zinc-200 flex justify-end">
+              <div className="pt-4 border-t border-border flex justify-end">
                 <Button
                   onClick={closeReviewModal}
-                  className="rounded-none bg-zinc-900 text-white hover:bg-zinc-800 text-xs font-mono uppercase px-6 h-9"
+                  className="rounded-none bg-primary text-white hover:bg-primary/90 text-xs font-mono uppercase px-6 h-9"
                 >
                   Close Review
                 </Button>

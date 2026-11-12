@@ -1,0 +1,17 @@
+with open('app/dashboard/provider/ProviderDashboard.tsx', 'r') as f:
+    content = f.read()
+content = content.replace('bg-white', 'bg-card')
+content = content.replace('bg-zinc-900', 'bg-primary')
+content = content.replace('text-zinc-900', 'text-foreground')
+content = content.replace('text-zinc-700', 'text-foreground')
+content = content.replace('text-zinc-600', 'text-foreground')
+content = content.replace('text-zinc-500', 'text-muted-foreground')
+content = content.replace('text-zinc-400', 'text-muted-foreground')
+content = content.replace('bg-zinc-100', 'bg-muted')
+content = content.replace('bg-zinc-50', 'bg-muted')
+content = content.replace('border-zinc-200', 'border-border')
+content = content.replace('border-zinc-100', 'border-border')
+content = content.replace('bg-zinc-950/60', 'bg-primary/60')
+with open('app/dashboard/provider/ProviderDashboard.tsx', 'w') as f:
+    f.write(content)
+print('Done provider')

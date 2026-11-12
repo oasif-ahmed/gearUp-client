@@ -45,10 +45,10 @@ export default function ProfilePageClient({ user }: ProfilePageClientProps) {
 
   if (!user) {
     return (
-      <div className="flex min-h-[50vh] items-center justify-center bg-[#FDFBF7] font-mono">
-        <div className="text-center space-y-3 p-8 border border-zinc-200 bg-white">
-          <h2 className="text-xl font-serif font-light text-zinc-900">Access Restricted</h2>
-          <p className="text-xs text-zinc-500">Please authenticate to inspect your profile ledger.</p>
+      <div className="flex min-h-[50vh] items-center justify-center bg-background font-mono">
+        <div className="text-center space-y-3 p-8 border border-border bg-card">
+          <h2 className="text-xl font-serif font-light text-foreground">Access Restricted</h2>
+          <p className="text-xs text-muted-foreground">Please authenticate to inspect your profile ledger.</p>
         </div>
       </div>
     );
@@ -121,17 +121,17 @@ export default function ProfilePageClient({ user }: ProfilePageClientProps) {
   };
 
   return (
-    <div className="min-h-screen bg-[#FDFBF7] text-zinc-900 font-mono py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-background text-foreground font-mono py-12 px-4 sm:px-6 lg:px-8 selection:bg-primary selection:text-primary-foreground">
       <div className="max-w-4xl mx-auto space-y-8">
         
         {/* Header Section */}
-        <div className="border-b border-zinc-200 pb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div className="border-b border-border pb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-zinc-100 border border-zinc-200 text-xs uppercase tracking-wider text-zinc-600">
-              <Sparkles className="h-3.5 w-3.5 text-zinc-900" />
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-muted border border-border text-xs uppercase tracking-wider text-muted-foreground">
+              <Sparkles className="h-3.5 w-3.5 text-primary" />
               Account Administration
             </div>
-            <h1 className="text-4xl font-serif font-light tracking-tight text-zinc-900">
+            <h1 className="text-4xl font-serif font-light tracking-tight text-foreground">
               User Profile & Settings
             </h1>
           </div>
@@ -155,9 +155,9 @@ export default function ProfilePageClient({ user }: ProfilePageClientProps) {
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
           
           {/* Left Column: Identity Card */}
-          <div className="md:col-span-4 bg-white border border-zinc-200 p-6 space-y-6 shadow-xs rounded-none">
+          <div className="md:col-span-4 bg-card border border-border p-6 space-y-6 shadow-xs rounded-none">
             <div className="flex flex-col items-center text-center space-y-4">
-              <div className="relative h-28 w-28 border border-zinc-300 overflow-hidden rounded-none bg-zinc-100 flex items-center justify-center">
+              <div className="relative h-28 w-28 border border-border overflow-hidden rounded-none bg-muted flex items-center justify-center">
                 {previewProfilePhoto ? (
                   <img
                     src={previewProfilePhoto}
@@ -165,26 +165,26 @@ export default function ProfilePageClient({ user }: ProfilePageClientProps) {
                     className="h-full w-full object-cover"
                   />
                 ) : (
-                  <span className="text-2xl font-bold text-zinc-700 font-mono">
+                  <span className="text-2xl font-bold text-muted-foreground font-mono">
                     {getInitials(user.name)}
                   </span>
                 )}
               </div>
 
               <div className="space-y-1 w-full">
-                <h2 className="text-lg font-bold text-zinc-900 tracking-tight truncate">
+                <h2 className="text-lg font-bold text-foreground tracking-tight truncate">
                   {user.name}
                 </h2>
-                <div className="flex items-center justify-center gap-1.5 text-xs text-zinc-500 truncate">
+                <div className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground truncate">
                   <Mail className="h-3.5 w-3.5 shrink-0" />
                   <span>{user.email}</span>
                 </div>
               </div>
 
-              <div className="w-full pt-4 border-t border-zinc-100 flex items-center justify-between text-xs">
-                <span className="text-zinc-400 uppercase tracking-wider">Access Role</span>
-                <span className="inline-flex items-center gap-1 font-bold text-zinc-900 bg-zinc-100 px-2.5 py-1 border border-zinc-200">
-                  <Shield className="h-3 w-3 text-zinc-700" />
+              <div className="w-full pt-4 border-t border-border flex items-center justify-between text-xs">
+                <span className="text-muted-foreground uppercase tracking-wider">Access Role</span>
+                <span className="inline-flex items-center gap-1 font-bold text-foreground bg-muted px-2.5 py-1 border border-border">
+                  <Shield className="h-3 w-3 text-primary" />
                   {user.role}
                 </span>
               </div>
@@ -192,12 +192,12 @@ export default function ProfilePageClient({ user }: ProfilePageClientProps) {
           </div>
 
           {/* Right Column: Editing Form */}
-          <div className="md:col-span-8 bg-white border border-zinc-200 p-6 sm:p-8 space-y-6 shadow-xs rounded-none">
-            <div className="border-b border-zinc-200 pb-4">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-900">
+          <div className="md:col-span-8 bg-card border border-border p-6 sm:p-8 space-y-6 shadow-xs rounded-none">
+            <div className="border-b border-border pb-4">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-foreground">
                 Edit Credentials & Bio
               </h3>
-              <p className="text-xs text-zinc-500 font-sans mt-1">
+              <p className="text-xs text-muted-foreground font-sans mt-1">
                 Update your display name, public biography, or upload a custom avatar.
               </p>
             </div>
@@ -206,7 +206,7 @@ export default function ProfilePageClient({ user }: ProfilePageClientProps) {
               
               {/* Avatar Upload */}
               <div className="space-y-2">
-                <label className="block text-xs font-bold uppercase text-zinc-700 tracking-wider">
+                <label className="block text-xs font-bold uppercase text-muted-foreground tracking-wider">
                   Profile Photograph
                 </label>
                 <div className="flex items-center gap-3">
@@ -219,11 +219,11 @@ export default function ProfilePageClient({ user }: ProfilePageClientProps) {
                   />
                   <label
                     htmlFor="profilePhotoUpload"
-                    className="inline-flex items-center gap-2 px-4 py-2.5 text-xs font-medium border border-zinc-300 bg-[#FDFBF7] text-zinc-800 hover:bg-zinc-100 cursor-pointer rounded-none transition-colors"
+                    className="inline-flex items-center gap-2 px-4 py-2.5 text-xs font-medium border border-border bg-muted text-foreground hover:bg-accent/10 cursor-pointer rounded-none transition-colors"
                   >
-                    <Upload className="h-3.5 w-3.5 text-zinc-900" /> Choose File
+                    <Upload className="h-3.5 w-3.5 text-primary" /> Choose File
                   </label>
-                  <span className="text-xs text-zinc-500 truncate max-w-[240px]">
+                  <span className="text-xs text-muted-foreground truncate max-w-[240px]">
                     {selectedFile ? selectedFile.name : "No new file chosen"}
                   </span>
                 </div>
@@ -231,12 +231,12 @@ export default function ProfilePageClient({ user }: ProfilePageClientProps) {
 
               {/* Name Field */}
               <div className="space-y-2">
-                <label className="block text-xs font-bold uppercase text-zinc-700 tracking-wider">
+                <label className="block text-xs font-bold uppercase text-muted-foreground tracking-wider">
                   Full Name
                 </label>
                 <Input
                   type="text"
-                  className="w-full h-10 rounded-none border-zinc-300 bg-[#FDFBF7] text-xs font-mono text-zinc-900 focus-visible:ring-zinc-900"
+                  className="w-full h-10 rounded-none border-border bg-muted text-xs font-mono text-foreground focus-visible:ring-primary"
                   value={editedName}
                   onChange={(e) => setEditedName(e.target.value)}
                 />
@@ -244,11 +244,11 @@ export default function ProfilePageClient({ user }: ProfilePageClientProps) {
 
               {/* Bio Field */}
               <div className="space-y-2">
-                <label className="block text-xs font-bold uppercase text-zinc-700 tracking-wider">
+                <label className="block text-xs font-bold uppercase text-muted-foreground tracking-wider">
                   Professional Biography / Bio
                 </label>
                 <textarea
-                  className="w-full rounded-none border border-zinc-300 bg-[#FDFBF7] px-3 py-2 text-xs font-mono text-zinc-900 focus:outline-none focus:ring-1 focus:ring-zinc-900 resize-none"
+                  className="w-full rounded-none border border-border bg-muted px-3 py-2 text-xs font-mono text-foreground focus:outline-none focus:ring-1 focus:ring-primary resize-none"
                   rows={4}
                   placeholder="Share a brief overview of your expertise or equipment interests..."
                   value={editedBio}
@@ -259,9 +259,9 @@ export default function ProfilePageClient({ user }: ProfilePageClientProps) {
             </div>
 
             {/* Action Bar */}
-            <div className="pt-4 border-t border-zinc-100 flex items-center justify-end gap-3">
+            <div className="pt-4 border-t border-border flex items-center justify-end gap-3">
               <Button
-                className="rounded-none bg-zinc-900 hover:bg-zinc-800 text-white text-xs uppercase font-semibold h-11 px-8 shadow-xs"
+                className="rounded-none bg-primary text-primary-foreground hover:bg-primary/90 text-xs uppercase font-semibold h-11 px-8 shadow-xs"
                 onClick={handleSave}
                 disabled={isPending}
               >

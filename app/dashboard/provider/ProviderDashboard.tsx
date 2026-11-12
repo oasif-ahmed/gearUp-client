@@ -7,6 +7,7 @@ import React, {
   useRef,
   useActionState,
 } from "react";
+import * as animeModule from "animejs";
 import {
   Plus,
   Trash2,
@@ -16,7 +17,11 @@ import {
   Upload,
   Layers,
   Image as ImageIcon,
+  Sun,
+  Moon,
 } from "lucide-react";
+import { useTheme } from "next-themes";
+import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -114,7 +119,19 @@ export default function ProviderDashboard({
   currentUserId,
 }: ProviderDashboardProps) {
   const router = useRouter();
+  const containerRef = useRef<HTMLDivElement>(null);
   const [activeTab, setActiveTab] = useState<"gear" | "orders">("gear");
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Animate list items on tab change
+  useEffect(() => {
+    setMounted(true);
+  }, [activeTab]);
 
   const initialActionState: AddGearState = {
     success: false,
@@ -187,6 +204,23 @@ export default function ProviderDashboard({
     { key: "batteryType", value: "EN-EL15c" },
     { key: "storage", value: "Dual Slots (CFexpress/XQD + SD)" },
   ]);
+
+  // Animate modals on open
+  useEffect(() => {
+    const animateFn = (animeModule as any).animate;
+    if (animateFn) {
+      const modalContent = document.querySelector('.modal-content');
+      if (modalContent) {
+        animateFn({
+          targets: modalContent,
+          opacity: [0, 1],
+          scale: [0.95, 1],
+          duration: 300,
+          easing: 'easeOutBack'
+        });
+      }
+    }
+  }, [selectedInvoice, editingItem, restockItem]);
 
   const [specKey, setSpecKey] = useState("");
   const [specValue, setSpecValue] = useState("");
@@ -527,24 +561,36 @@ export default function ProviderDashboard({
   return (
     <div className="container mx-auto px-4 py-12 max-w-6xl space-y-10">
       {/* Header Section */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between border-b border-zinc-200 pb-6 gap-4">
+      <div className="flex flex-col md:flex-row md:items-end justify-between border-b border-border pb-6 gap-4">
         <div>
-          <span className="text-xs font-mono uppercase tracking-widest text-zinc-500">
+          <span className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
             [ Management Console ]
           </span>
 
-          <h1 className="text-3xl font-light tracking-tight text-zinc-900 mt-1">
+          <h1 className="text-3xl font-light tracking-tight text-foreground mt-1">
             Provider Dashboard
           </h1>
         </div>
 
         <div className="flex items-center gap-2">
-          <button
-            onClick={() => setActiveTab("gear")}
+            {mounted && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 px-3 rounded-none text-muted-foreground hover:text-foreground hover:bg-accent/10 uppercase"
+                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                aria-label="Toggle theme"
+              >
+                {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+              </Button>
+            )}
+
+            <button
+              onClick={() => setActiveTab("gear")}
             className={`px-4 py-2 text-xs font-mono uppercase tracking-wider rounded-none border transition-colors ${
               activeTab === "gear"
-                ? "bg-zinc-900 text-white border-zinc-900"
-                : "bg-white text-zinc-700 border-zinc-200 hover:bg-zinc-50"
+                ? "bg-primary text-primary-foreground border-primary"
+                : "bg-card text-foreground border-border hover:bg-accent"
             }`}
           >
             Gear Inventory
@@ -554,8 +600,8 @@ export default function ProviderDashboard({
             onClick={() => setActiveTab("orders")}
             className={`px-4 py-2 text-xs font-mono uppercase tracking-wider rounded-none border transition-colors ${
               activeTab === "orders"
-                ? "bg-zinc-900 text-white border-zinc-900"
-                : "bg-white text-zinc-700 border-zinc-200 hover:bg-zinc-50"
+                ? "bg-primary text-primary-foreground border-primary"
+                : "bg-card text-foreground border-border hover:bg-accent"
             }`}
           >
             Rental Invoices & Orders
@@ -565,16 +611,16 @@ export default function ProviderDashboard({
 
       {/* TAB 1: GEAR MANAGEMENT */}
       {activeTab === "gear" && (
-        <div className="w-full max-w-[1340px] mx-auto space-y-6">
+        <div ref={containerRef} className="w-full max-w-[1340px] mx-auto space-y-6">
           {/* Add New Gear Form */}
-          <div className="min-w-0 border border-zinc-200 bg-white p-5 sm:p-6 lg:p-8 rounded-none shadow-sm">
-            <div className="mb-6 border-b border-zinc-100 pb-4">
-              <h2 className="text-sm font-mono uppercase tracking-tight text-zinc-900 flex items-center gap-2">
+          <div className="min-w-0 border border-border bg-card p-5 sm:p-6 lg:p-8 rounded-none shadow-sm">
+            <div className="mb-6 border-b border-border pb-4">
+              <h2 className="text-sm font-mono uppercase tracking-tight text-foreground flex items-center gap-2">
                 <Plus className="h-4 w-4" />
                 Add New Equipment Listing
               </h2>
 
-              <p className="text-xs text-zinc-500 mt-1">
+              <p className="text-xs text-muted-foreground mt-1">
                 Register professional equipment with technical specs, deposits,
                 and gallery media.
               </p>
@@ -586,7 +632,7 @@ export default function ProviderDashboard({
                 <div className="md:col-span-2 space-y-1.5">
                   <Label
                     htmlFor="name"
-                    className="text-xs font-mono uppercase text-zinc-700"
+                    className="text-xs font-mono uppercase text-muted-foreground"
                   >
                     Gear Name
                   </Label>
@@ -597,7 +643,7 @@ export default function ProviderDashboard({
                     value={gearName}
                     onChange={(e) => setGearName(e.target.value)}
                     placeholder="e.g., Nikon Z6 II Mirrorless Camera"
-                    className="rounded-none border-zinc-200 bg-background text-xs"
+                    className="rounded-none border-border bg-background text-xs"
                     required
                   />
                 </div>
@@ -605,7 +651,7 @@ export default function ProviderDashboard({
                 <div className="space-y-1.5">
                   <Label
                     htmlFor="brand"
-                    className="text-xs font-mono uppercase text-zinc-700"
+                    className="text-xs font-mono uppercase text-muted-foreground"
                   >
                     Brand
                   </Label>
@@ -616,7 +662,7 @@ export default function ProviderDashboard({
                     value={brand}
                     onChange={(e) => setBrand(e.target.value)}
                     placeholder="e.g., Nikon"
-                    className="rounded-none border-zinc-200 bg-background text-xs"
+                    className="rounded-none border-border bg-background text-xs"
                     required
                   />
                 </div>
@@ -627,7 +673,7 @@ export default function ProviderDashboard({
                 <div className="space-y-1.5">
                   <Label
                     htmlFor="categoryId"
-                    className="text-xs font-mono uppercase text-zinc-700"
+                    className="text-xs font-mono uppercase text-muted-foreground"
                   >
                     Category
                   </Label>
@@ -639,12 +685,12 @@ export default function ProviderDashboard({
                   >
                     <SelectTrigger
                       id="categoryId"
-                      className="rounded-none border-zinc-200 text-xs"
+                      className="rounded-none border-border text-xs"
                     >
                       <SelectValue placeholder="Select category" />
                     </SelectTrigger>
 
-                    <SelectContent className="rounded-none border-zinc-200 text-xs">
+                    <SelectContent className="rounded-none border-border text-xs">
                       {categories.map((cat) => (
                         <SelectItem
                           key={cat.id}
@@ -661,7 +707,7 @@ export default function ProviderDashboard({
                 <div className="space-y-1.5">
                   <Label
                     htmlFor="condition"
-                    className="text-xs font-mono uppercase text-zinc-700"
+                    className="text-xs font-mono uppercase text-muted-foreground"
                   >
                     Gear Condition
                   </Label>
@@ -675,12 +721,12 @@ export default function ProviderDashboard({
                   >
                     <SelectTrigger
                       id="condition"
-                      className="rounded-none border-zinc-200 text-xs"
+                      className="rounded-none border-border text-xs"
                     >
                       <SelectValue placeholder="Select condition" />
                     </SelectTrigger>
 
-                    <SelectContent className="rounded-none border-zinc-200 text-xs">
+                    <SelectContent className="rounded-none border-border text-xs">
                       {Object.values(GearCondition).map((value) => (
                         <SelectItem
                           key={value}
@@ -697,7 +743,7 @@ export default function ProviderDashboard({
                 <div className="space-y-1.5">
                   <Label
                     htmlFor="status"
-                    className="text-xs font-mono uppercase text-zinc-700"
+                    className="text-xs font-mono uppercase text-muted-foreground"
                   >
                     Listing Status
                   </Label>
@@ -711,12 +757,12 @@ export default function ProviderDashboard({
                   >
                     <SelectTrigger
                       id="status"
-                      className="rounded-none border-zinc-200 text-xs"
+                      className="rounded-none border-border text-xs"
                     >
                       <SelectValue placeholder="Select status" />
                     </SelectTrigger>
 
-                    <SelectContent className="rounded-none border-zinc-200 text-xs">
+                    <SelectContent className="rounded-none border-border text-xs">
                       {Object.values(GearStatus).map((value) => (
                         <SelectItem
                           key={value}
@@ -736,7 +782,7 @@ export default function ProviderDashboard({
                 <div className="space-y-1.5">
                   <Label
                     htmlFor="pricePerDay"
-                    className="text-xs font-mono uppercase text-zinc-700"
+                    className="text-xs font-mono uppercase text-muted-foreground"
                   >
                     Price Per Day (৳)
                   </Label>
@@ -752,7 +798,7 @@ export default function ProviderDashboard({
                       )
                     }
                     placeholder="2500"
-                    className="rounded-none border-zinc-200 bg-background text-xs font-mono"
+                    className="rounded-none border-border bg-background text-xs font-mono"
                     required
                   />
                 </div>
@@ -760,7 +806,7 @@ export default function ProviderDashboard({
                 <div className="space-y-1.5">
                   <Label
                     htmlFor="securityDeposit"
-                    className="text-xs font-mono uppercase text-zinc-700"
+                    className="text-xs font-mono uppercase text-muted-foreground"
                   >
                     Security Deposit (৳)
                   </Label>
@@ -776,7 +822,7 @@ export default function ProviderDashboard({
                       )
                     }
                     placeholder="10000"
-                    className="rounded-none border-zinc-200 bg-background text-xs font-mono"
+                    className="rounded-none border-border bg-background text-xs font-mono"
                     required
                   />
                 </div>
@@ -784,7 +830,7 @@ export default function ProviderDashboard({
                 <div className="space-y-1.5">
                   <Label
                     htmlFor="quantity"
-                    className="text-xs font-mono uppercase text-zinc-700"
+                    className="text-xs font-mono uppercase text-muted-foreground"
                   >
                     Quantity Stock
                   </Label>
@@ -800,7 +846,7 @@ export default function ProviderDashboard({
                       )
                     }
                     placeholder="2"
-                    className="rounded-none border-zinc-200 bg-background text-xs font-mono"
+                    className="rounded-none border-border bg-background text-xs font-mono"
                     required
                   />
                 </div>
@@ -810,7 +856,7 @@ export default function ProviderDashboard({
               <div className="space-y-1.5">
                 <Label
                   htmlFor="description"
-                  className="text-xs font-mono uppercase text-zinc-700"
+                  className="text-xs font-mono uppercase text-muted-foreground"
                 >
                   Description
                 </Label>
@@ -822,7 +868,7 @@ export default function ProviderDashboard({
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="Full-frame 24.5 MP mirrorless camera ideal for 4K video and low-light photography..."
-                  className="rounded-none border-zinc-200 bg-background text-xs resize-none"
+                  className="rounded-none border-border bg-background text-xs resize-none"
                   required
                 />
               </div>
@@ -847,8 +893,8 @@ export default function ProviderDashboard({
               />
 
               {/* Image Upload */}
-              <div className="space-y-3 border-t border-zinc-100 pt-4">
-                <Label className="text-xs font-mono uppercase text-zinc-700 flex items-center gap-1.5">
+              <div className="space-y-3 border-t border-border pt-4">
+                <Label className="text-xs font-mono uppercase text-muted-foreground flex items-center gap-1.5">
                   <ImageIcon className="h-3.5 w-3.5" />
                   Gear Images
                 </Label>
@@ -866,7 +912,7 @@ export default function ProviderDashboard({
                   type="button"
                   variant="outline"
                   onClick={() => fileInputRef.current?.click()}
-                  className="rounded-none text-xs border-zinc-200 h-9 px-4 font-mono gap-1.5"
+                  className="rounded-none text-xs border-border h-9 px-4 font-mono gap-1.5"
                 >
                   <Upload className="h-3.5 w-3.5" />
                   Choose Images
@@ -876,7 +922,7 @@ export default function ProviderDashboard({
                   {previews.map((src, idx) => (
                     <div
                       key={idx}
-                      className="relative border border-zinc-200 bg-zinc-50"
+                      className="relative border border-border bg-muted"
                     >
                       <img
                         src={src}
@@ -887,12 +933,12 @@ export default function ProviderDashboard({
                       <button
                         type="button"
                         onClick={() => handleRemoveImage(idx)}
-                        className="absolute top-1 right-1 bg-white border border-zinc-200 p-0.5 text-zinc-500 hover:text-red-600 transition-colors"
+                        className="absolute top-1 right-1 bg-card border border-border p-0.5 text-muted-foreground hover:text-red-600 transition-colors"
                       >
                         <X className="h-3.5 w-3.5" />
                       </button>
 
-                      <p className="truncate px-2 py-1 text-[10px] font-mono text-zinc-600">
+                      <p className="truncate px-2 py-1 text-[10px] font-mono text-foreground">
                         {imageFiles[idx].name}
                       </p>
                     </div>
@@ -901,8 +947,8 @@ export default function ProviderDashboard({
               </div>
 
               {/* Dynamic Specifications */}
-              <div className="space-y-3 border-t border-zinc-100 pt-4">
-                <Label className="text-xs font-mono uppercase text-zinc-700 flex items-center gap-1.5">
+              <div className="space-y-3 border-t border-border pt-4">
+                <Label className="text-xs font-mono uppercase text-muted-foreground flex items-center gap-1.5">
                   <Layers className="h-3.5 w-3.5" />
                   Technical Specifications
                 </Label>
@@ -912,21 +958,21 @@ export default function ProviderDashboard({
                     placeholder="Key (e.g., sensor)"
                     value={specKey}
                     onChange={(e) => setSpecKey(e.target.value)}
-                    className="rounded-none border-zinc-200 text-xs font-mono md:col-span-2"
+                    className="rounded-none border-border text-xs font-mono md:col-span-2"
                   />
 
                   <Input
                     placeholder="Value (e.g., Full Frame CMOS)"
                     value={specValue}
                     onChange={(e) => setSpecValue(e.target.value)}
-                    className="rounded-none border-zinc-200 text-xs font-mono md:col-span-2"
+                    className="rounded-none border-border text-xs font-mono md:col-span-2"
                   />
 
                   <Button
                     type="button"
                     variant="outline"
                     onClick={handleAddSpec}
-                    className="rounded-none text-xs border-zinc-200 h-9 font-mono"
+                    className="rounded-none text-xs border-border h-9 font-mono"
                   >
                     Add Specification
                   </Button>
@@ -936,14 +982,14 @@ export default function ProviderDashboard({
                   {specifications.map((spec, idx) => (
                     <div
                       key={idx}
-                      className="flex items-center justify-between border border-zinc-200 px-3 py-1.5 bg-zinc-50 text-xs font-mono"
+                      className="flex items-center justify-between border border-border px-3 py-1.5 bg-muted text-xs font-mono"
                     >
                       <div className="truncate">
-                        <span className="text-zinc-400 uppercase text-[10px]">
+                        <span className="text-muted-foreground uppercase text-[10px]">
                           {spec.key}:{" "}
                         </span>
 
-                        <span className="text-zinc-900 font-medium">
+                        <span className="text-foreground font-medium">
                           {spec.value}
                         </span>
                       </div>
@@ -951,7 +997,7 @@ export default function ProviderDashboard({
                       <button
                         type="button"
                         onClick={() => handleRemoveSpec(idx)}
-                        className="text-zinc-400 hover:text-red-600 transition-colors ml-2"
+                        className="text-muted-foreground hover:text-red-600 transition-colors ml-2"
                       >
                         <X className="h-3.5 w-3.5" />
                       </button>
@@ -974,11 +1020,11 @@ export default function ProviderDashboard({
               )}
 
               {/* Form Action */}
-              <div className="flex justify-end pt-4 border-t border-zinc-100">
+              <div className="flex justify-end pt-4 border-t border-border">
                 <button
                   type="submit"
                   disabled={isPending || !categoryId}
-                  className="rounded-none bg-zinc-900 px-8 py-3 text-xs font-mono uppercase tracking-wider text-white hover:bg-zinc-800 transition-colors disabled:cursor-not-allowed disabled:opacity-60"
+                  className="rounded-none bg-primary px-8 py-3 text-xs font-mono uppercase tracking-wider text-white hover:bg-primary/90 transition-colors disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {isPending ? "Uploading & Publishing..." : "Publish Listing"}
                 </button>
@@ -987,19 +1033,19 @@ export default function ProviderDashboard({
           </div>
 
           {/* Inventory Table */}
-          <div className="w-full min-w-0 border border-zinc-200 bg-white p-5 sm:p-6 lg:p-6 2xl:p-8 rounded-none shadow-sm">
-            <div className="mb-6 flex items-center justify-between border-b border-zinc-100 pb-4">
+          <div className="w-full min-w-0 border border-border bg-card p-5 sm:p-6 lg:p-6 2xl:p-8 rounded-none shadow-sm">
+            <div className="mb-6 flex items-center justify-between border-b border-border pb-4">
               <div>
-                <h2 className="text-sm font-mono uppercase tracking-tight text-zinc-900">
+                <h2 className="text-sm font-mono uppercase tracking-tight text-foreground">
                   Active Inventory
                 </h2>
 
-                <p className="text-xs text-zinc-500 mt-1">
+                <p className="text-xs text-muted-foreground mt-1">
                   Manage stock allocations and equipment state.
                 </p>
               </div>
 
-              <span className="text-xs font-mono text-zinc-400">
+              <span className="text-xs font-mono text-muted-foreground">
                 {inventory.length} ITEMS LISTED
               </span>
             </div>
@@ -1007,24 +1053,24 @@ export default function ProviderDashboard({
             <div className="w-full overflow-x-auto">
               <Table className="min-w-[620px]">
                 <TableHeader>
-                  <TableRow className="border-zinc-200 hover:bg-transparent">
-                    <TableHead className="text-xs font-mono uppercase text-zinc-500">
+                  <TableRow className="border-border hover:bg-transparent">
+                    <TableHead className="text-xs font-mono uppercase text-muted-foreground">
                       Name
                     </TableHead>
 
-                    <TableHead className="text-xs font-mono uppercase text-zinc-500">
+                    <TableHead className="text-xs font-mono uppercase text-muted-foreground">
                       Category
                     </TableHead>
 
-                    <TableHead className="text-xs font-mono uppercase text-zinc-500">
+                    <TableHead className="text-xs font-mono uppercase text-muted-foreground">
                       Rate/Day
                     </TableHead>
 
-                    <TableHead className="text-xs font-mono uppercase text-zinc-500">
+                    <TableHead className="text-xs font-mono uppercase text-muted-foreground">
                       Stock
                     </TableHead>
 
-                    <TableHead className="text-xs font-mono uppercase text-zinc-500 text-right">
+                    <TableHead className="text-xs font-mono uppercase text-muted-foreground text-right">
                       Actions
                     </TableHead>
                   </TableRow>
@@ -1032,20 +1078,20 @@ export default function ProviderDashboard({
 
                 <TableBody>
                   {inventory.map((item) => (
-                    <TableRow key={item.id} className="border-zinc-100 text-xs">
-                      <TableCell className="font-medium text-zinc-900">
+                    <TableRow key={item.id} className="border-border text-xs animate-item">
+                      <TableCell className="font-medium text-foreground">
                         {item.name}
                       </TableCell>
 
-                      <TableCell className="text-zinc-600">
+                      <TableCell className="text-muted-foreground">
                         {item.category?.name}
                       </TableCell>
 
-                      <TableCell className="font-mono text-zinc-900">
+                      <TableCell className="font-mono text-foreground">
                         ৳{item.pricePerDay}
                       </TableCell>
 
-                      <TableCell className="font-mono text-zinc-600">
+                      <TableCell className="font-mono text-muted-foreground">
                         {item.quantity}
                       </TableCell>
 
@@ -1054,7 +1100,7 @@ export default function ProviderDashboard({
                           variant="outline"
                           size="sm"
                           onClick={() => setRestockItem(item)}
-                          className="h-7 text-xs rounded-none border-zinc-200 text-zinc-800 hover:bg-zinc-100 gap-1.5 font-mono"
+                          className="h-7 text-xs rounded-none border-border text-foreground hover:bg-accent/50 gap-1.5 font-mono"
                         >
                           <RefreshCw className="h-3 w-3" />
                           Restock
@@ -1064,7 +1110,7 @@ export default function ProviderDashboard({
                           variant="ghost"
                           size="sm"
                           onClick={() => handleOpenEdit(item)}
-                          className="h-7 text-xs rounded-none hover:bg-zinc-100 font-mono"
+                          className="h-7 text-xs rounded-none hover:bg-accent/50 font-mono"
                         >
                           Edit
                         </Button>
@@ -1073,7 +1119,7 @@ export default function ProviderDashboard({
                           variant="ghost"
                           size="sm"
                           onClick={() => handleDeleteGear(item.id)}
-                          className="h-7 text-xs rounded-none text-red-600 hover:text-red-700 hover:bg-red-50 font-mono"
+                          className="h-7 text-xs rounded-none text-red-600 hover:text-red-700 hover:bg-red-50/50 font-mono"
                         >
                           Delete
                         </Button>
@@ -1085,7 +1131,7 @@ export default function ProviderDashboard({
                     <TableRow>
                       <TableCell
                         colSpan={5}
-                        className="text-center text-xs text-zinc-500 py-8"
+                        className="text-center text-xs text-muted-foreground py-8"
                       >
                         No equipment listed yet.
                       </TableCell>
@@ -1101,20 +1147,20 @@ export default function ProviderDashboard({
       {/* TAB 2: INVOICES & RENTAL ORDERS */}
       {activeTab === "orders" && (
         <div className="space-y-6">
-          <div className="border border-zinc-200 bg-white p-8 rounded-none shadow-xs">
-            <div className="mb-6 flex items-center justify-between border-b border-zinc-100 pb-4">
+          <div className="border border-border bg-card p-8 rounded-none shadow-xs">
+            <div className="mb-6 flex items-center justify-between border-b border-border pb-4">
               <div>
-                <h2 className="text-sm font-mono uppercase tracking-tight text-zinc-900">
+                <h2 className="text-sm font-mono uppercase tracking-tight text-foreground">
                   Rental Invoices & Manifests
                 </h2>
 
-                <p className="text-xs text-zinc-500 mt-1">
+                <p className="text-xs text-muted-foreground mt-1">
                   Select any transaction to inspect the official paper invoice
                   receipt.
                 </p>
               </div>
 
-              <span className="text-xs font-mono text-zinc-400">
+              <span className="text-xs font-mono text-muted-foreground">
                 {orders.length} TOTAL INVOICES
               </span>
             </div>
@@ -1124,15 +1170,15 @@ export default function ProviderDashboard({
                 <div
                   key={ord.id}
                   onClick={() => setSelectedInvoice(ord)}
-                  className="group border border-zinc-200 bg-[#FDFBF7] p-6 rounded-none hover:border-zinc-900 cursor-pointer transition-all relative flex flex-col justify-between space-y-4 shadow-2xs"
+                  className="group border border-border bg-card p-6 rounded-none hover:border-primary cursor-pointer transition-all relative flex flex-col justify-between space-y-4 shadow-2xs"
                 >
-                  <div className="flex items-start justify-between border-b border-zinc-200/80 pb-3">
+                  <div className="flex items-start justify-between border-b border-border/80 pb-3">
                     <div>
-                      <span className="text-[10px] font-mono text-zinc-400 uppercase tracking-widest">
+                      <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">
                         [ RENTAL INVOICE ]
                       </span>
 
-                      <h3 className="text-sm font-mono font-semibold text-zinc-900 mt-0.5">
+                      <h3 className="text-sm font-mono font-semibold text-foreground mt-0.5">
                         {ord.invoiceNo}
                       </h3>
                     </div>
@@ -1143,42 +1189,42 @@ export default function ProviderDashboard({
                           ? "bg-blue-50 text-blue-800 border-blue-200"
                           : ord.status === "PICKED_UP"
                             ? "bg-emerald-50 text-emerald-800 border-emerald-200"
-                            : "bg-zinc-100 text-zinc-800 border-zinc-200"
+                            : "bg-muted text-foreground border-border"
                       }`}
                     >
                       {ord.status}
                     </span>
                   </div>
 
-                  <div className="space-y-1.5 text-xs text-zinc-700 font-mono">
+                  <div className="space-y-1.5 text-xs text-muted-foreground font-mono">
                     <div className="flex justify-between">
-                      <span className="text-zinc-400">Client:</span>
+                      <span className="text-muted-foreground">Client:</span>
 
-                      <span className="font-medium text-zinc-900">
+                      <span className="font-medium text-foreground">
                         {ord.clientName}
                       </span>
                     </div>
 
                     <div className="flex justify-between">
-                      <span className="text-zinc-400">Asset:</span>
+                      <span className="text-muted-foreground">Asset:</span>
 
-                      <span className="text-zinc-900">
+                      <span className="text-foreground">
                         {ord.gearName} (Qty: {ord.quantity})
                       </span>
                     </div>
 
                     <div className="flex justify-between">
-                      <span className="text-zinc-400">Duration:</span>
+                      <span className="text-muted-foreground">Duration:</span>
                       <span>{ord.rentalWindow}</span>
                     </div>
                   </div>
 
-                  <div className="pt-3 border-t border-zinc-200/80 flex items-center justify-between text-xs font-mono">
-                    <span className="text-zinc-500">
+                  <div className="pt-3 border-t border-border/80 flex items-center justify-between text-xs font-mono">
+                    <span className="text-muted-foreground">
                       Total: ৳{(ord.dailyRate * ord.totalDays).toLocaleString()}
                     </span>
 
-                    <span className="text-zinc-900 group-hover:underline flex items-center gap-1 font-medium">
+                    <span className="text-foreground group-hover:underline flex items-center gap-1 font-medium">
                       Inspect Paper Receipt
                       <ArrowUpRight className="h-3 w-3" />
                     </span>
@@ -1192,68 +1238,68 @@ export default function ProviderDashboard({
 
       {/* PAPER INVOICE MODAL */}
       {selectedInvoice && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/60 backdrop-blur-xs p-4">
-          <div className="w-full max-w-xl border border-zinc-300 bg-[#FDFBF7] p-8 rounded-none shadow-2xl space-y-6 relative font-serif">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-primary/60 backdrop-blur-xs p-4">
+          <div className="modal-content w-full max-w-xl border border-border bg-muted p-8 rounded-none shadow-2xl space-y-6 relative font-serif">
             <button
               onClick={() => setSelectedInvoice(null)}
-              className="absolute top-6 right-6 text-zinc-400 hover:text-zinc-900 transition-colors"
+              className="absolute top-6 right-6 text-muted-foreground hover:text-foreground transition-colors"
             >
               <X className="h-5 w-5" />
             </button>
 
-            <div className="text-center border-b border-zinc-300 pb-6 space-y-1">
-              <span className="text-[10px] font-mono uppercase tracking-widest text-zinc-500">
+            <div className="text-center border-b border-border pb-6 space-y-1">
+              <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
                 GearUp Rental Corp — Official Statement
               </span>
 
-              <h2 className="text-2xl font-normal tracking-tight text-zinc-900">
+              <h2 className="text-2xl font-normal tracking-tight text-foreground">
                 Equipment Rental Invoice
               </h2>
 
-              <p className="text-xs font-mono text-zinc-500">
+              <p className="text-xs font-mono text-muted-foreground">
                 {selectedInvoice.invoiceNo} • Issued:{" "}
                 {selectedInvoice.createdAt}
               </p>
             </div>
 
-            <div className="grid grid-cols-2 gap-4 text-xs font-mono border-b border-zinc-200 pb-6">
+            <div className="grid grid-cols-2 gap-4 text-xs font-mono border-b border-border pb-6">
               <div>
-                <span className="text-zinc-400 block uppercase text-[10px]">
+                <span className="text-muted-foreground block uppercase text-[10px]">
                   Billed To:
                 </span>
 
-                <span className="font-semibold text-zinc-900 text-sm block mt-0.5">
+                <span className="font-semibold text-foreground text-sm block mt-0.5">
                   {selectedInvoice.clientName}
                 </span>
 
-                <span className="text-zinc-600">
+                <span className="text-muted-foreground">
                   {selectedInvoice.clientEmail}
                 </span>
               </div>
 
               <div className="text-right">
-                <span className="text-zinc-400 block uppercase text-[10px]">
+                <span className="text-muted-foreground block uppercase text-[10px]">
                   Rental Period:
                 </span>
 
-                <span className="font-medium text-zinc-900 block mt-0.5">
+                <span className="font-medium text-foreground block mt-0.5">
                   {selectedInvoice.rentalWindow}
                 </span>
 
-                <span className="text-zinc-600">
+                <span className="text-muted-foreground">
                   {selectedInvoice.totalDays} Billing Days
                 </span>
               </div>
             </div>
 
             <div className="space-y-3">
-              <span className="text-[10px] font-mono uppercase tracking-widest text-zinc-400 block">
+              <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground block">
                 Itemized Manifest
               </span>
 
               <table className="w-full text-xs font-mono border-collapse">
                 <thead>
-                  <tr className="border-b border-zinc-300 text-left text-zinc-500">
+                  <tr className="border-b border-border text-left text-muted-foreground">
                     <th className="pb-2 font-medium">Description</th>
                     <th className="pb-2 font-medium text-center">Qty</th>
                     <th className="pb-2 font-medium text-right">Rate/Day</th>
@@ -1261,21 +1307,21 @@ export default function ProviderDashboard({
                   </tr>
                 </thead>
 
-                <tbody className="divide-y divide-zinc-200">
+                <tbody className="divide-y divide-border">
                   <tr>
-                    <td className="py-3 text-zinc-900 font-sans font-medium">
+                    <td className="py-3 text-foreground font-sans font-medium">
                       {selectedInvoice.gearName}
                     </td>
 
-                    <td className="py-3 text-center text-zinc-600">
+                    <td className="py-3 text-center text-muted-foreground">
                       {selectedInvoice.quantity}
                     </td>
 
-                    <td className="py-3 text-right text-zinc-600">
+                    <td className="py-3 text-right text-muted-foreground">
                       ৳{selectedInvoice.dailyRate}
                     </td>
 
-                    <td className="py-3 text-right font-semibold text-zinc-900">
+                    <td className="py-3 text-right font-semibold text-foreground">
                       ৳{selectedInvoice.dailyRate * selectedInvoice.totalDays}
                     </td>
                   </tr>
@@ -1283,24 +1329,23 @@ export default function ProviderDashboard({
               </table>
             </div>
 
-            <div className="border-t border-zinc-300 pt-4 flex justify-between items-center font-mono text-xs">
+            <div className="border-t border-border pt-4 flex justify-between items-center font-mono text-xs">
               <div className="space-y-0.5">
-                <span className="text-zinc-500 block text-[10px]">
+                <span className="text-muted-foreground block text-[10px]">
                   Fulfillment Status:
-                </span>
 
-                <span className="font-semibold text-zinc-900 uppercase">
+                <span className="font-semibold text-foreground uppercase">
                   {selectedInvoice.status}
                 </span>
               </div>
 
               <div className="text-right space-y-1">
-                <div className="text-zinc-500">
+                <div className="text-muted-foreground">
                   Subtotal: ৳
                   {selectedInvoice.dailyRate * selectedInvoice.totalDays}
                 </div>
 
-                <div className="text-sm font-semibold text-zinc-900">
+                <div className="text-sm font-semibold text-foreground">
                   Total Due: ৳
                   {(
                     selectedInvoice.dailyRate * selectedInvoice.totalDays
@@ -1310,9 +1355,9 @@ export default function ProviderDashboard({
               </div>
             </div>
 
-            <div className="flex items-center justify-between pt-4 border-t border-zinc-300">
+            <div className="flex items-center justify-between pt-4 border-t border-border">
               <div className="flex items-center gap-2">
-                <span className="text-[11px] font-mono text-zinc-500">
+                <span className="text-[11px] font-mono text-muted-foreground">
                   Update Status:
                 </span>
 
@@ -1325,11 +1370,11 @@ export default function ProviderDashboard({
                     )
                   }
                 >
-                  <SelectTrigger className="h-7 w-[130px] text-xs rounded-none border-zinc-300 bg-white font-mono">
+                  <SelectTrigger className="h-7 w-[130px] text-xs rounded-none border-border bg-card font-mono">
                     <SelectValue placeholder="Status" />
                   </SelectTrigger>
 
-                  <SelectContent className="rounded-none border-zinc-300 text-xs font-mono">
+                  <SelectContent className="rounded-none border-border text-xs font-mono">
                     <SelectItem value="PLACED" className="rounded-none text-xs">
                       PLACED
                     </SelectItem>
@@ -1367,7 +1412,7 @@ export default function ProviderDashboard({
 
               <Button
                 onClick={() => setSelectedInvoice(null)}
-                className="rounded-none bg-zinc-900 text-white hover:bg-zinc-800 text-xs h-8 px-5 font-mono"
+                className="rounded-none bg-primary text-primary-foreground hover:bg-primary/90 text-xs h-8 px-5 font-mono"
               >
                 Close Receipt
               </Button>
@@ -1378,24 +1423,24 @@ export default function ProviderDashboard({
 
       {/* EDIT GEAR MODAL */}
       {editingItem && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-zinc-950/60 backdrop-blur-sm p-4">
-          <div className="w-full max-w-3xl max-h-[90vh] overflow-y-auto border border-zinc-200 bg-white p-5 sm:p-7 shadow-2xl">
-            <div className="flex items-center justify-between border-b border-zinc-100 pb-4 mb-5">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-primary/60 backdrop-blur-sm p-4">
+          <div className="modal-content w-full max-w-3xl max-h-[90vh] overflow-y-auto border border-border bg-card p-5 sm:p-7 shadow-2xl">
+            <div className="flex items-center justify-between border-b border-border pb-4 mb-5">
               <div>
-                <span className="text-[10px] font-mono uppercase tracking-widest text-zinc-400">
+                <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
                   [ Inventory Management ]
                 </span>
-                <h2 className="text-lg font-semibold text-zinc-900">
+                <h2 className="text-lg font-semibold text-foreground">
                   Edit Gear Item
                 </h2>
-                <p className="text-xs text-zinc-500 mt-1">
+                <p className="text-xs text-muted-foreground mt-1">
                   Update listing details, images, stock, and specifications.
                 </p>
               </div>
               <button
                 type="button"
                 onClick={() => setEditingItem(null)}
-                className="text-zinc-400 hover:text-zinc-900"
+                className="text-muted-foreground hover:text-foreground"
                 aria-label="Close edit modal"
               >
                 <X className="h-5 w-5" />
@@ -1427,7 +1472,7 @@ export default function ProviderDashboard({
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-xs font-mono uppercase text-zinc-700">
+                  <Label className="text-xs font-mono uppercase text-muted-foreground">
                     Category
                   </Label>
                   <Select
@@ -1436,12 +1481,12 @@ export default function ProviderDashboard({
                       handleEditFieldChange("categoryId", value)
                     }
                   >
-                    <SelectTrigger className="rounded-none border-zinc-200 text-xs font-mono">
+                    <SelectTrigger className="rounded-none border-border text-xs font-mono">
                       <SelectValue placeholder="Select category" />
                     </SelectTrigger>
                     <SelectContent
                       position="popper"
-                      className="z-[70] rounded-none border-zinc-200 text-xs font-mono"
+                      className="z-[70] rounded-none border-border text-xs font-mono"
                     >
                       {categories.map((category) => (
                         <SelectItem
@@ -1456,7 +1501,7 @@ export default function ProviderDashboard({
                   </Select>
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-xs font-mono uppercase text-zinc-700">
+                  <Label className="text-xs font-mono uppercase text-muted-foreground">
                     Condition
                   </Label>
                   <Select
@@ -1465,12 +1510,12 @@ export default function ProviderDashboard({
                       handleEditFieldChange("condition", value)
                     }
                   >
-                    <SelectTrigger className="rounded-none border-zinc-200 text-xs font-mono">
+                    <SelectTrigger className="rounded-none border-border text-xs font-mono">
                       <SelectValue placeholder="Select condition" />
                     </SelectTrigger>
                     <SelectContent
                       position="popper"
-                      className="z-[70] rounded-none border-zinc-200 text-xs font-mono"
+                      className="z-[70] rounded-none border-border text-xs font-mono"
                     >
                       {Object.values(GearCondition).map((value) => (
                         <SelectItem
@@ -1527,7 +1572,7 @@ export default function ProviderDashboard({
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-xs font-mono uppercase text-zinc-700">
+                  <Label className="text-xs font-mono uppercase text-muted-foreground">
                     Status
                   </Label>
                   <Select
@@ -1536,12 +1581,12 @@ export default function ProviderDashboard({
                       handleEditFieldChange("status", value)
                     }
                   >
-                    <SelectTrigger className="rounded-none border-zinc-200 text-xs font-mono">
+                    <SelectTrigger className="rounded-none border-border text-xs font-mono">
                       <SelectValue placeholder="Select status" />
                     </SelectTrigger>
                     <SelectContent
                       position="popper"
-                      className="z-[70] rounded-none border-zinc-200 text-xs font-mono"
+                      className="z-[70] rounded-none border-border text-xs font-mono"
                     >
                       {Object.values(GearStatus).map((value) => (
                         <SelectItem
@@ -1570,12 +1615,12 @@ export default function ProviderDashboard({
                 />
               </div>
 
-              <div className="space-y-3 border-t border-zinc-100 pt-4">
+              <div className="space-y-3 border-t border-border pt-4">
                 <Label className="flex items-center gap-2">
                   <ImageIcon className="h-4 w-4" /> Existing Images
                 </Label>
                 {editExistingImages.length === 0 ? (
-                  <p className="text-xs text-zinc-500">
+                  <p className="text-xs text-muted-foreground">
                     No existing images. Add new images below if needed.
                   </p>
                 ) : (
@@ -1583,7 +1628,7 @@ export default function ProviderDashboard({
                     {editExistingImages.map((src, index) => (
                       <div
                         key={`${src}-${index}`}
-                        className="relative border border-zinc-200"
+                        className="relative border border-border"
                       >
                         <img
                           src={src}
@@ -1597,7 +1642,7 @@ export default function ProviderDashboard({
                               prev.filter((_, i) => i !== index),
                             )
                           }
-                          className="absolute top-1 right-1 bg-white border p-1 text-red-600"
+                          className="absolute top-1 right-1 bg-card border p-1 text-red-600"
                           aria-label="Remove existing image"
                         >
                           <X className="h-3.5 w-3.5" />
@@ -1639,7 +1684,7 @@ export default function ProviderDashboard({
                 )}
               </div>
 
-              <div className="space-y-3 border-t border-zinc-100 pt-4">
+              <div className="space-y-3 border-t border-border pt-4">
                 <Label className="flex items-center gap-2">
                   <Layers className="h-4 w-4" /> Technical Specifications
                 </Label>
@@ -1666,7 +1711,7 @@ export default function ProviderDashboard({
                   {editSpecifications.map((spec, index) => (
                     <div
                       key={`${spec.key}-${index}`}
-                      className="flex items-center justify-between gap-2 border bg-zinc-50 px-3 py-2 text-xs"
+                      className="flex items-center justify-between gap-2 border bg-muted px-3 py-2 text-xs"
                     >
                       <span className="min-w-0 truncate">
                         <strong>{spec.key}:</strong> {spec.value}
@@ -1698,7 +1743,7 @@ export default function ProviderDashboard({
                 </p>
               )}
 
-              <div className="flex justify-end gap-2 border-t border-zinc-100 pt-4">
+              <div className="flex justify-end gap-2 border-t border-border pt-4">
                 <Button
                   type="button"
                   variant="outline"
@@ -1718,22 +1763,22 @@ export default function ProviderDashboard({
 
       {/* RESTOCK MODAL */}
       {restockItem && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/40 backdrop-blur-xs p-4">
-          <div className="w-full max-w-md border border-zinc-200 bg-white p-6 rounded-none shadow-lg space-y-4">
-            <div className="flex items-center justify-between border-b border-zinc-100 pb-3">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-primary/40 backdrop-blur-xs p-4">
+          <div className="modal-content w-full max-w-md border border-border bg-card p-6 rounded-none shadow-lg space-y-4">
+            <div className="flex items-center justify-between border-b border-border pb-3">
               <div>
-                <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-400">
+                <span className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
                   [ Inventory Increment ]
                 </span>
 
-                <h3 className="text-base font-semibold text-zinc-900">
+                <h3 className="text-base font-semibold text-foreground">
                   Restock Equipment
                 </h3>
               </div>
 
               <button
                 onClick={() => setRestockItem(null)}
-                className="text-zinc-400 hover:text-zinc-900 transition-colors"
+                className="text-muted-foreground hover:text-foreground transition-colors"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -1741,9 +1786,9 @@ export default function ProviderDashboard({
 
             <form onSubmit={handleRestockSubmit} className="space-y-4">
               <div className="space-y-1">
-                <p className="text-xs text-zinc-500 font-mono">Target Item:</p>
+                <p className="text-xs text-muted-foreground font-mono">Target Item:</p>
 
-                <p className="text-xs font-semibold text-zinc-900">
+                <p className="text-xs font-semibold text-foreground">
                   {restockItem.name}
                 </p>
               </div>
@@ -1751,7 +1796,7 @@ export default function ProviderDashboard({
               <div className="space-y-1.5">
                 <Label
                   htmlFor="addQuantity"
-                  className="text-xs font-mono uppercase text-zinc-700"
+                  className="text-xs font-mono uppercase text-muted-foreground"
                 >
                   Additional Quantity to Add
                 </Label>
@@ -1762,17 +1807,17 @@ export default function ProviderDashboard({
                   min="1"
                   value={restockQuantity}
                   onChange={(e) => setRestockQuantity(Number(e.target.value))}
-                  className="rounded-none border-zinc-200 text-xs font-mono focus:ring-1 focus:ring-zinc-900"
+                  className="rounded-none border-border text-xs font-mono focus:ring-1 focus:ring-primary"
                   required
                 />
               </div>
 
-              <div className="flex justify-end gap-2 pt-2 border-t border-zinc-100 font-mono">
+              <div className="flex justify-end gap-2 pt-2 border-t border-border font-mono">
                 <Button
                   type="button"
                   variant="outline"
                   onClick={() => setRestockItem(null)}
-                  className="rounded-none text-xs h-9 border-zinc-200"
+                  className="rounded-none text-xs h-9 border-border"
                 >
                   Cancel
                 </Button>
@@ -1780,7 +1825,7 @@ export default function ProviderDashboard({
                 <Button
                   type="submit"
                   disabled={isRestocking}
-                  className="rounded-none bg-zinc-900 text-white hover:bg-zinc-800 text-xs h-9 px-4"
+                  className="rounded-none bg-primary text-primary-foreground hover:bg-primary/90 text-xs h-9 px-4"
                 >
                   {isRestocking ? "Updating..." : "Confirm Restock"}
                 </Button>

@@ -1,6 +1,8 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import * as animeModule from "animejs";
+import { useTheme } from "next-themes";
 import {
   Users,
   Package,
@@ -22,6 +24,8 @@ import {
   DollarSign,
   ShieldCheck,
   Box,
+  Sun,
+  Moon,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -48,9 +52,21 @@ export default function AdminDashboard({
     image?: string;
   }) => Promise<any>;
 }) {
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+  const containerRef = useRef<HTMLDivElement>(null);
   const [activeTab, setActiveTab] = useState<
     "users" | "gear" | "rentals" | "categories"
   >("users");
+
+  // Animate list items on tab change
+  useEffect(() => {
+    setMounted(true);
+  }, [activeTab]);
 
   // Safe array normalization
   const userList = Array.isArray(users) ? users : users?.users || [];
@@ -251,26 +267,38 @@ export default function AdminDashboard({
   };
 
   return (
-    <div className="min-h-screen bg-[#FDFBF7] py-10 text-zinc-900 font-mono text-xs w-full">
+    <div className="min-h-screen bg-background py-10 text-foreground font-mono text-xs w-full">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         {/* Header & Navigation Tabs */}
-        <div className="border-b border-zinc-200 pb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div className="border-b border-border pb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
-            <span className="text-[10px] uppercase tracking-widest text-zinc-500">
+            <span className="text-[10px] uppercase tracking-widest text-muted-foreground">
               [ Administrator Control Panel ]
             </span>
-            <h1 className="text-3xl font-light tracking-tight text-zinc-900 mt-1 font-serif">
+            <h1 className="text-3xl font-light tracking-tight text-foreground mt-1 font-serif">
               Platform Command Center
             </h1>
           </div>
 
-          <div className="flex flex-wrap items-center gap-1 bg-white border border-zinc-200 p-1">
+          <div className="flex flex-wrap items-center gap-1 bg-card border border-border p-1">
+            {mounted && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 px-3 rounded-none text-muted-foreground hover:text-foreground hover:bg-accent/10 uppercase"
+                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                aria-label="Toggle theme"
+              >
+                {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+              </Button>
+            )}
+
             <button
               onClick={() => setActiveTab("users")}
               className={`px-3 py-2 uppercase tracking-wider transition-colors flex items-center gap-1.5 ${
                 activeTab === "users"
-                  ? "bg-zinc-900 text-white font-semibold"
-                  : "text-zinc-600 hover:bg-zinc-50"
+                  ? "bg-primary text-primary-foreground font-semibold"
+                  : "text-muted-foreground hover:bg-muted/50"
               }`}
             >
               <Users className="h-3.5 w-3.5" /> Users ({userList.length})
@@ -279,8 +307,8 @@ export default function AdminDashboard({
               onClick={() => setActiveTab("gear")}
               className={`px-3 py-2 uppercase tracking-wider transition-colors flex items-center gap-1.5 ${
                 activeTab === "gear"
-                  ? "bg-zinc-900 text-white font-semibold"
-                  : "text-zinc-600 hover:bg-zinc-50"
+                  ? "bg-primary text-primary-foreground font-semibold"
+                  : "text-muted-foreground hover:bg-muted/50"
               }`}
             >
               <Package className="h-3.5 w-3.5" /> Gear Directory (
@@ -290,8 +318,8 @@ export default function AdminDashboard({
               onClick={() => setActiveTab("rentals")}
               className={`px-3 py-2 uppercase tracking-wider transition-colors flex items-center gap-1.5 ${
                 activeTab === "rentals"
-                  ? "bg-zinc-900 text-white font-semibold"
-                  : "text-zinc-600 hover:bg-zinc-50"
+                  ? "bg-primary text-primary-foreground font-semibold"
+                  : "text-muted-foreground hover:bg-muted/50"
               }`}
             >
               <Receipt className="h-3.5 w-3.5" /> Rentals ({rentalList.length})
@@ -300,8 +328,8 @@ export default function AdminDashboard({
               onClick={() => setActiveTab("categories")}
               className={`px-3 py-2 uppercase tracking-wider transition-colors flex items-center gap-1.5 ${
                 activeTab === "categories"
-                  ? "bg-zinc-900 text-white font-semibold"
-                  : "text-zinc-600 hover:bg-zinc-50"
+                  ? "bg-primary text-primary-foreground font-semibold"
+                  : "text-muted-foreground hover:bg-muted/50"
               }`}
             >
               <Layers className="h-3.5 w-3.5" /> Categories (
@@ -313,16 +341,16 @@ export default function AdminDashboard({
         {/* TAB 1: USERS */}
         {activeTab === "users" && (
           <div className="space-y-4">
-            <div className="flex justify-between items-center border-b border-zinc-200 pb-3">
-              <h2 className="text-xs uppercase tracking-widest text-zinc-500 font-semibold">
+            <div className="flex justify-between items-center border-b border-border pb-3">
+              <h2 className="text-xs uppercase tracking-widest text-muted-foreground font-semibold">
                 Registered Platform Users ({userList.length})
               </h2>
-              <span className="text-[10px] text-zinc-400">
+              <span className="text-[10px] text-muted-foreground">
                 Click any user card for inspection modal
               </span>
             </div>
 
-            <div className="grid grid-cols-1 gap-3">
+            <div ref={containerRef} className="grid grid-cols-1 gap-3">
               {userList.map((u: any) => {
                 const userStatus = u.activeStatus || "ACTIVE";
                 const isSuspended = userStatus === "SUSPEND";
@@ -331,23 +359,23 @@ export default function AdminDashboard({
                   <div
                     key={u.id}
                     onClick={() => openUserModal(u)}
-                    className="bg-white border border-zinc-200 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-zinc-900 cursor-pointer transition-all shadow-xs group"
+                    className="bg-card border border-border p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-foreground cursor-pointer transition-all shadow-xs group animate-item"
                   >
                     <div className="flex items-center gap-4">
                       <div
                         className={`w-10 h-10 flex items-center justify-center border font-bold text-sm uppercase shrink-0 ${
                           isSuspended
                             ? "bg-red-50 border-red-200 text-red-600"
-                            : "bg-zinc-900 border-zinc-900 text-white"
+                            : "bg-primary border-primary text-white"
                         }`}
                       >
                         {u.name ? u.name.slice(0, 2).toUpperCase() : "US"}
                       </div>
                       <div className="space-y-0.5">
                         <div className="flex items-center gap-2">
-                          <span className="font-semibold text-zinc-900 text-sm group-hover:underline flex items-center gap-1">
+                          <span className="font-semibold text-foreground text-sm group-hover:underline flex items-center gap-1">
                             {u.name || "Unnamed User"}
-                            <ExternalLink className="h-3 w-3 opacity-0 group-hover:opacity-100 text-zinc-400 transition-opacity" />
+                            <ExternalLink className="h-3 w-3 opacity-0 group-hover:opacity-100 text-muted-foreground transition-opacity" />
                           </span>
                           <Badge
                             variant="outline"
@@ -356,13 +384,13 @@ export default function AdminDashboard({
                             {u.role || "CUSTOMER"}
                           </Badge>
                         </div>
-                        <p className="text-[11px] text-zinc-500 font-mono">
+                        <p className="text-[11px] text-muted-foreground font-mono">
                           {u.email} • ID: #{u.id.slice(0, 8)}
                         </p>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-4 justify-between sm:justify-end border-t sm:border-t-0 pt-3 sm:pt-0 border-zinc-100">
+                    <div className="flex items-center gap-4 justify-between sm:justify-end border-t sm:border-t-0 pt-3 sm:pt-0 border-border">
                       <div className="flex items-center gap-1.5">
                         {isSuspended ? (
                           <AlertCircle className="h-3.5 w-3.5 text-red-500" />
@@ -382,7 +410,7 @@ export default function AdminDashboard({
                         onClick={(e) => handleStatusToggle(u.id, userStatus, e)}
                         className={`rounded-none text-[10px] uppercase h-8 px-4 ${
                           isSuspended
-                            ? "bg-zinc-900 text-white hover:bg-zinc-800"
+                            ? "bg-primary text-white hover:bg-primary/90"
                             : "text-red-600 border-red-200 hover:bg-red-50"
                         }`}
                       >
@@ -393,7 +421,7 @@ export default function AdminDashboard({
                 );
               })}
               {userList.length === 0 && (
-                <div className="bg-white border border-zinc-200 p-12 text-center text-zinc-400">
+                <div className="bg-card border border-border p-12 text-center text-muted-foreground">
                   No users found in the system.
                 </div>
               )}
@@ -404,11 +432,11 @@ export default function AdminDashboard({
         {/* TAB 2: GEAR DIRECTORY */}
         {activeTab === "gear" && (
           <div className="space-y-4">
-            <div className="flex justify-between items-center border-b border-zinc-200 pb-3">
-              <h2 className="text-xs uppercase tracking-widest text-zinc-500 font-semibold">
+            <div className="flex justify-between items-center border-b border-border pb-3">
+              <h2 className="text-xs uppercase tracking-widest text-muted-foreground font-semibold">
                 Global Gear Directory ({gearList.length} items)
               </h2>
-              <span className="text-[10px] text-zinc-400">
+              <span className="text-[10px] text-muted-foreground">
                 Click any gear card for specification inspection
               </span>
             </div>
@@ -417,10 +445,10 @@ export default function AdminDashboard({
                 <div
                   key={gear.id}
                   onClick={() => openGearModal(gear)}
-                  className="border border-zinc-200 p-4 bg-white flex flex-col justify-between shadow-xs hover:border-zinc-900 cursor-pointer transition-all group"
+                  className="border border-border p-4 bg-card flex flex-col justify-between shadow-xs hover:border-foreground cursor-pointer transition-all group animate-item"
                 >
                   <div className="flex gap-3 mb-3">
-                    <div className="w-14 h-14 bg-zinc-100 shrink-0 border border-zinc-200 overflow-hidden">
+                    <div className="w-14 h-14 bg-muted shrink-0 border border-border overflow-hidden">
                       <img
                         src={
                           gear.images?.[0] ||
@@ -431,19 +459,19 @@ export default function AdminDashboard({
                       />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <span className="text-[10px] text-zinc-400 uppercase tracking-widest">
+                      <span className="text-[10px] text-muted-foreground uppercase tracking-widest">
                         {gear.brand || "Brand"}
                       </span>
-                      <h4 className="text-sm font-medium text-zinc-900 truncate group-hover:underline flex items-center gap-1">
+                      <h4 className="text-sm font-medium text-foreground truncate group-hover:underline flex items-center gap-1">
                         {gear.name}
-                        <ExternalLink className="h-3 w-3 opacity-0 group-hover:opacity-100 text-zinc-400 transition-opacity" />
+                        <ExternalLink className="h-3 w-3 opacity-0 group-hover:opacity-100 text-muted-foreground transition-opacity" />
                       </h4>
-                      <p className="text-xs font-bold text-zinc-900 mt-0.5">
+                      <p className="text-xs font-bold text-foreground mt-0.5">
                         ৳{gear.pricePerDay} / day
                       </p>
                     </div>
                   </div>
-                  <div className="flex justify-between items-center text-[10px] text-zinc-500 pt-3 border-t border-zinc-100">
+                  <div className="flex justify-between items-center text-[10px] text-muted-foreground pt-3 border-t border-border">
                     <span>
                       Stock: {gear.quantity} | Dep: ৳{gear.securityDeposit}
                     </span>
@@ -457,7 +485,7 @@ export default function AdminDashboard({
                 </div>
               ))}
               {gearList.length === 0 && (
-                <div className="col-span-full bg-white border border-zinc-200 p-12 text-center text-zinc-400">
+                <div className="col-span-full bg-card border border-border p-12 text-center text-muted-foreground">
                   No gear items found.
                 </div>
               )}
@@ -468,11 +496,11 @@ export default function AdminDashboard({
         {/* TAB 3: RENTAL ORDERS */}
         {activeTab === "rentals" && (
           <div className="space-y-4">
-            <div className="flex justify-between items-center border-b border-zinc-200 pb-3">
-              <h2 className="text-xs uppercase tracking-widest text-zinc-500 font-semibold">
+            <div className="flex justify-between items-center border-b border-border pb-3">
+              <h2 className="text-xs uppercase tracking-widest text-muted-foreground font-semibold">
                 Platform Rental Orders Manifest ({rentalList.length})
               </h2>
-              <span className="text-[10px] text-zinc-400">
+              <span className="text-[10px] text-muted-foreground">
                 Click any rental order to inspect itemized manifest
               </span>
             </div>
@@ -481,13 +509,13 @@ export default function AdminDashboard({
                 <div
                   key={ord.id}
                   onClick={() => openRentalModal(ord)}
-                  className="bg-white border border-zinc-200 p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 shadow-xs hover:border-zinc-900 cursor-pointer transition-all group"
+                  className="bg-card border border-border p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 shadow-xs hover:border-primary cursor-pointer transition-all group"
                 >
                   <div>
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="font-semibold text-zinc-900 text-sm group-hover:underline flex items-center gap-1">
+                      <span className="font-semibold text-foreground text-sm group-hover:underline flex items-center gap-1">
                         #{ord.id.slice(0, 8).toUpperCase()}
-                        <ExternalLink className="h-3 w-3 opacity-0 group-hover:opacity-100 text-zinc-400 transition-opacity" />
+                        <ExternalLink className="h-3 w-3 opacity-0 group-hover:opacity-100 text-muted-foreground transition-opacity" />
                       </span>
                       <Badge
                         variant="outline"
@@ -496,30 +524,30 @@ export default function AdminDashboard({
                         {ord.status}
                       </Badge>
                     </div>
-                    <p className="text-[11px] text-zinc-500">
+                    <p className="text-[11px] text-muted-foreground">
                       Customer:{" "}
-                      <strong className="text-zinc-900">
+                      <strong className="text-foreground">
                         {ord.customer?.name || "N/A"}
                       </strong>{" "}
                       ({ord.customer?.email})
                     </p>
                   </div>
 
-                  <div className="flex items-center gap-6 bg-[#FDFBF7] p-3 border border-zinc-200 w-full md:w-auto justify-between">
+                  <div className="flex items-center gap-6 bg-[#FDFBF7] p-3 border border-border w-full md:w-auto justify-between">
                     <div>
-                      <span className="text-[10px] text-zinc-400 block uppercase">
+                      <span className="text-[10px] text-muted-foreground block uppercase">
                         Rental Window
                       </span>
-                      <span className="text-zinc-900 font-medium">
+                      <span className="text-foreground font-medium">
                         {new Date(ord.startDate).toLocaleDateString()} —{" "}
                         {new Date(ord.endDate).toLocaleDateString()}
                       </span>
                     </div>
                     <div className="text-right">
-                      <span className="text-[10px] text-zinc-400 block uppercase">
+                      <span className="text-[10px] text-muted-foreground block uppercase">
                         Total Amount
                       </span>
-                      <span className="text-base font-bold text-zinc-900">
+                      <span className="text-base font-bold text-foreground">
                         ৳{Number(ord.totalAmount).toLocaleString()}
                       </span>
                     </div>
@@ -527,7 +555,7 @@ export default function AdminDashboard({
                 </div>
               ))}
               {rentalList.length === 0 && (
-                <div className="bg-white border border-zinc-200 p-12 text-center text-zinc-400">
+                <div className="bg-card border border-border p-12 text-center text-muted-foreground">
                   No rental orders logged.
                 </div>
               )}
@@ -540,8 +568,8 @@ export default function AdminDashboard({
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
             {/* Create Category Form */}
             <div className="lg:col-span-4">
-              <Card className="rounded-none border-zinc-200 bg-white p-6 shadow-xs space-y-4">
-                <h2 className="text-xs uppercase tracking-widest text-zinc-500 pb-2 border-b border-zinc-100 flex items-center gap-1.5">
+              <Card className="rounded-none border-border bg-card p-6 shadow-xs space-y-4">
+                <h2 className="text-xs uppercase tracking-widest text-muted-foreground pb-2 border-b border-border flex items-center gap-1.5">
                   <FolderPlus className="h-4 w-4" /> Create New Category
                 </h2>
 
@@ -550,7 +578,7 @@ export default function AdminDashboard({
                   className="space-y-4"
                 >
                   <div className="space-y-1">
-                    <label className="text-[10px] uppercase text-zinc-500">
+                    <label className="text-[10px] uppercase text-muted-foreground">
                       Category Name
                     </label>
                     <Input
@@ -558,13 +586,13 @@ export default function AdminDashboard({
                       placeholder="e.g., GYM, Camping"
                       value={newCategoryName}
                       onChange={(e) => setNewCategoryName(e.target.value)}
-                      className="rounded-none border-zinc-200 h-9 text-xs"
+                      className="rounded-none border-border h-9 text-xs"
                       required
                     />
                   </div>
 
                   <div className="space-y-1">
-                    <label className="text-[10px] uppercase text-zinc-500">
+                    <label className="text-[10px] uppercase text-muted-foreground">
                       Description
                     </label>
                     <Input
@@ -572,12 +600,12 @@ export default function AdminDashboard({
                       placeholder="Tents, sleeping bags and camp gear"
                       value={newCategoryDesc}
                       onChange={(e) => setNewCategoryDesc(e.target.value)}
-                      className="rounded-none border-zinc-200 h-9 text-xs"
+                      className="rounded-none border-border h-9 text-xs"
                     />
                   </div>
 
                   <div className="space-y-1">
-                    <label className="text-[10px] uppercase text-zinc-500">
+                    <label className="text-[10px] uppercase text-muted-foreground">
                       Upload Category Image
                     </label>
                     <Input
@@ -588,14 +616,14 @@ export default function AdminDashboard({
                           setSelectedFile(e.target.files[0]);
                         }
                       }}
-                      className="rounded-none border-zinc-200 h-9 text-xs file:bg-zinc-900 file:text-white file:border-0 file:text-[10px] file:uppercase file:px-2 file:h-full file:mr-2 cursor-pointer"
+                      className="rounded-none border-border h-9 text-xs file:bg-primary file:text-white file:border-0 file:text-[10px] file:uppercase file:px-2 file:h-full file:mr-2 cursor-pointer"
                     />
                   </div>
 
                   <Button
                     type="submit"
                     disabled={isSubmittingCat}
-                    className="w-full rounded-none bg-zinc-900 text-white hover:bg-zinc-800 text-xs uppercase h-9 tracking-wider"
+                    className="w-full rounded-none bg-primary text-white hover:bg-primary/90 text-xs uppercase h-9 tracking-wider"
                   >
                     {isSubmittingCat ? "Creating..." : "Save Category"}
                   </Button>
@@ -606,8 +634,8 @@ export default function AdminDashboard({
             {/* Interactive Accordion Categories */}
             <div className="lg:col-span-8">
               <div className="space-y-3">
-                <div className="border-b border-zinc-200 pb-3 flex justify-between items-center">
-                  <h2 className="text-xs uppercase tracking-widest text-zinc-500 font-semibold flex items-center gap-1.5">
+                <div className="border-b border-border pb-3 flex justify-between items-center">
+                  <h2 className="text-xs uppercase tracking-widest text-muted-foreground font-semibold flex items-center gap-1.5">
                     <Tag className="h-4 w-4" /> Interactive Category Directory (
                     {categoryList.length})
                   </h2>
@@ -623,28 +651,28 @@ export default function AdminDashboard({
                   return (
                     <div
                       key={catId}
-                      className="bg-white border border-zinc-200 transition-all shadow-xs"
+                      className="bg-card border border-border transition-all shadow-xs"
                     >
                       <button
                         type="button"
                         onClick={() => toggleCategoryExpand(catId)}
-                        className="w-full p-4 flex items-center justify-between text-left hover:bg-zinc-50/50 transition-colors"
+                        className="w-full p-4 flex items-center justify-between text-left hover:bg-muted/50 transition-colors"
                       >
                         <div className="space-y-1">
                           <div className="flex items-center gap-3">
-                            <span className="font-bold text-zinc-900 text-sm">
+                            <span className="font-bold text-foreground text-sm">
                               {cat.name}
                             </span>
-                            <Badge className="rounded-none text-[9px] uppercase bg-zinc-100 text-zinc-800 border border-zinc-200">
+                            <Badge className="rounded-none text-[9px] uppercase bg-muted text-foreground border border-border">
                               {items.length} Gear Item(s)
                             </Badge>
                           </div>
-                          <p className="text-[11px] text-zinc-500">
+                          <p className="text-[11px] text-muted-foreground">
                             {cat.description || "No description provided."}
                           </p>
                         </div>
 
-                        <div className="flex items-center gap-2 text-zinc-400">
+                        <div className="flex items-center gap-2 text-muted-foreground">
                           <span className="text-[10px] uppercase font-mono">
                             {isExpanded ? "Collapse" : "Expand"}
                           </span>
@@ -657,16 +685,16 @@ export default function AdminDashboard({
                       </button>
 
                       {isExpanded && (
-                        <div className="px-4 pb-4 pt-2 border-t border-zinc-100 bg-[#FDFBF7] space-y-2">
+                        <div className="px-4 pb-4 pt-2 border-t border-border bg-[#FDFBF7] space-y-2">
                           {items.length > 0 ? (
                             items.map((g: any) => (
                               <div
                                 key={g.id}
                                 onClick={() => openGearModal(g)}
-                                className="bg-white border border-zinc-200 p-3 flex items-center justify-between gap-4 shadow-2xs hover:border-zinc-900 cursor-pointer transition-all"
+                                className="bg-card border border-border p-3 flex items-center justify-between gap-4 shadow-2xs hover:border-primary cursor-pointer transition-all"
                               >
                                 <div className="flex items-center gap-3 min-w-0">
-                                  <div className="w-10 h-10 bg-zinc-100 border border-zinc-200 shrink-0 overflow-hidden">
+                                  <div className="w-10 h-10 bg-muted border border-border shrink-0 overflow-hidden">
                                     <img
                                       src={
                                         g.images?.[0] ||
@@ -677,17 +705,17 @@ export default function AdminDashboard({
                                     />
                                   </div>
                                   <div className="min-w-0">
-                                    <p className="text-[9px] uppercase tracking-widest text-zinc-400">
+                                    <p className="text-[9px] uppercase tracking-widest text-muted-foreground">
                                       {g.brand || "Brand"}
                                     </p>
-                                    <h4 className="text-xs font-medium text-zinc-900 truncate">
+                                    <h4 className="text-xs font-medium text-foreground truncate">
                                       {g.name}
                                     </h4>
                                   </div>
                                 </div>
 
                                 <div className="flex items-center gap-4 shrink-0">
-                                  <span className="font-mono font-bold text-zinc-900 text-xs">
+                                  <span className="font-mono font-bold text-foreground text-xs">
                                     ৳{g.pricePerDay}/day
                                   </span>
                                   <Badge
@@ -700,7 +728,7 @@ export default function AdminDashboard({
                               </div>
                             ))
                           ) : (
-                            <div className="py-6 text-center text-zinc-400 text-xs">
+                            <div className="py-6 text-center text-muted-foreground text-xs">
                               No gear items currently assigned to this category.
                             </div>
                           )}
@@ -711,7 +739,7 @@ export default function AdminDashboard({
                 })}
 
                 {categoryList.length === 0 && (
-                  <div className="bg-white border border-zinc-200 p-12 text-center text-zinc-400">
+                  <div className="bg-card border border-border p-12 text-center text-muted-foreground">
                     No categories found.
                   </div>
                 )}
@@ -722,41 +750,41 @@ export default function AdminDashboard({
 
         {/* 1. USER INSPECTION DETAIL MODAL */}
         {selectedUser && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/60 backdrop-blur-xs p-4">
-            <div className="w-full max-w-lg border border-zinc-300 bg-[#FDFBF7] p-8 rounded-none shadow-2xl space-y-6 relative font-mono text-xs">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-primary/60 backdrop-blur-xs p-4">
+            <div className="modal-content w-full max-w-lg border border-border bg-muted p-8 rounded-none shadow-2xl space-y-6 relative font-mono text-xs">
               <button
                 type="button"
                 onClick={closeModal}
-                className="absolute top-6 right-6 text-zinc-400 hover:text-zinc-900 transition-colors"
+                className="absolute top-6 right-6 text-muted-foreground hover:text-foreground transition-colors"
               >
                 <X className="h-5 w-5" />
               </button>
 
-              <div className="border-b border-zinc-300 pb-4 space-y-1">
-                <span className="text-[10px] uppercase tracking-widest text-zinc-500 block">
+              <div className="border-b border-border pb-4 space-y-1">
+                <span className="text-[10px] uppercase tracking-widest text-muted-foreground block">
                   [ Account Record File ]
                 </span>
-                <h2 className="text-2xl font-normal text-zinc-900 font-serif">
+                <h2 className="text-2xl font-normal text-foreground font-serif">
                   {selectedUser.name || "Unnamed Account"}
                 </h2>
-                <span className="text-[10px] text-zinc-400 block font-mono">
+                <span className="text-[10px] text-muted-foreground block font-mono">
                   ID: {selectedUser.id}
                 </span>
               </div>
 
-              <div className="space-y-3 bg-white p-4 border border-zinc-200">
-                <div className="flex justify-between items-center border-b border-zinc-100 pb-2">
-                  <span className="text-zinc-400 uppercase text-[10px] flex items-center gap-1.5">
-                    <Mail className="h-3.5 w-3.5 text-zinc-600" /> Email Address
+              <div className="space-y-3 bg-card p-4 border border-border">
+                <div className="flex justify-between items-center border-b border-border pb-2">
+                  <span className="text-muted-foreground uppercase text-[10px] flex items-center gap-1.5">
+                    <Mail className="h-3.5 w-3.5 text-muted-foreground" /> Email Address
                   </span>
-                  <span className="font-semibold text-zinc-900">
+                  <span className="font-semibold text-foreground">
                     {selectedUser.email}
                   </span>
                 </div>
 
-                <div className="flex justify-between items-center border-b border-zinc-100 pb-2">
-                  <span className="text-zinc-400 uppercase text-[10px] flex items-center gap-1.5">
-                    <Shield className="h-3.5 w-3.5 text-zinc-600" /> Account
+                <div className="flex justify-between items-center border-b border-border pb-2">
+                  <span className="text-muted-foreground uppercase text-[10px] flex items-center gap-1.5">
+                    <Shield className="h-3.5 w-3.5 text-muted-foreground" /> Account
                     Role
                   </span>
                   <Badge
@@ -767,9 +795,9 @@ export default function AdminDashboard({
                   </Badge>
                 </div>
 
-                <div className="flex justify-between items-center border-b border-zinc-100 pb-2">
-                  <span className="text-zinc-400 uppercase text-[10px] flex items-center gap-1.5">
-                    <UserCheck className="h-3.5 w-3.5 text-zinc-600" /> Active
+                <div className="flex justify-between items-center border-b border-border pb-2">
+                  <span className="text-muted-foreground uppercase text-[10px] flex items-center gap-1.5">
+                    <UserCheck className="h-3.5 w-3.5 text-muted-foreground" /> Active
                     Status
                   </span>
                   <Badge
@@ -784,22 +812,22 @@ export default function AdminDashboard({
                   </Badge>
                 </div>
 
-                <div className="flex justify-between items-center border-b border-zinc-100 pb-2">
-                  <span className="text-zinc-400 uppercase text-[10px] flex items-center gap-1.5">
-                    <Phone className="h-3.5 w-3.5 text-zinc-600" /> Phone
+                <div className="flex justify-between items-center border-b border-border pb-2">
+                  <span className="text-muted-foreground uppercase text-[10px] flex items-center gap-1.5">
+                    <Phone className="h-3.5 w-3.5 text-muted-foreground" /> Phone
                     Contact
                   </span>
-                  <span className="text-zinc-900">
+                  <span className="text-foreground">
                     {selectedUser.profile?.phone || "Not provided"}
                   </span>
                 </div>
 
                 <div className="flex justify-between items-center">
-                  <span className="text-zinc-400 uppercase text-[10px] flex items-center gap-1.5">
-                    <Calendar className="h-3.5 w-3.5 text-zinc-600" /> Member
+                  <span className="text-muted-foreground uppercase text-[10px] flex items-center gap-1.5">
+                    <Calendar className="h-3.5 w-3.5 text-muted-foreground" /> Member
                     Since
                   </span>
-                  <span className="text-zinc-900">
+                  <span className="text-foreground">
                     {selectedUser.createdAt
                       ? new Date(selectedUser.createdAt).toLocaleDateString()
                       : "N/A"}
@@ -809,16 +837,16 @@ export default function AdminDashboard({
 
               {selectedUser.profile?.bio && (
                 <div className="space-y-1">
-                  <span className="text-[10px] uppercase tracking-widest text-zinc-400 block">
+                  <span className="text-[10px] uppercase tracking-widest text-muted-foreground block">
                     User Bio
                   </span>
-                  <p className="p-3 bg-white border border-zinc-200 text-zinc-700 italic text-[11px]">
+                  <p className="p-3 bg-card border border-border text-foreground italic text-[11px]">
                     "{selectedUser.profile.bio}"
                   </p>
                 </div>
               )}
 
-              <div className="pt-2 border-t border-zinc-300 flex justify-between items-center">
+              <div className="pt-2 border-t border-border flex justify-between items-center">
                 <Button
                   size="sm"
                   variant={
@@ -836,7 +864,7 @@ export default function AdminDashboard({
                   }}
                   className={`rounded-none text-[10px] uppercase h-9 px-4 ${
                     selectedUser.activeStatus === "SUSPEND"
-                      ? "bg-zinc-900 text-white hover:bg-zinc-800"
+                      ? "bg-primary text-white hover:bg-primary/90"
                       : "text-red-600 border-red-200 hover:bg-red-50"
                   }`}
                 >
@@ -847,7 +875,7 @@ export default function AdminDashboard({
 
                 <Button
                   onClick={closeModal}
-                  className="rounded-none bg-zinc-900 text-white hover:bg-zinc-800 text-xs uppercase px-6 h-9"
+                  className="rounded-none bg-primary text-white hover:bg-primary/90 text-xs uppercase px-6 h-9"
                 >
                   Close Record
                 </Button>
@@ -858,41 +886,41 @@ export default function AdminDashboard({
 
         {/* 2. RENTAL ORDER INSPECTION MODAL */}
         {selectedRental && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/60 backdrop-blur-xs p-4">
-            <div className="w-full max-w-xl border border-zinc-300 bg-[#FDFBF7] p-8 rounded-none shadow-2xl space-y-6 relative font-mono text-xs">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-primary/60 backdrop-blur-xs p-4">
+            <div className="modal-content w-full max-w-xl border border-border bg-muted p-8 rounded-none shadow-2xl space-y-6 relative font-mono text-xs">
               <button
                 type="button"
                 onClick={closeModal}
-                className="absolute top-6 right-6 text-zinc-400 hover:text-zinc-900 transition-colors"
+                className="absolute top-6 right-6 text-muted-foreground hover:text-foreground transition-colors"
               >
                 <X className="h-5 w-5" />
               </button>
 
-              <div className="text-center border-b border-zinc-300 pb-6 space-y-1 font-serif">
-                <span className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 block">
+              <div className="text-center border-b border-border pb-6 space-y-1 font-serif">
+                <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground block">
                   GearUp Administrator — Audit Statement
                 </span>
-                <h2 className="text-2xl font-normal tracking-tight text-zinc-900">
+                <h2 className="text-2xl font-normal tracking-tight text-foreground">
                   Rental Order #{selectedRental.id.slice(0, 8).toUpperCase()}
                 </h2>
-                <p className="text-xs font-mono text-zinc-500">
+                <p className="text-xs font-mono text-muted-foreground">
                   Customer: {selectedRental.customer?.name} (
                   {selectedRental.customer?.email})
                 </p>
               </div>
 
-              <div className="grid grid-cols-2 gap-4 border-b border-zinc-200 pb-6">
+              <div className="grid grid-cols-2 gap-4 border-b border-border pb-6">
                 <div>
-                  <span className="text-zinc-400 block uppercase text-[10px]">
+                  <span className="text-muted-foreground block uppercase text-[10px]">
                     Rental Window:
                   </span>
-                  <span className="font-semibold text-zinc-900 block mt-0.5">
+                  <span className="font-semibold text-foreground block mt-0.5">
                     {new Date(selectedRental.startDate).toLocaleDateString()} —{" "}
                     {new Date(selectedRental.endDate).toLocaleDateString()}
                   </span>
                 </div>
                 <div className="text-right">
-                  <span className="text-zinc-400 block uppercase text-[10px]">
+                  <span className="text-muted-foreground block uppercase text-[10px]">
                     Fulfillment Status:
                   </span>
                   <Badge
@@ -906,24 +934,24 @@ export default function AdminDashboard({
 
               {/* Itemized Manifest */}
               <div className="space-y-3">
-                <span className="text-[10px] uppercase tracking-widest text-zinc-400 block">
+                <span className="text-[10px] uppercase tracking-widest text-muted-foreground block">
                   Itemized Manifest Ledger
                 </span>
                 <div className="space-y-2 max-h-48 overflow-y-auto">
                   {selectedRental.items?.map((item: any) => (
                     <div
                       key={item.id}
-                      className="bg-white border border-zinc-200 p-3 flex justify-between items-center"
+                      className="bg-card border border-border p-3 flex justify-between items-center"
                     >
                       <div>
-                        <p className="font-medium text-zinc-900">
+                        <p className="font-medium text-foreground">
                           {item.gearItem?.name || "Equipment Item"}
                         </p>
-                        <p className="text-[10px] text-zinc-400 font-mono">
+                        <p className="text-[10px] text-muted-foreground font-mono">
                           Qty: {item.quantity} unit(s)
                         </p>
                       </div>
-                      <span className="font-bold text-zinc-900">
+                      <span className="font-bold text-foreground">
                         ৳{Number(item.pricePerDay).toLocaleString()} / day
                       </span>
                     </div>
@@ -931,25 +959,25 @@ export default function AdminDashboard({
                 </div>
               </div>
 
-              <div className="border-t border-zinc-300 pt-4 flex justify-between items-center">
-                <div className="text-zinc-500 text-[11px] flex items-center gap-1">
-                  <ShieldCheck className="h-3.5 w-3.5 text-zinc-700" />
+              <div className="border-t border-border pt-4 flex justify-between items-center">
+                <div className="text-muted-foreground text-[11px] flex items-center gap-1">
+                  <ShieldCheck className="h-3.5 w-3.5 text-muted-foreground" />
                   <span>Admin Verified Audit Log</span>
                 </div>
                 <div className="text-right">
-                  <span className="text-zinc-400 text-[10px] block uppercase">
+                  <span className="text-muted-foreground text-[10px] block uppercase">
                     Total Valuation
                   </span>
-                  <span className="text-lg font-bold text-zinc-900">
+                  <span className="text-lg font-bold text-foreground">
                     ৳{Number(selectedRental.totalAmount).toLocaleString()} BDT
                   </span>
                 </div>
               </div>
 
-              <div className="pt-2 border-t border-zinc-200 flex justify-end">
+              <div className="pt-2 border-t border-border flex justify-end">
                 <Button
                   onClick={closeModal}
-                  className="rounded-none bg-zinc-900 text-white hover:bg-zinc-800 text-xs font-mono uppercase px-6 h-9"
+                  className="rounded-none bg-primary text-primary-foreground hover:bg-primary/90 text-xs font-mono uppercase px-6 h-9"
                 >
                   Close Statement
                 </Button>
@@ -960,30 +988,30 @@ export default function AdminDashboard({
 
         {/* 3. GEAR ASSET INSPECTION MODAL */}
         {selectedGear && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/60 backdrop-blur-xs p-4">
-            <div className="w-full max-w-xl border border-zinc-300 bg-[#FDFBF7] p-8 rounded-none shadow-2xl space-y-6 relative font-mono text-xs">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-primary/60 backdrop-blur-xs p-4">
+            <div className="modal-content w-full max-w-xl border border-border bg-muted p-8 rounded-none shadow-2xl space-y-6 relative font-mono text-xs">
               <button
                 type="button"
                 onClick={closeModal}
-                className="absolute top-6 right-6 text-zinc-400 hover:text-zinc-900 transition-colors"
+                className="absolute top-6 right-6 text-muted-foreground hover:text-foreground transition-colors"
               >
                 <X className="h-5 w-5" />
               </button>
 
-              <div className="border-b border-zinc-300 pb-4 space-y-1">
-                <span className="text-[10px] uppercase tracking-widest text-zinc-500 block">
+              <div className="border-b border-border pb-4 space-y-1">
+                <span className="text-[10px] uppercase tracking-widest text-muted-foreground block">
                   [ Equipment Spec Sheet ]
                 </span>
-                <h2 className="text-2xl font-normal text-zinc-900 font-serif">
+                <h2 className="text-2xl font-normal text-foreground font-serif">
                   {selectedGear.name}
                 </h2>
-                <span className="text-[10px] text-zinc-400 block font-mono">
+                <span className="text-[10px] text-muted-foreground block font-mono">
                   Asset ID: {selectedGear.id} • Brand: {selectedGear.brand}
                 </span>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="h-40 border border-zinc-200 bg-white overflow-hidden">
+                <div className="h-40 border border-border bg-card overflow-hidden">
                   <img
                     src={
                       selectedGear.images?.[0] ||
@@ -993,33 +1021,33 @@ export default function AdminDashboard({
                     className="w-full h-full object-cover"
                   />
                 </div>
-                <div className="space-y-3 bg-white p-4 border border-zinc-200 flex flex-col justify-center">
-                  <div className="flex justify-between border-b border-zinc-100 pb-2">
-                    <span className="text-zinc-400 uppercase text-[10px]">
+                <div className="space-y-3 bg-card p-4 border border-border flex flex-col justify-center">
+                  <div className="flex justify-between border-b border-border pb-2">
+                    <span className="text-muted-foreground uppercase text-[10px]">
                       Daily Rate
                     </span>
-                    <span className="font-bold text-zinc-900">
+                    <span className="font-bold text-foreground">
                       ৳{selectedGear.pricePerDay}
                     </span>
                   </div>
-                  <div className="flex justify-between border-b border-zinc-100 pb-2">
-                    <span className="text-zinc-400 uppercase text-[10px]">
+                  <div className="flex justify-between border-b border-border pb-2">
+                    <span className="text-muted-foreground uppercase text-[10px]">
                       Security Deposit
                     </span>
-                    <span className="font-bold text-zinc-900">
+                    <span className="font-bold text-foreground">
                       ৳{selectedGear.securityDeposit}
                     </span>
                   </div>
-                  <div className="flex justify-between border-b border-zinc-100 pb-2">
-                    <span className="text-zinc-400 uppercase text-[10px]">
+                  <div className="flex justify-between border-b border-border pb-2">
+                    <span className="text-muted-foreground uppercase text-[10px]">
                       Stock Quantity
                     </span>
-                    <span className="font-bold text-zinc-900">
+                    <span className="font-bold text-foreground">
                       {selectedGear.quantity} unit(s)
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-zinc-400 uppercase text-[10px]">
+                    <span className="text-muted-foreground uppercase text-[10px]">
                       Asset Status
                     </span>
                     <Badge
@@ -1033,18 +1061,18 @@ export default function AdminDashboard({
               </div>
 
               <div className="space-y-1">
-                <span className="text-[10px] uppercase tracking-widest text-zinc-400 block">
+                <span className="text-[10px] uppercase tracking-widest text-muted-foreground block">
                   Description
                 </span>
-                <p className="p-3 bg-white border border-zinc-200 text-zinc-700 text-[11px] leading-relaxed">
+                <p className="p-3 bg-card border border-border text-foreground text-[11px] leading-relaxed">
                   {selectedGear.description || "No description provided."}
                 </p>
               </div>
 
-              <div className="pt-2 border-t border-zinc-300 flex justify-end">
+              <div className="pt-2 border-t border-border flex justify-end">
                 <Button
                   onClick={closeModal}
-                  className="rounded-none bg-zinc-900 text-white hover:bg-zinc-800 text-xs font-mono uppercase px-6 h-9"
+                  className="rounded-none bg-primary text-primary-foreground hover:bg-primary/90 text-xs font-mono uppercase px-6 h-9"
                 >
                   Close Spec Sheet
                 </Button>

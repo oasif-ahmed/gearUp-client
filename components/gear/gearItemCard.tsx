@@ -82,83 +82,64 @@ const GearItemCard: React.FC<GearItemCardProps> = ({
   );
 
   return (
-    <div className="group relative rounded-none border border-[#d8d2c6] dark:border-zinc-700 bg-[#ede8df] dark:bg-zinc-800 shadow-sm transition-all hover:border-[#2c2a29] dark:hover:border-zinc-100 hover:shadow-md overflow-hidden flex flex-col h-full font-mono">
+    <div className="group relative rounded-none border border-border bg-card shadow-none transition-all hover:border-primary overflow-hidden flex flex-col h-full font-mono">
       
-      {/* 1. Compact Image Header Section */}
-      <div className="relative h-40 w-full overflow-hidden bg-[#f4f1ea] dark:bg-zinc-900 shrink-0 border-b border-[#d8d2c6] dark:border-zinc-700">
+      {/* 1. Full Image Cover Background */}
+      <div className="relative h-72 w-full overflow-hidden bg-muted shrink-0">
         <img
           src={imageUrl}
           alt={name}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
         />
-        <div className="absolute top-2 left-2 flex gap-1 z-10">
-          <Badge variant={conditionVariant(condition)} className="rounded-none text-[9px] uppercase font-mono px-1.5 py-0">
+        
+        {/* Floating Badges */}
+        <div className="absolute top-3 left-3 flex flex-col gap-1.5 z-10">
+          <Badge className="rounded-none text-[9px] uppercase font-mono px-2 py-0.5 bg-background text-foreground border-none">
             {formatCondition(condition)}
           </Badge>
-          <Badge variant={statusVariant(status)} className="rounded-none text-[9px] uppercase font-mono px-1.5 py-0">
-            {status ? status.charAt(0) + status.slice(1).toLowerCase() : ""}
-          </Badge>
-        </div>
-        <div className="absolute top-2 right-2 z-10">
-          <span className="bg-[#ede8df]/90 dark:bg-zinc-900/90 backdrop-blur-sm px-2 py-0.5 text-[10px] font-mono uppercase font-bold text-[#2c2a29] dark:text-zinc-100 border border-[#d8d2c6] dark:border-zinc-700">
+          <div className="bg-primary px-2 py-0.5 text-[9px] font-mono uppercase font-bold text-primary-foreground">
             {category?.name || "General"}
-          </span>
+          </div>
         </div>
-      </div>
 
-      {/* 2. Packed Content Body */}
-      <div className="p-3.5 flex flex-col flex-1 justify-between space-y-2.5">
-        
-        {/* Title & Brand */}
-        <div className="space-y-0.5">
-          <div className="flex justify-between items-center text-[10px] font-mono text-[#6b655f] dark:text-zinc-400 uppercase tracking-wider">
-            <span>{brand || "Standard Brand"}</span>
-            <span>Ref #{id?.slice(-6)}</span>
+        {/* 2. Content Overlay with Clean Background */}
+        <div className="absolute bottom-0 left-0 right-0 p-4 z-10 bg-gradient-to-t from-black/80 via-black/40 to-transparent">
+
+          {/* Brand & Title */}
+          <div className="space-y-0.5 mb-2">
+            <span className="text-[9px] font-mono text-white/70 uppercase tracking-widest block">
+              {brand || "Standard Brand"}
+            </span>
+            <h3 className="text-base font-bold text-white line-clamp-1 font-serif uppercase tracking-tight" title={name}>
+              {name}
+            </h3>
           </div>
 
-          <h3 className="text-sm font-bold text-[#2c2a29] dark:text-white line-clamp-1 group-hover:text-[#5a6b5c] transition-colors font-serif" title={name}>
-            {name}
-          </h3>
-
-          <p className="text-[11px] text-[#6b655f] dark:text-zinc-300 line-clamp-1 leading-relaxed font-mono">
-            {description || "No description provided."}
+          {/* Details (Always visible) */}
+          <p className="text-[10px] text-white/90 line-clamp-2 font-mono leading-relaxed mb-3">
+            {description || "Premium gear available for immediate rental."}
           </p>
-        </div>
 
-        {/* Dense 2x2 Specifications Grid (Shows up to 4 specs packed tightly) */}
-        <div className="grid grid-cols-2 gap-1 text-[10px] font-mono text-[#6b655f] dark:text-zinc-400 bg-[#f4f1ea] dark:bg-zinc-900 p-2 border border-[#d8d2c6] dark:border-zinc-700">
-          {activeSpecs.length > 0 ? (
-            activeSpecs.slice(0, 4).map(([key, val]) => (
-              <div key={key} className="flex items-center gap-1 truncate">
-                <Tag className="h-2.5 w-2.5 shrink-0 text-[#5a6b5c]" />
-                <span className="truncate capitalize font-mono text-[10px]">
-                  <strong className="text-[#2c2a29] dark:text-zinc-200">{key}:</strong> {String(val)}
-                </span>
-              </div>
-            ))
-          ) : (
-            <div className="col-span-2 text-center text-[10px] text-[#a39c94] italic">
-              Standard specifications apply
+          {/* Price & Inventory Footer */}
+          <div className="pt-2 border-t border-white/20 flex items-center justify-between">
+            <div className="text-left">
+              <p className="text-[9px] text-white/60 uppercase font-mono leading-none mb-1">Rate / Deposit</p>
+              <p className="text-xs font-bold text-white font-mono leading-none">
+                {formatPrice(pricePerDay)}<span className="text-[9px] font-normal text-white/70">/d</span>
+                <span className="text-[9px] font-normal text-white/60 ml-1">({formatPrice(securityDeposit)})</span>
+              </p>
             </div>
-          )}
-        </div>
-
-        {/* Financial & Inventory Footer */}
-        <div className="pt-2 mt-auto border-t border-[#d8d2c6] dark:border-zinc-700 flex items-center justify-between">
-          <div>
-            <p className="text-[9px] text-[#a39c94] uppercase font-mono">Rate / Deposit</p>
-            <p className="text-xs font-bold text-[#2c2a29] dark:text-white font-mono">
-              {formatPrice(pricePerDay)}<span className="text-[10px] font-normal text-[#6b655f]">/d</span>
-              <span className="text-[10px] font-normal text-[#a39c94] ml-1">(Dep: {formatPrice(securityDeposit)})</span>
-            </p>
-          </div>
-
-          <div className="flex items-center gap-1 text-[10px] text-[#6b655f] dark:text-zinc-400 font-mono shrink-0">
-            <Package className="h-3 w-3 text-[#5a6b5c]" />
-            <span>{quantity} left</span>
+            <div className="flex items-center gap-1.5 text-[9px] text-white/90 uppercase font-mono">
+              <Package className="h-3 w-3 text-primary" />
+              <span>{quantity}</span>
+            </div>
           </div>
         </div>
 
+        {/* Status indicator bar at the very bottom */}
+        <div className={`absolute bottom-0 left-0 w-full h-1 z-20 ${
+          status === "AVAILABLE" ? "bg-emerald-500" : "bg-destructive"
+        }`} />
       </div>
     </div>
   );

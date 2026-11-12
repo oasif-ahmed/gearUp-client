@@ -40,7 +40,7 @@ export default function GearSearchBar({
           name="search"
           defaultValue={defaultValue}
           placeholder="Search gear items..."
-          className="h-10 rounded-none border-zinc-300 bg-white text-xs font-mono text-zinc-900 focus-visible:ring-zinc-900"
+          className="h-10 rounded-none border-border bg-background text-xs font-mono text-foreground focus-visible:ring-ring"
           tabIndex={isOpen ? 0 : -1}
         />
       </div>
@@ -49,7 +49,7 @@ export default function GearSearchBar({
         <Button
           type="submit"
           size="icon"
-          className="h-10 w-10 shrink-0 rounded-none bg-zinc-900 text-white hover:bg-zinc-800"
+          className="h-10 w-10 shrink-0 rounded-none bg-primary text-primary-foreground hover:opacity-90"
           aria-label="Submit search"
         >
           <Search className="h-4 w-4" />
@@ -61,7 +61,7 @@ export default function GearSearchBar({
         size="icon"
         variant="outline"
         onClick={handleToggle}
-        className="h-10 w-10 shrink-0 rounded-none border-zinc-300 bg-white text-zinc-900"
+        className="h-10 w-10 shrink-0 rounded-none border-border bg-background text-foreground"
         aria-label={isOpen ? "Close search" : "Open search"}
       >
         {isOpen ? (

@@ -6,27 +6,48 @@
 :root {
   --background: #FDFBF7;
   --foreground: #18181b;
-  --card: #ffffff;
+  --card: #FDFBF7;
   --card-foreground: #18181b;
-  --popover: #ffffff;
+  --popover: #FDFBF7;
   --popover-foreground: #18181b;
   --primary: #18181b;
-  --primary-foreground: #fdfbf7;
-  --secondary: #f4f2ed;
+  --primary-foreground: #FDFBF7;
+  --secondary: #F5F0E8;
   --secondary-foreground: #18181b;
-  --muted: #f4f2ed;
+  --muted: #F5F0E8;
   --muted-foreground: #71717a;
-  --accent: #f4f2ed;
-  --accent-foreground: #18181b;
+  --accent: #bc3a28;
+  --accent-foreground: #fff6e8;
   --destructive: #ef4444;
   --destructive-foreground: #fdfbf7;
-  --border: #e4e4e7;
+  --border: #d8c9ac;
   --input: #e4e4e7;
-  --ring: #18181b;
-  --radius: 0rem; /* Sharp, modern editorial corners */
+  --ring: #bc3a28;
+  --radius: 0rem;
 }
 
-/* Tailwind v4 theme mapping for shadcn */
+.dark {
+  --background: #16120b;
+  --foreground: #f3ead3;
+  --card: #1e1810;
+  --card-foreground: #f3ead3;
+  --popover: #1e1810;
+  --popover-foreground: #f3ead3;
+  --primary: #f3ead3;
+  --primary-foreground: #16120b;
+  --secondary: #241e13;
+  --secondary-foreground: #f3ead3;
+  --muted: #241e13;
+  --muted-foreground: #b0a284;
+  --accent: #c34a31;
+  --accent-foreground: #fff6e6;
+  --destructive: #c34a31;
+  --destructive-foreground: #fff6e6;
+  --border: #3a3122;
+  --input: #3a3122;
+  --ring: #e0573d;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -43,6 +64,7 @@
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);

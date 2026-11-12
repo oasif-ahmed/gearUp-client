@@ -46,12 +46,12 @@ export function RegisterForm() {
   }
   return (
     <div className="w-full max-w-md mx-auto relative z-10 font-mono">
-      <Card className="bg-[#ede8df] dark:bg-zinc-800 border border-[#d8d2c6] dark:border-zinc-700 rounded-none shadow-sm text-[#2c2a29] dark:text-[#f4f1ea]">
-        <CardHeader className="space-y-1.5 border-b border-[#d8d2c6] dark:border-zinc-700 pb-6">
-          <CardTitle className="text-xl font-bold tracking-tight text-[#2c2a29] dark:text-white text-center font-serif">
+      <Card className="bg-card border border-border rounded-none shadow-sm text-foreground">
+        <CardHeader className="space-y-1.5 border-b border-border pb-6">
+          <CardTitle className="text-xl font-bold tracking-tight text-foreground text-center font-serif">
             Create Your Account
           </CardTitle>
-          <CardDescription className="text-xs text-[#6b655f] dark:text-zinc-400 text-center font-mono">
+          <CardDescription className="text-xs text-muted-foreground text-center font-mono">
             Fill in your details to get started
           </CardDescription>
         </CardHeader>
@@ -60,7 +60,7 @@ export function RegisterForm() {
         <form action={formAction}>
           <CardContent className="pt-6 space-y-4">
             {state && state.message && !state.success && (
-              <div className="p-2.5 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 text-rose-700 dark:text-rose-400 text-xs font-mono">
+              <div className="p-2.5 bg-destructive/10 border border-destructive/20 text-destructive text-xs font-mono">
                 {state.message}
               </div>
             )}
@@ -68,7 +68,7 @@ export function RegisterForm() {
             <div className="space-y-1.5">
               <Label
                 htmlFor="name"
-                className="text-xs font-mono uppercase text-[#6b655f] dark:text-zinc-300"
+                className="text-xs font-mono uppercase text-muted-foreground"
               >
                 Full Name
               </Label>
@@ -78,22 +78,22 @@ export function RegisterForm() {
                 type="text"
                 placeholder="John Doe"
                 required
-                className="h-9 rounded-none text-xs border-[#d8d2c6] dark:border-zinc-700 bg-[#f4f1ea] dark:bg-zinc-900 text-[#2c2a29] dark:text-white font-mono"
+                className="h-9 rounded-none text-xs border-border bg-accent/30 text-foreground font-mono"
               />
             </div>
 
             <div className="space-y-1.5">
               <Label
                 htmlFor="role"
-                className="text-xs font-mono uppercase text-[#6b655f] dark:text-zinc-300"
+                className="text-xs font-mono uppercase text-muted-foreground"
               >
                 Account Type
               </Label>
               <Select name="role" required defaultValue="CUSTOMER">
-                <SelectTrigger className="h-9 rounded-none text-xs border-[#d8d2c6] dark:border-zinc-700 bg-[#f4f1ea] dark:bg-zinc-900 text-[#2c2a29] dark:text-white font-mono">
+                <SelectTrigger className="h-9 rounded-none text-xs border-border bg-accent/30 text-foreground font-mono">
                   <SelectValue placeholder="Select your role" />
                 </SelectTrigger>
-                <SelectContent className="rounded-none border-[#d8d2c6] dark:border-zinc-700 bg-[#ede8df] dark:bg-zinc-800 text-[#2c2a29] dark:text-white font-mono">
+                <SelectContent className="rounded-none border-border bg-popover text-popover-foreground font-mono">
                   <SelectItem value="CUSTOMER">Customer</SelectItem>
                   <SelectItem value="PROVIDER">Provider</SelectItem>
                   <SelectItem value="ADMIN">Admin</SelectItem>
@@ -104,7 +104,7 @@ export function RegisterForm() {
             <div className="space-y-1.5">
               <Label
                 htmlFor="email"
-                className="text-xs font-mono uppercase text-[#6b655f] dark:text-zinc-300"
+                className="text-xs font-mono uppercase text-muted-foreground"
               >
                 Email Address
               </Label>
@@ -114,14 +114,14 @@ export function RegisterForm() {
                 type="email"
                 placeholder="you@example.com"
                 required
-                className="h-9 rounded-none text-xs border-[#d8d2c6] dark:border-zinc-700 bg-[#f4f1ea] dark:bg-zinc-900 text-[#2c2a29] dark:text-white font-mono"
+                className="h-9 rounded-none text-xs border-border bg-accent/30 text-foreground font-mono"
               />
             </div>
 
             <div className="space-y-1.5">
               <Label
                 htmlFor="password"
-                className="text-xs font-mono uppercase text-[#6b655f] dark:text-zinc-300"
+                className="text-xs font-mono uppercase text-muted-foreground"
               >
                 Password
               </Label>
@@ -132,13 +132,13 @@ export function RegisterForm() {
                   type={showPassword ? "text" : "password"}
                   placeholder="Create a password"
                   required
-                  className="h-9 rounded-none text-xs border-[#d8d2c6] dark:border-zinc-700 bg-[#f4f1ea] dark:bg-zinc-900 text-[#2c2a29] dark:text-white pr-10 font-mono"
+                  className="h-9 rounded-none text-xs border-border bg-accent/30 text-foreground pr-10 font-mono"
                 />
                 <Button
                   type="button"
                   variant="ghost"
                   size="sm"
-                  className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent text-[#6b655f] dark:text-zinc-400"
+                  className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent text-muted-foreground"
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? (
@@ -154,24 +154,24 @@ export function RegisterForm() {
               <input
                 type="checkbox"
                 id="terms"
-                className="rounded-none border-[#d8d2c6] dark:border-zinc-700 bg-[#f4f1ea] dark:bg-zinc-900 h-4 w-4 accent-[#2c2a29] cursor-pointer"
+                className="rounded-none border-border bg-accent/30 h-4 w-4 cursor-pointer"
                 required
               />
               <label
                 htmlFor="terms"
-                className="text-[11px] text-[#6b655f] dark:text-zinc-400 font-mono cursor-pointer leading-tight"
+                className="text-[11px] text-muted-foreground font-mono cursor-pointer leading-tight"
               >
                 I agree to the Terms of Service and Privacy Policy
               </label>
             </div>
           </CardContent>
 
-          <CardFooter className="flex flex-col gap-3 pt-0 border-t border-[#d8d2c6] dark:border-zinc-700 mt-4 pt-6">
+          <CardFooter className="flex flex-col gap-3 pt-0 border-t border-border mt-4 pt-6">
             {/* Submit button placed inside the form context */}
             <Button
               type="submit"
               disabled={pending}
-              className="w-full h-9 rounded-none bg-[#2c2a29] text-[#f4f1ea] hover:bg-[#43403e] dark:bg-zinc-100 dark:text-zinc-900 text-xs font-mono uppercase tracking-wider cursor-pointer flex items-center justify-center"
+              className="w-full h-9 rounded-none bg-primary text-primary-foreground hover:bg-primary/90 text-xs font-mono uppercase tracking-wider cursor-pointer flex items-center justify-center"
             >
               {pending ? (
                 <>
@@ -183,11 +183,11 @@ export function RegisterForm() {
               )}
             </Button>
 
-            <p className="text-center text-xs text-[#6b655f] dark:text-zinc-400 font-mono pt-2">
+            <p className="text-center text-xs text-muted-foreground font-mono pt-2">
               Already have an account?{" "}
               <Link
                 href="/login"
-                className="font-medium text-[#2c2a29] dark:text-white hover:underline"
+                className="font-medium text-foreground hover:underline"
               >
                 Sign in
               </Link>
