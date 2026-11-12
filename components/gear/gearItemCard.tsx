@@ -1,6 +1,9 @@
-import React from "react";
+"use client";
+
+import React, { useRef, useEffect } from "react";
 import { Package, Tag } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { floatElement, animate, animationPresets } from "@/lib/animations";
 
 interface GearItemCardProps {
   id: string;
@@ -48,6 +51,7 @@ const GearItemCard: React.FC<GearItemCardProps> = ({
   category,
 }) => {
   const imageUrl = images?.[0] || "/placeholder-gear.jpg";
+  const cardRef = useRef<HTMLDivElement>(null);
 
   const formatCondition = (cond: string) => {
     return cond ? cond.charAt(0) + cond.slice(1).toLowerCase() : "";
@@ -81,15 +85,34 @@ const GearItemCard: React.FC<GearItemCardProps> = ({
     ([_, value]) => value !== undefined && value !== null && value !== ""
   );
 
+  // Card entrance animation
+  useEffect(() => {
+    if (cardRef.current) {
+      // Staggered entrance animation
+      import("@/lib/animations").then(({ animate, animationPresets }) => {
+        animate(cardRef.current!, {
+          opacity: [0, 1],
+          translateY: [30, 0],
+          scale: [0.95, 1],
+          duration: 700,
+          easing: "easeOutExpo",
+        });
+      });
+    }
+  }, []);
+
   return (
-    <div className="group relative rounded-none border border-border bg-card shadow-none transition-all hover:border-primary overflow-hidden flex flex-col h-full font-mono">
+    <div 
+      ref={cardRef}
+      className="group relative rounded-lg border border-border bg-card shadow-sm transition-all duration-300 hover:border-primary overflow-hidden flex flex-col h-full font-mono"
+    >
       
       {/* 1. Full Image Cover Background */}
       <div className="relative h-72 w-full overflow-hidden bg-muted shrink-0">
         <img
           src={imageUrl}
           alt={name}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          className="w-full h-full object-cover transition-all duration-700 group-hover:scale-105"
         />
         
         {/* Floating Badges */}
@@ -102,7 +125,7 @@ const GearItemCard: React.FC<GearItemCardProps> = ({
           </div>
         </div>
 
-        {/* 2. Content Overlay with Clean Background */}
+        {/* 2. Content Overlay with Gradient */}
         <div className="absolute bottom-0 left-0 right-0 p-4 z-10 bg-gradient-to-t from-black/80 via-black/40 to-transparent">
 
           {/* Brand & Title */}
@@ -137,7 +160,7 @@ const GearItemCard: React.FC<GearItemCardProps> = ({
         </div>
 
         {/* Status indicator bar at the very bottom */}
-        <div className={`absolute bottom-0 left-0 w-full h-1 z-20 ${
+        <div className={`absolute bottom-0 left-0 w-full h-1 z-20 transition-colors ${
           status === "AVAILABLE" ? "bg-emerald-500" : "bg-destructive"
         }`} />
       </div>

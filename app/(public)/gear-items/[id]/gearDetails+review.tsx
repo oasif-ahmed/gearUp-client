@@ -228,16 +228,16 @@ export default function GearDetailsClient({
   if (!gearItem) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4 font-mono text-xs">
-        <Card className="w-full max-w-md text-center rounded-none border-zinc-200 shadow-xs">
+        <Card className="w-full max-w-md text-center rounded-none border-border shadow-xs">
           <CardHeader className="space-y-2">
             <AlertCircle className="h-10 w-10 text-red-600 mx-auto" />
             <CardTitle className="text-lg uppercase tracking-tight">Item Not Found</CardTitle>
-            <CardDescription className="text-xs text-zinc-500">
+            <CardDescription className="text-xs text-muted-foreground">
               The requested rental gear item could not be located.
             </CardDescription>
           </CardHeader>
           <CardFooter>
-            <Button asChild size="sm" className="w-full rounded-none bg-zinc-900 text-white hover:bg-zinc-800 text-xs uppercase">
+            <Button asChild size="sm" className="w-full rounded-none bg-primary text-white hover:bg-primary/90 text-xs uppercase">
               <Link href="/gear-items">Return to Gear Directory</Link>
             </Button>
           </CardFooter>
@@ -253,18 +253,18 @@ export default function GearDetailsClient({
   const isOutOfStock = gearItem.status !== "AVAILABLE" || remainingQuantity <= 0;
 
   return (
-    <div className="py-10 text-zinc-900 font-mono text-xs">
+    <div className="py-10 bg-background text-foreground font-mono text-xs">
       {/* Navigation Header */}
       <div className="max-w-6xl mx-auto px-4 mb-8">
-        <div className="flex items-center justify-between border-b border-zinc-200 pb-4">
+        <div className="flex items-center justify-between border-b border-border pb-4">
           <Link
             href="/gear-items"
-            className="inline-flex items-center gap-1.5 uppercase text-zinc-500 hover:text-zinc-900 transition-colors"
+            className="inline-flex items-center gap-1.5 uppercase text-muted-foreground hover:text-foreground transition-colors"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
             Back to Directory
           </Link>
-          <span className="text-[11px] uppercase text-zinc-400">
+          <span className="text-[11px] uppercase text-muted-foreground">
             REF: #{gearItem.id?.slice(-8) || "ITEM-001"}
           </span>
         </div>
@@ -274,8 +274,8 @@ export default function GearDetailsClient({
         {/* Hero Section */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
           {/* Media Showcase */}
-          <div className="lg:col-span-7 flex flex-col justify-between bg-white border border-zinc-200 p-6 shadow-xs">
-            <div className="relative w-full flex-1 min-h-[380px] overflow-hidden bg-zinc-50 mb-4 border border-zinc-100">
+          <div className="lg:col-span-7 flex flex-col justify-between bg-card border border-border p-6 shadow-xs">
+            <div className="relative w-full flex-1 min-h-[380px] overflow-hidden bg-muted mb-4 border border-border">
               {selectedImage ? (
                 <img
                   src={selectedImage}
@@ -283,12 +283,12 @@ export default function GearDetailsClient({
                   className="w-full h-full object-cover absolute inset-0"
                 />
               ) : (
-                <div className="w-full h-full flex items-center justify-center text-zinc-400">
+                <div className="w-full h-full flex items-center justify-center text-muted-foreground">
                   Loading Image...
                 </div>
               )}
               <div className="absolute top-4 left-4 flex gap-2 z-10">
-                <Badge className="rounded-none bg-zinc-900 text-white hover:bg-zinc-900 text-[10px] uppercase px-2 py-0.5">
+                <Badge className="rounded-none bg-primary text-white hover:bg-primary text-[10px] uppercase px-2 py-0.5">
                   {gearItem.category?.name || "Equipment"}
                 </Badge>
                 <Badge
@@ -305,7 +305,7 @@ export default function GearDetailsClient({
             </div>
 
             {images.length > 1 && (
-              <div className="flex gap-3 overflow-x-auto pt-2 border-t border-zinc-100">
+              <div className="flex gap-3 overflow-x-auto pt-2 border-t border-border">
                 {images.map((img: string, i: number) => {
                   const isSelected = selectedImage === img;
                   return (
@@ -314,7 +314,7 @@ export default function GearDetailsClient({
                       type="button"
                       onClick={() => setSelectedImage(img)}
                       className={`relative w-16 h-16 shrink-0 border transition-all ${
-                        isSelected ? "border-zinc-900 ring-1 ring-zinc-900" : "border-zinc-200 opacity-60 hover:opacity-100"
+                        isSelected ? "border-primary ring-1 ring-primary" : "border-border opacity-60 hover:opacity-100"
                       }`}
                     >
                       <img src={img} alt={`view-${i}`} className="w-full h-full object-cover" />
@@ -326,34 +326,34 @@ export default function GearDetailsClient({
           </div>
 
           {/* Invoice Summary & Cart Action */}
-          <div className="lg:col-span-5 flex flex-col justify-between bg-white border border-zinc-200 p-8 shadow-xs">
+          <div className="lg:col-span-5 flex flex-col justify-between bg-card border border-border p-8 shadow-xs">
             <div className="space-y-3">
               <div className="flex items-center gap-2">
-                <span className="uppercase tracking-wider text-zinc-500">{gearItem.brand}</span>
-                <span className="text-zinc-300">•</span>
-                <span className="uppercase text-zinc-500">Condition: {gearItem.condition || "Standard"}</span>
+                <span className="uppercase tracking-wider text-muted-foreground">{gearItem.brand}</span>
+                <span className="text-muted-foreground">•</span>
+                <span className="uppercase text-muted-foreground">Condition: {gearItem.condition || "Standard"}</span>
               </div>
-              <h1 className="text-2xl font-normal tracking-tight text-zinc-900 font-serif">
+              <h1 className="text-2xl font-normal tracking-tight text-foreground font-serif">
                 {gearItem.name}
               </h1>
               {/* Removed line-clamp-3 so long descriptions flow cleanly without getting clipped */}
-              <p className="text-xs text-zinc-600 leading-relaxed border-b border-zinc-100 pb-6 whitespace-pre-line">
+              <p className="text-xs text-muted-foreground leading-relaxed border-b border-border pb-6 whitespace-pre-line">
                 {gearItem.description}
               </p>
             </div>
 
-            <div className="space-y-3 bg-[#FDFBF7] p-4 border border-zinc-200/80 my-4">
-              <div className="flex justify-between items-center text-zinc-600">
+            <div className="space-y-3 bg-muted p-4 border border-border my-4">
+              <div className="flex justify-between items-center text-muted-foreground">
                 <span>Daily Rental Fee</span>
-                <span className="text-sm font-bold text-zinc-900">৳{gearItem.pricePerDay}</span>
+                <span className="text-sm font-bold text-foreground">৳{gearItem.pricePerDay}</span>
               </div>
-              <div className="flex justify-between items-center text-zinc-500 text-[11px]">
+              <div className="flex justify-between items-center text-muted-foreground text-[11px]">
                 <span>Security Deposit (Refundable)</span>
                 <span>৳{gearItem.securityDeposit}</span>
               </div>
-              <div className="flex justify-between items-center text-zinc-500 text-[11px] border-t border-zinc-200/60 pt-2">
+              <div className="flex justify-between items-center text-muted-foreground text-[11px] border-t border-border/60 pt-2">
                 <span>Inventory Status</span>
-                <span className="text-zinc-900 font-semibold">{remainingQuantity} units available</span>
+                <span className="text-foreground font-semibold">{remainingQuantity} units available</span>
               </div>
             </div>
 
@@ -362,12 +362,12 @@ export default function GearDetailsClient({
                 size="lg"
                 onClick={handleAddToCart}
                 disabled={isOutOfStock}
-                className="w-full rounded-none bg-zinc-900 text-white hover:bg-zinc-800 text-xs uppercase tracking-wider h-11 flex items-center justify-center gap-2"
+                className="w-full rounded-none bg-primary text-white hover:bg-primary/90 text-xs uppercase tracking-wider h-11 flex items-center justify-center gap-2"
               >
                 <ShoppingCart className="h-4 w-4" />
                 {isOutOfStock ? "Out of Stock" : `Add to Cart — ৳{gearItem.pricePerDay}/Day`}
               </Button>
-              <p className="text-[10px] text-zinc-400 text-center">
+              <p className="text-[10px] text-muted-foreground text-center">
                 Zero hidden fees. Deposit released upon return verification.
               </p>
             </div>
@@ -377,41 +377,41 @@ export default function GearDetailsClient({
         {/* Technical Specs & Safeguards */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 pt-4 items-start">
           {/* Added max height and vertical scrolling for specs so it doesn't leave huge empty gaps on the right if specifications are long */}
-          <div className="md:col-span-7 bg-white border border-zinc-200 p-8 shadow-xs flex flex-col">
-            <h2 className="uppercase tracking-widest text-zinc-900 font-semibold mb-6 flex items-center gap-2 border-b border-zinc-100 pb-3 shrink-0">
-              <Layers className="h-4 w-4 text-zinc-700" /> Technical Specifications
+          <div className="md:col-span-7 bg-card border border-border p-8 shadow-xs flex flex-col">
+            <h2 className="uppercase tracking-widest text-foreground font-semibold mb-6 flex items-center gap-2 border-b border-border pb-3 shrink-0">
+              <Layers className="h-4 w-4 text-foreground" /> Technical Specifications
             </h2>
             {specEntries.length > 0 ? (
-              <div className="divide-y divide-zinc-100 max-h-[420px] overflow-y-auto pr-2">
+              <div className="divide-y divide-border max-h-[420px] overflow-y-auto pr-2">
                 {specEntries.map(([key, value]) => (
                   <div key={key} className="py-2.5 flex justify-between items-center gap-4">
-                    <span className="text-zinc-500 capitalize">{key.replace(/([A-Z])/g, " $1")}</span>
-                    <span className="text-zinc-900 font-medium text-right">{String(value)}</span>
+                    <span className="text-muted-foreground capitalize">{key.replace(/([A-Z])/g, " $1")}</span>
+                    <span className="text-foreground font-medium text-right">{String(value)}</span>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-zinc-400 italic">No extra technical parameters specified for this unit.</p>
+              <p className="text-muted-foreground italic">No extra technical parameters specified for this unit.</p>
             )}
           </div>
 
-          <div className="md:col-span-5 bg-white border border-zinc-200 p-8 shadow-xs">
-            <h2 className="uppercase tracking-widest text-zinc-900 font-semibold mb-6 flex items-center gap-2 border-b border-zinc-100 pb-3">
-              <ShieldCheck className="h-4 w-4 text-zinc-700" /> Terms & Safeguards
+          <div className="md:col-span-5 bg-card border border-border p-8 shadow-xs">
+            <h2 className="uppercase tracking-widest text-foreground font-semibold mb-6 flex items-center gap-2 border-b border-border pb-3">
+              <ShieldCheck className="h-4 w-4 text-foreground" /> Terms & Safeguards
             </h2>
-            <div className="space-y-4 text-xs text-zinc-600">
+            <div className="space-y-4 text-xs text-muted-foreground">
               <div className="flex items-start gap-3">
-                <PackageCheck className="h-4 w-4 text-zinc-800 shrink-0 mt-0.5" />
+                <PackageCheck className="h-4 w-4 text-foreground shrink-0 mt-0.5" />
                 <div>
-                  <p className="font-semibold text-zinc-900 mb-0.5">Verified Equipment</p>
-                  <p className="text-zinc-500 text-[11px]">Inspected for standard operation in {gearItem.condition || "Standard"} state.</p>
+                  <p className="font-semibold text-foreground mb-0.5">Verified Equipment</p>
+                  <p className="text-muted-foreground text-[11px]">Inspected for standard operation in {gearItem.condition || "Standard"} state.</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <RotateCcw className="h-4 w-4 text-zinc-800 shrink-0 mt-0.5" />
+                <RotateCcw className="h-4 w-4 text-foreground shrink-0 mt-0.5" />
                 <div>
-                  <p className="font-semibold text-zinc-900 mb-0.5">Instant Deposit Settlement</p>
-                  <p className="text-zinc-500 text-[11px]">Your ৳{gearItem.securityDeposit} deposit is securely held and refunded upon return.</p>
+                  <p className="font-semibold text-foreground mb-0.5">Instant Deposit Settlement</p>
+                  <p className="text-muted-foreground text-[11px]">Your ৳{gearItem.securityDeposit} deposit is securely held and refunded upon return.</p>
                 </div>
               </div>
             </div>
@@ -419,23 +419,23 @@ export default function GearDetailsClient({
         </div>
 
         {/* REVIEWS SECTION */}
-        <div className="bg-white border border-zinc-200 p-8 shadow-xs space-y-8">
-          <div className="border-b border-zinc-200 pb-4 flex justify-between items-center">
-            <h2 className="uppercase tracking-widest text-zinc-900 font-semibold flex items-center gap-2">
-              <MessageSquare className="h-4 w-4 text-zinc-700" /> Customer Reviews & Ratings ({reviews.length})
+        <div className="bg-card border border-border p-8 shadow-xs space-y-8">
+          <div className="border-b border-border pb-4 flex justify-between items-center">
+            <h2 className="uppercase tracking-widest text-foreground font-semibold flex items-center gap-2">
+              <MessageSquare className="h-4 w-4 text-foreground" /> Customer Reviews & Ratings ({reviews.length})
             </h2>
           </div>
 
           {/* Review Submission Form */}
-          <form onSubmit={handleReviewSubmit} className="bg-[#FDFBF7] p-6 border border-zinc-200 space-y-4">
-            <h3 className="uppercase tracking-wider text-zinc-700 font-semibold">Write an Equipment Review</h3>
+          <form onSubmit={handleReviewSubmit} className="bg-muted p-6 border border-border space-y-4">
+            <h3 className="uppercase tracking-wider text-foreground font-semibold">Write an Equipment Review</h3>
             
             <div className="flex items-center gap-3">
-              <span className="text-zinc-500 uppercase">Rating:</span>
+              <span className="text-muted-foreground uppercase">Rating:</span>
               <select
                 value={rating}
                 onChange={(e) => setRating(Number(e.target.value))}
-                className="border border-zinc-200 bg-white px-3 py-1.5 uppercase text-xs"
+                className="border border-border bg-card px-3 py-1.5 uppercase text-xs"
               >
                 <option value={5}>5 Stars (Exceptional)</option>
                 <option value={4}>4 Stars (Very Good)</option>
@@ -451,7 +451,7 @@ export default function GearDetailsClient({
                 placeholder="Share your experience with this gear item..."
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
-                className="w-full border border-zinc-200 bg-white p-3 text-xs focus:outline-none focus:border-zinc-900"
+                className="w-full border border-border bg-card p-3 text-xs focus:outline-none focus:border-primary"
                 required
               />
             </div>
@@ -459,7 +459,7 @@ export default function GearDetailsClient({
             <Button
               type="submit"
               disabled={isSubmittingReview}
-              className="rounded-none bg-zinc-900 text-white hover:bg-zinc-800 text-xs uppercase px-6 h-9 flex items-center gap-2"
+              className="rounded-none bg-primary text-white hover:bg-primary/90 text-xs uppercase px-6 h-9 flex items-center gap-2"
             >
               <Send className="h-3.5 w-3.5" />
               {isSubmittingReview ? "Submitting..." : "Post Review"}
@@ -473,10 +473,10 @@ export default function GearDetailsClient({
                 const isEditing = editingReviewId === rev.id;
 
                 return (
-                  <div key={rev.id} className="border border-zinc-200 p-4 bg-white space-y-3">
+                  <div key={rev.id} className="border border-border p-4 bg-card space-y-3">
                     <div className="flex justify-between items-center">
                       <div className="flex items-center gap-2">
-                        <span className="font-bold text-zinc-900">{rev.customer?.name || "Verified Customer"}</span>
+                        <span className="font-bold text-foreground">{rev.customer?.name || "Verified Customer"}</span>
                         {!isEditing && (
                           <div className="flex text-amber-500">
                             {Array.from({ length: rev.rating || 5 }).map((_, i) => (
@@ -487,7 +487,7 @@ export default function GearDetailsClient({
                       </div>
 
                       <div className="flex items-center gap-3">
-                        <span className="text-[10px] text-zinc-400">
+                        <span className="text-[10px] text-muted-foreground">
                           {new Date(rev.createdAt).toLocaleDateString()}
                         </span>
                         
@@ -497,7 +497,7 @@ export default function GearDetailsClient({
                             <button
                               type="button"
                               onClick={() => handleStartEdit(rev)}
-                              className="p-1 text-zinc-400 hover:text-zinc-900 transition-colors"
+                              className="p-1 text-muted-foreground hover:text-foreground transition-colors"
                               title="Edit Review"
                             >
                               <Pencil className="h-3.5 w-3.5" />
@@ -506,7 +506,7 @@ export default function GearDetailsClient({
                               type="button"
                               disabled={deletingReviewId === rev.id}
                               onClick={() => handleDeleteReview(rev.id)}
-                              className="p-1 text-zinc-400 hover:text-red-600 transition-colors"
+                              className="p-1 text-muted-foreground hover:text-red-600 transition-colors"
                               title="Delete Review"
                             >
                               <Trash2 className="h-3.5 w-3.5" />
@@ -518,13 +518,13 @@ export default function GearDetailsClient({
 
                     {/* Inline Edit Mode Form */}
                     {isEditing ? (
-                      <div className="bg-[#FDFBF7] p-3 border border-zinc-200 space-y-3 mt-2">
+                      <div className="bg-muted p-3 border border-border space-y-3 mt-2">
                         <div className="flex items-center gap-2">
-                          <span className="text-zinc-500 text-[10px] uppercase">Rating:</span>
+                          <span className="text-muted-foreground text-[10px] uppercase">Rating:</span>
                           <select
                             value={editRating}
                             onChange={(e) => setEditRating(Number(e.target.value))}
-                            className="border border-zinc-200 bg-white px-2 py-1 text-xs uppercase"
+                            className="border border-border bg-card px-2 py-1 text-xs uppercase"
                           >
                             <option value={5}>5 Stars</option>
                             <option value={4}>4 Stars</option>
@@ -538,7 +538,7 @@ export default function GearDetailsClient({
                           rows={2}
                           value={editComment}
                           onChange={(e) => setEditComment(e.target.value)}
-                          className="w-full border border-zinc-200 bg-white p-2 text-xs focus:outline-none focus:border-zinc-900"
+                          className="w-full border border-border bg-card p-2 text-xs focus:outline-none focus:border-primary"
                         />
 
                         <div className="flex items-center gap-2 justify-end">
@@ -554,20 +554,20 @@ export default function GearDetailsClient({
                             size="sm"
                             disabled={isUpdatingReview}
                             onClick={() => handleUpdateReview(rev.id)}
-                            className="rounded-none bg-zinc-900 text-white hover:bg-zinc-800 text-[10px] uppercase h-7 px-3 flex items-center gap-1"
+                            className="rounded-none bg-primary text-white hover:bg-primary/90 text-[10px] uppercase h-7 px-3 flex items-center gap-1"
                           >
                             <Check className="h-3.5 w-3.5" /> {isUpdatingReview ? "Saving..." : "Save Changes"}
                           </Button>
                         </div>
                       </div>
                     ) : (
-                      <p className="text-zinc-700 text-xs leading-relaxed">{rev.comment}</p>
+                      <p className="text-foreground text-xs leading-relaxed">{rev.comment}</p>
                     )}
                   </div>
                 );
               })
             ) : (
-              <p className="text-center text-zinc-400 py-8">No reviews yet for this item. Be the first to review!</p>
+              <p className="text-center text-muted-foreground py-8">No reviews yet for this item. Be the first to review!</p>
             )}
           </div>
         </div>

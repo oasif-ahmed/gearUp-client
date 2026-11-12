@@ -1,9 +1,21 @@
+
 "use client";
 
 import React, { useState, useEffect, useTransition } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X, Rocket, User, Settings, LogOut, LayoutDashboard, ShieldAlert, Sun, Moon } from "lucide-react";
+import {
+  Menu,
+  X,
+  Rocket,
+  User,
+  Settings,
+  LogOut,
+  LayoutDashboard,
+  ShieldAlert,
+  Sun,
+  Moon,
+} from "lucide-react";
 import { logoutUser } from "@/services/auth.service";
 import { useTheme } from "next-themes";
 
@@ -29,15 +41,17 @@ interface User {
 
 interface NavbarProps {
   user?: User | null;
-  k?: number
+  k?: number;
 }
 
 export default function Navbar({ user, k }: NavbarProps) {
   const pathname = usePathname();
+
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [mounted, setMounted] = useState(false);
+
   const { theme, setTheme } = useTheme();
 
   useEffect(() => {
@@ -49,7 +63,9 @@ export default function Navbar({ user, k }: NavbarProps) {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
     };
+
     window.addEventListener("scroll", handleScroll);
+
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
@@ -71,6 +87,7 @@ export default function Navbar({ user, k }: NavbarProps) {
 
   // Role checks
   const userRole = user?.role?.toUpperCase();
+
   const isProvider = userRole === "PROVIDER";
   const isAdmin = userRole === "ADMIN";
   const isCustomer = userRole === "CUSTOMER";
@@ -93,13 +110,13 @@ export default function Navbar({ user, k }: NavbarProps) {
         }`}
       >
         <div className="flex items-center justify-between">
-          
           {/* Logo */}
           <div className="flex items-center gap-2">
             <Link href="/" className="flex items-center space-x-2 group">
               <div className="flex h-8 w-8 items-center justify-center bg-foreground text-background shadow-xs rounded-none group-hover:bg-foreground/90 transition-colors">
                 <Rocket className="h-4 w-4" />
               </div>
+
               <span className="text-sm font-bold tracking-tight text-foreground font-mono uppercase tracking-[0.2em]">
                 Gear Up
               </span>
@@ -108,17 +125,19 @@ export default function Navbar({ user, k }: NavbarProps) {
 
           {/* Desktop Navigation Links */}
           <div className="hidden items-center space-x-1.5 md:flex font-mono text-xs">
-            {navLinks.map((link) => {
+            {navLinks.map((link, index) => {
               const active = isActive(link.href);
+
               return (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`px-3 py-1.5 uppercase transition-all rounded-none ${
+                  className={`px-3 py-1.5 uppercase transition-all duration-200 rounded-md ${
                     active
                       ? "bg-accent text-accent-foreground font-semibold shadow-xs"
                       : "text-muted-foreground hover:text-foreground hover:bg-accent/10"
-                  }`}
+                  } animate-fade-in-up`}
+                  style={{ animationDelay: `${index * 100}ms` }}
                 >
                   {link.name}
                 </Link>
@@ -131,10 +150,16 @@ export default function Navbar({ user, k }: NavbarProps) {
                 variant="ghost"
                 size="sm"
                 className="h-8 px-3 rounded-none text-muted-foreground hover:text-foreground hover:bg-accent/10 uppercase"
-                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                onClick={() =>
+                  setTheme(theme === "dark" ? "light" : "dark")
+                }
                 aria-label="Toggle theme"
               >
-                {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+                {theme === "dark" ? (
+                  <Sun className="h-4 w-4" />
+                ) : (
+                  <Moon className="h-4 w-4" />
+                )}
               </Button>
             )}
           </div>
@@ -151,7 +176,11 @@ export default function Navbar({ user, k }: NavbarProps) {
                 >
                   <Link href="/login">Log in</Link>
                 </Button>
-                <Button size="sm" className="h-8 text-xs bg-foreground text-background hover:bg-foreground/90 rounded-none px-3 uppercase tracking-wider font-semibold">
+
+                <Button
+                  size="sm"
+                  className="h-8 text-xs bg-foreground text-background hover:bg-foreground/90 rounded-none px-3 uppercase tracking-wider font-semibold"
+                >
                   <Link href="/register">Register</Link>
                 </Button>
               </>
@@ -177,22 +206,32 @@ export default function Navbar({ user, k }: NavbarProps) {
                     </div>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56 rounded-none border-dashed border-border bg-card text-foreground font-mono text-xs shadow-md" align="end" forceMount>
-                  <DropdownMenuLabel className="font-normal">
-                    <div className="flex flex-col space-y-1">
-                      <p className="text-xs font-bold leading-none text-foreground">
+
+                <DropdownMenuContent
+                  className="w-56 rounded-lg border-dashed border-border bg-card text-foreground font-mono text-xs shadow-xl animate-fade-in-up"
+                  align="end"
+                  forceMount
+                >
+                  <DropdownMenuLabel className="font-normal animate-fade-in">
+                    <div className="flex flex-col space-y-1 animate-fade-in-up">
+                      <p className="text-xs font-bold leading-none text-foreground animate-fade-in-up">
                         {user?.name || "User"}
                       </p>
-                      <p className="text-[10px] leading-none text-muted-foreground">
+
+                      <p className="text-[10px] leading-none text-muted-foreground animate-fade-in-up">
                         {user?.email || "user@example.com"}
                       </p>
                     </div>
                   </DropdownMenuLabel>
-                  <DropdownMenuSeparator className="bg-border" />
-                  
+
+                  <DropdownMenuSeparator className="bg-border animate-fade-in" />
+
                   {isProvider && (
                     <DropdownMenuItem asChild>
-                      <Link href="/dashboard/provider" className="cursor-pointer text-xs rounded-none hover:bg-accent/10 focus:bg-accent/10">
+                      <Link
+                        href="/dashboard/provider"
+                        className="cursor-pointer text-xs rounded-lg hover:bg-accent/10 focus:bg-accent/10 transition-all duration-200 hover:translate-x-1 animate-fade-in-up"
+                      >
                         <LayoutDashboard className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
                         <span>Provider Dashboard</span>
                       </Link>
@@ -201,7 +240,10 @@ export default function Navbar({ user, k }: NavbarProps) {
 
                   {isCustomer && (
                     <DropdownMenuItem asChild>
-                      <Link href="/customer-cart" className="cursor-pointer text-xs rounded-none hover:bg-accent/10 focus:bg-accent/10">
+                      <Link
+                        href="/customer-cart"
+                        className="cursor-pointer text-xs rounded-lg hover:bg-accent/10 focus:bg-accent/10 transition-all duration-200 hover:translate-x-1"
+                      >
                         <LayoutDashboard className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
                         <span>My Cart</span>
                       </Link>
@@ -210,7 +252,10 @@ export default function Navbar({ user, k }: NavbarProps) {
 
                   {isAdmin && (
                     <DropdownMenuItem asChild>
-                      <Link href="/dashboard/admin" className="cursor-pointer text-xs rounded-none hover:bg-accent/10 focus:bg-accent/10">
+                      <Link
+                        href="/dashboard/admin"
+                        className="cursor-pointer text-xs rounded-lg hover:bg-accent/10 focus:bg-accent/10 transition-all duration-200 hover:translate-x-1"
+                      >
                         <ShieldAlert className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
                         <span>Admin Dashboard</span>
                       </Link>
@@ -218,36 +263,58 @@ export default function Navbar({ user, k }: NavbarProps) {
                   )}
 
                   <DropdownMenuItem asChild>
-                    <Link href="/profile" className="cursor-pointer text-xs rounded-none hover:bg-accent/10 focus:bg-accent/10">
+                    <Link
+                      href="/profile"
+                      className="cursor-pointer text-xs rounded-lg hover:bg-accent/10 focus:bg-accent/10 transition-all duration-200 hover:translate-x-1"
+                    >
                       <User className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
                       <span>Profile</span>
                     </Link>
                   </DropdownMenuItem>
+
                   <DropdownMenuItem asChild>
-                    <Link href="/setting" className="cursor-pointer text-xs rounded-none hover:bg-accent/10 focus:bg-accent/10">
+                    <Link
+                      href="/setting"
+                      className="cursor-pointer text-xs rounded-lg hover:bg-accent/10 focus:bg-accent/10 transition-all duration-200 hover:translate-x-1"
+                    >
                       <Settings className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
                       <span>Settings</span>
                     </Link>
                   </DropdownMenuItem>
+
                   <DropdownMenuItem
-                    className="cursor-pointer text-xs rounded-none hover:bg-accent/10 focus:bg-accent/10 flex items-center gap-2"
-                    onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                    className="cursor-pointer text-xs rounded-lg hover:bg-accent/10 focus:bg-accent/10 flex items-center gap-2 transition-all duration-200 hover:translate-x-1"
+                    onClick={() =>
+                      setTheme(theme === "dark" ? "light" : "dark")
+                    }
                   >
                     {mounted && (
                       <>
-                        {theme === "dark" ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
-                        <span>{theme === "dark" ? "Light Mode" : "Dark Mode"}</span>
+                        {theme === "dark" ? (
+                          <Sun className="h-3.5 w-3.5" />
+                        ) : (
+                          <Moon className="h-3.5 w-3.5" />
+                        )}
+
+                        <span>
+                          {theme === "dark" ? "Light Mode" : "Dark Mode"}
+                        </span>
                       </>
                     )}
                   </DropdownMenuItem>
+
                   <DropdownMenuSeparator className="bg-border" />
+
                   <DropdownMenuItem
-                    className="cursor-pointer text-xs text-destructive focus:bg-destructive/10 focus:text-destructive rounded-none"
+                    className="cursor-pointer text-xs text-destructive focus:bg-destructive/10 focus:text-destructive rounded-lg transition-all duration-200 hover:bg-destructive/10 hover:translate-x-1"
                     disabled={isPending}
                     onClick={handleLogout}
                   >
                     <LogOut className="mr-2 h-3.5 w-3.5" />
-                    <span>{isPending ? "Logging out..." : "Log out"}</span>
+
+                    <span>
+                      {isPending ? "Logging out..." : "Log out"}
+                    </span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -263,120 +330,142 @@ export default function Navbar({ user, k }: NavbarProps) {
               onClick={() => setIsOpen(!isOpen)}
               aria-label="Toggle Menu"
             >
-              {isOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+              {isOpen ? (
+                <X className="h-4 w-4" />
+              ) : (
+                <Menu className="h-4 w-4" />
+              )}
             </Button>
           </div>
         </div>
 
         {/* Mobile Menu Dropdown */}
         {isOpen && (
-          <div className="mt-3 border-t border-dashed border-border pt-3 md:hidden font-mono text-xs">
+          <div className="mt-3 border-t border-dashed border-border pt-3 md:hidden font-mono text-xs animate-fade-in-up">
             <div className="flex flex-col space-y-1">
-              {navLinks.map((link) => {
+              {navLinks.map((link, index) => {
                 const active = isActive(link.href);
+
                 return (
                   <Link
                     key={link.href}
                     href={link.href}
-                    className={`px-3 py-2 uppercase transition-all ${
+                    className={`px-3 py-2 uppercase transition-all duration-200 ${
                       active
                         ? "bg-accent text-accent-foreground font-bold"
                         : "text-muted-foreground hover:bg-accent/10 hover:text-foreground"
-                    }`}
+                    } animate-fade-in-up`}
+                    style={{ animationDelay: `${index * 80}ms` }}
                     onClick={() => setIsOpen(false)}
                   >
                     {link.name}
                   </Link>
                 );
               })}
+            </div>
 
-              {/* Theme Toggle in Mobile */}
-              {mounted && (
-                <Button
-                  variant="ghost"
-                  className="w-full justify-start px-3 py-2 text-muted-foreground hover:text-foreground hover:bg-accent/10 uppercase"
-                  onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+            {/* Theme Toggle in Mobile */}
+            {mounted && (
+              <Button
+                variant="ghost"
+                className="w-full justify-start px-3 py-2 text-muted-foreground hover:text-foreground hover:bg-accent/10 uppercase animate-fade-in-up"
+                onClick={() =>
+                  setTheme(theme === "dark" ? "light" : "dark")
+                }
+              >
+                {theme === "dark" ? (
+                  <Sun className="h-4 w-4 mr-2" />
+                ) : (
+                  <Moon className="h-4 w-4 mr-2" />
+                )}
+
+                {theme === "dark" ? "Light Mode" : "Dark Mode"}
+              </Button>
+            )}
+          </div>
+        )}
+
+        {/* Mobile User Actions */}
+        {isOpen && (
+          <div className="mt-3 flex flex-col gap-2 border-t border-dashed border-border pt-3">
+            {user ? (
+              <>
+                {isProvider && (
+                  <Link
+                    href="/dashboard/provider"
+                    className="inline-flex items-center justify-center border border-dashed border-border px-3 py-2 text-xs font-medium text-foreground hover:bg-accent/10 uppercase"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    Provider Dashboard
+                  </Link>
+                )}
+
+                {isCustomer && (
+                  <Link
+                    href="/customer-cart"
+                    className="inline-flex items-center justify-center border border-dashed border-border px-3 py-2 text-xs font-medium text-foreground hover:bg-accent/10 uppercase"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    My Cart
+                  </Link>
+                )}
+
+                {isAdmin && (
+                  <Link
+                    href="/dashboard/admin"
+                    className="inline-flex items-center justify-center border border-dashed border-border px-3 py-2 text-xs font-medium text-foreground hover:bg-accent/10 uppercase"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    Admin Dashboard
+                  </Link>
+                )}
+
+                <Link
+                  href="/profile"
+                  className="inline-flex items-center justify-center border border-dashed border-border px-3 py-2 text-xs font-medium text-foreground hover:bg-accent/10 uppercase"
+                  onClick={() => setIsOpen(false)}
                 >
-                  {theme === "dark" ? <Sun className="h-4 w-4 mr-2" /> : <Moon className="h-4 w-4 mr-2" />}
-                  {theme === "dark" ? "Light Mode" : "Dark Mode"}
-                </Button>
-              )}
-            </div>
-            
-            <div className="mt-3 flex flex-col gap-2 border-t border-dashed border-border pt-3">
-              {user ? (
-                <>
-                  {isProvider && (
-                    <Link
-                      href="/dashboard/provider"
-                      className="inline-flex items-center justify-center border border-dashed border-border px-3 py-2 text-xs font-medium text-foreground hover:bg-accent/10 uppercase"
-                      onClick={() => setIsOpen(false)}
-                    >
-                      Provider Dashboard
-                    </Link>
-                  )}
-                  {isCustomer && (
-                    <Link
-                      href="/customer-cart"
-                      className="inline-flex items-center justify-center border border-dashed border-border px-3 py-2 text-xs font-medium text-foreground hover:bg-accent/10 uppercase"
-                      onClick={() => setIsOpen(false)}
-                    >
-                      My Cart
-                    </Link>
-                  )}
-                  {isAdmin && (
-                    <Link
-                      href="/dashboard/admin"
-                      className="inline-flex items-center justify-center border border-dashed border-border px-3 py-2 text-xs font-medium text-foreground hover:bg-accent/10 uppercase"
-                      onClick={() => setIsOpen(false)}
-                    >
-                      Admin Dashboard
-                    </Link>
-                  )}
-                  <Link
-                    href="/profile"
-                    className="inline-flex items-center justify-center border border-dashed border-border px-3 py-2 text-xs font-medium text-foreground hover:bg-accent/10 uppercase"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    My Profile
-                  </Link>
-                  <Link
-                    href="/setting"
-                    className="inline-flex items-center justify-center border border-dashed border-border px-3 py-2 text-xs font-medium text-foreground hover:bg-accent/10 uppercase"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    Settings
-                  </Link>
-                  <button
-                    disabled={isPending}
-                    className="inline-flex items-center justify-center bg-destructive px-3 py-2 text-xs font-medium text-destructive-foreground hover:opacity-90 disabled:opacity-50 uppercase"
-                    onClick={() => {
-                      setIsOpen(false);
-                      handleLogout();
-                    }}
-                  >
-                    {isPending ? "Logging out..." : "Log out"}
-                  </button>
-                </>
-              ) : (
-                <>
-                  <Link
-                    href="/login"
-                    className="inline-flex items-center justify-center border border-dashed border-border px-3 py-2 text-xs font-medium text-foreground hover:bg-accent/10 uppercase"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    Log in
-                  </Link>
-                  <Link
-                    href="/register"
-                    className="inline-flex items-center justify-center bg-foreground text-background px-3 py-2 text-xs font-bold hover:opacity-90 uppercase"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    Register
-                  </Link>
-                </>
-              )}
-            </div>
+                  My Profile
+                </Link>
+
+                <Link
+                  href="/setting"
+                  className="inline-flex items-center justify-center border border-dashed border-border px-3 py-2 text-xs font-medium text-foreground hover:bg-accent/10 uppercase"
+                  onClick={() => setIsOpen(false)}
+                >
+                  Settings
+                </Link>
+
+                <button
+                  disabled={isPending}
+                  className="inline-flex items-center justify-center bg-destructive px-3 py-2 text-xs font-medium text-destructive-foreground hover:opacity-90 disabled:opacity-50 uppercase"
+                  onClick={() => {
+                    setIsOpen(false);
+                    handleLogout();
+                  }}
+                >
+                  {isPending ? "Logging out..." : "Log out"}
+                </button>
+              </>
+            ) : (
+              <>
+                <Link
+                  href="/login"
+                  className="inline-flex items-center justify-center border border-dashed border-border px-3 py-2 text-xs font-medium text-foreground hover:bg-accent/10 uppercase"
+                  onClick={() => setIsOpen(false)}
+                >
+                  Log in
+                </Link>
+
+                <Link
+                  href="/register"
+                  className="inline-flex items-center justify-center bg-foreground text-background px-3 py-2 text-xs font-bold hover:opacity-90 uppercase"
+                  onClick={() => setIsOpen(false)}
+                >
+                  Register
+                </Link>
+              </>
+            )}
           </div>
         )}
       </nav>

@@ -23,7 +23,7 @@
   --border: #d8c9ac;
   --input: #e4e4e7;
   --ring: #bc3a28;
-  --radius: 0rem;
+  --radius: 0.5rem;
 }
 
 .dark {
@@ -71,4 +71,107 @@
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
+}
+
+/* Custom button animations */
+@keyframes button-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+}
+
+@keyframes button-shine {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+.btn-hover-animate {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-hover-animate:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+}
+
+.btn-hover-animate:active {
+  transform: scale(0.97);
+}
+
+.btn-shine {
+  background-size: 200% auto;
+}
+
+.btn-shine:hover {
+  animation: button-shine 1.5s ease infinite;
+}
+
+.btn-pulse:hover {
+  animation: button-pulse 1.5s ease-in-out infinite;
+}
+
+/* Subtle rounded corners for common elements */
+.card, .btn, input, select, textarea, .dropdown-menu, .dialog, .sheet, .popover, .tooltip, .alert, .table, .badge, .avatar, .progress, .slider, .switch, .tabs, .accordion, .collapsible, .hover-card, .menubar, .menubar-item, .navigation-menu, .pagination, .breadcrumb, .sidebar, .header, .footer, .section, article, aside, figure, nav, section, main, header, footer, aside {
+  border-radius: var(--radius-lg);
+}
+
+/* Ensure buttons have subtle rounded corners */
+button, .btn {
+  border-radius: var(--radius-lg);
+}
+
+/* Rounded corners for cards and containers */
+.card, [class*="card"], [class*="Card"] {
+  border-radius: var(--radius-lg);
+}
+
+/* Rounded corners for inputs and form elements */
+input, select, textarea, [role="combobox"], [role="listbox"] {
+  border-radius: var(--radius-md);
+}
+
+/* Rounded corners for dropdown menus and popovers */
+[data-radix-popper-content-wrapper], [data-radix-dropdown-menu-content], [data-radix-popover-content], [data-radix-tooltip-content], [data-radix-dialog-content], [data-radix-alert-dialog-content], [data-radix-sheet-content], [data-radix-drawer-content], [data-radix-hover-card-content] {
+  border-radius: var(--radius-lg);
+}
+
+/* Rounded corners for tables */
+table, [role="grid"] {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+/* Rounded corners for badges */
+.badge, [data-slot="badge"] {
+  border-radius: var(--radius-full);
+}
+
+/* Rounded corners for progress bars */
+[role="progressbar"], progress {
+  border-radius: var(--radius-full);
+}
+
+/* Rounded corners for sliders and switches */
+[role="slider"], [role="switch"] {
+  border-radius: var(--radius-full);
+}
+
+/* Rounded corners for tabs */
+[role="tablist"], [role="tabpanel"], [role="tab"] {
+  border-radius: var(--radius-md);
+}
+
+/* Smooth transitions for all interactive elements */
+*, *::before, *::after {
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

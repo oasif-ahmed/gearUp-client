@@ -5,7 +5,14 @@ import Link from "next/link";
 import { ArrowRight, CheckCircle2, FileText, Download, ShieldCheck, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { animate, createTimeline, onScroll } from "animejs";
+import { 
+  createTimeline, 
+  floatElement, 
+  animate, 
+  animationPresets, 
+  staggerElements 
+} from "@/lib/animations";
+import { onScroll } from "animejs";
 
 export default function Hero() {
   const [activeTab, setActiveTab] = useState<"enterprise" | "growth">("growth");
@@ -30,8 +37,8 @@ export default function Hero() {
     // Animate Badge
     if (badgeRef.current) {
       tl.add(badgeRef.current, {
-        opacity: [0, 1],
-        translateY: [-20, 0],
+        ...animationPresets.fadeIn,
+        translateY: -20,
         duration: 800,
       });
     }
@@ -39,8 +46,7 @@ export default function Hero() {
     // Animate Headline with Text Effect
     if (headlineRef.current) {
       tl.add(headlineRef.current, {
-        opacity: [0, 1],
-        translateY: [30, 0],
+        ...animationPresets.slideUp,
         duration: 1000,
       }, "-=400");
     }
@@ -48,49 +54,39 @@ export default function Hero() {
     // Animate Paragraph
     if (textRef.current) {
       tl.add(textRef.current, {
-        opacity: [0, 1],
-        translateY: [20, 0],
+        ...animationPresets.slideUp,
         duration: 800,
       }, "-=600");
     }
 
     // Animate Buttons
     if (buttonsRef.current) {
-      tl.add(buttonsRef.current.children, {
-        opacity: [0, 1],
-        translateY: [20, 0],
+      staggerElements(buttonsRef.current.children as unknown as Element[], 'normal', {
+        ...animationPresets.slideUp,
         duration: 600,
-        delay: (el: any, i: number) => i * 150,
-      }, "-=400");
+      });
     }
 
     // Animate Trust Indicators
     if (trustRef.current) {
-      tl.add(trustRef.current.children, {
-        opacity: [0, 1],
+      staggerElements(trustRef.current.children as unknown as Element[], 'normal', {
+        ...animationPresets.cardEnter,
         scale: [0.9, 1],
         duration: 600,
-        delay: (el: any, i: number) => i * 100,
-      }, "-=400");
+      });
     }
 
     // Animate Invoice Card Panel with Float Effect
     if (invoicePanelRef.current) {
-      tl.add(invoicePanelRef.current, {
-        opacity: [0, 1],
+      animate(invoicePanelRef.current, {
+        ...animationPresets.cardEnter,
         translateX: [40, 0],
         rotate: [2, 0],
         duration: 1200,
-      }, "-=1000");
+      });
 
       // Continuous Floating animation for Invoice card
-      animate(invoicePanelRef.current, {
-        translateY: [-6, 6],
-        duration: 3000,
-        direction: "alternate",
-        loop: true,
-        easing: "easeInOutSine"
-      });
+      floatElement(invoicePanelRef.current, 6, 3000);
     }
 
     // 2. Scroll Animation Setup
