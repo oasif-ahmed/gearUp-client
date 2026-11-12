@@ -1,23 +1,20 @@
 "use client";
 import { useEffect, useRef } from 'react';
-import anime from 'animejs';
+import * as anime from 'animejs';
 
-export function useAnime(animationConfig: anime.AnimeParams) {
+export function useAnime(targets: any, animationConfig: any) {
   const elementRef = useRef<HTMLDivElement>(null);
-  const animationRef = useRef<anime.AnimeInstance | null>(null);
 
   useEffect(() => {
     if (elementRef.current) {
-      animationRef.current = anime({
-        targets: elementRef.current,
+      // animejs v4 uses animate(targets, parameters) function
+      const animation = anime.animate(targets || elementRef.current, {
         ...animationConfig,
       });
+      return () => {
+        animation.pause();
+      };
     }
-    return () => {
-      if (animationRef.current) {
-        animationRef.current.pause();
-      }
-    };
   }, [animationConfig]);
 
   return elementRef;

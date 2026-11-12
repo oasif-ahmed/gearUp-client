@@ -21,7 +21,6 @@ import {
   Moon,
 } from "lucide-react";
 import { useTheme } from "next-themes";
-import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -124,6 +123,11 @@ export default function ProviderDashboard({
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
+  // Modal states (must be declared before useEffect that uses them)
+  const [selectedInvoice, setSelectedInvoice] = useState<RentalOrder | null>(null);
+  const [editingItem, setEditingItem] = useState<GearItem | null>(null);
+  const [restockItem, setRestockItem] = useState<GearItem | null>(null);
+
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -225,17 +229,9 @@ export default function ProviderDashboard({
   const [specKey, setSpecKey] = useState("");
   const [specValue, setSpecValue] = useState("");
 
-  // Restock and Invoice States
-  const [restockItem, setRestockItem] = useState<GearItem | null>(null);
   const [restockQuantity, setRestockQuantity] = useState<number>(1);
   const [isRestocking, setIsRestocking] = useState(false);
 
-  const [selectedInvoice, setSelectedInvoice] = useState<RentalOrder | null>(
-    null,
-  );
-
-  // Edit Gear Modal State
-  const [editingItem, setEditingItem] = useState<GearItem | null>(null);
   const [editForm, setEditForm] = useState({
     name: "",
     description: "",
@@ -1333,6 +1329,7 @@ export default function ProviderDashboard({
               <div className="space-y-0.5">
                 <span className="text-muted-foreground block text-[10px]">
                   Fulfillment Status:
+                </span>
 
                 <span className="font-semibold text-foreground uppercase">
                   {selectedInvoice.status}

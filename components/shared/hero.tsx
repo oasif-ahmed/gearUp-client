@@ -23,7 +23,7 @@ export default function Hero() {
     // 1. Initial Page Load Animation (Staggered Reveal)
     const tl = createTimeline({
       defaults: {
-        easing: "easeOutExpo",
+        duration: 800,
       }
     });
 

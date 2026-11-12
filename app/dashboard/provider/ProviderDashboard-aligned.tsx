@@ -105,7 +105,7 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
   const { categories, gearItems, currentUserId, rentalOrders } = props;
   const router = useRouter();
   const searchParams = useSearchParams();
-  const orderIdFromUrl = searchParams.get("orderId");
+  const orderIdFromUrl = searchParams?.get("orderId");
   const [activeTab, setActiveTab] = useState<"gear" | "orders">("gear");
   const [gearView, setGearView] = useState<"add" | "inventory">("add");
 
