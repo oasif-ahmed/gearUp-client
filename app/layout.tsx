@@ -4,7 +4,7 @@ import './globals.css'
 import { Inter } from 'next/font/google'
 import { getMe } from '@/services/getMe'
 import { Toaster } from 'sonner'
-import { ThemeProvider as NextThemesProvider } from 'next-themes'
+import { ThemeProvider } from '@/components/theme-provider'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -23,7 +23,7 @@ export default async function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.className} bg-background text-foreground antialiased selection:bg-primary selection:text-primary-foreground`}>
-        <NextThemesProvider
+        <ThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
@@ -34,7 +34,7 @@ export default async function RootLayout({
             <Toaster richColors position="top-center" />
           </main>
           <Footer />
-        </NextThemesProvider>
+        </ThemeProvider>
       </body>
     </html>
   )

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState } from "react";
+import { useActionState, useRef } from "react";
 import { loginUser } from "@/services/auth.service";
 
 import { Button } from "@/components/ui/button";
@@ -26,6 +26,15 @@ const initialState = {
 
 const LoginForm = () => {
   const [state, action, pending] = useActionState(loginUser, initialState);
+  const emailRef = useRef<HTMLInputElement>(null);
+  const passwordRef = useRef<HTMLInputElement>(null);
+
+  const fillCredentials = (email: string, pass: string) => {
+    if (emailRef.current && passwordRef.current) {
+      emailRef.current.value = email;
+      passwordRef.current.value = pass;
+    }
+  };
 
   {
     state && state.message && !state.success && (
@@ -69,6 +78,7 @@ const LoginForm = () => {
                 type="email"
                 placeholder="m@example.com"
                 required
+                ref={emailRef}
                 className="h-9 rounded-none text-xs border-border bg-accent/30 text-foreground relative z-20 font-mono"
               />
             </div>
@@ -87,6 +97,7 @@ const LoginForm = () => {
                 type="password"
                 placeholder="••••••••"
                 required
+                ref={passwordRef}
                 aria-invalid={!!state?.message && !state.success}
                 aria-describedby={
                   state?.message && !state.success
@@ -142,6 +153,36 @@ const LoginForm = () => {
             >
               {pending ? <Spinner /> : "Login"}
             </Button>
+
+            <div className="grid grid-cols-1 gap-2 pt-2">
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                className="w-full text-[10px] h-8 rounded-none border border-dashed border-border uppercase"
+                onClick={() => fillCredentials("rifat@gmail.com", "rifat123")}
+              >
+                Use Customer Creds
+              </Button>
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                className="w-full text-[10px] h-8 rounded-none border border-dashed border-border uppercase"
+                onClick={() => fillCredentials("jony@gmail.com", "jony123")}
+              >
+                Use Provider Creds
+              </Button>
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                className="w-full text-[10px] h-8 rounded-none border border-dashed border-border uppercase"
+                onClick={() => fillCredentials("admin@gmail.com", "admin123")}
+              >
+                Use Admin Creds
+              </Button>
+            </div>
           </form>
         </CardContent>
 
