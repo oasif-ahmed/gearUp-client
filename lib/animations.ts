@@ -166,7 +166,6 @@ export const staggerPresets = {
 export const easings = {
   easeOutExpo: 'easeOutExpo',
   easeOutQuad: 'easeOutQuad',
-  easeOutQuad: 'easeOutQuad',
   easeInExpo: 'easeInExpo',
   easeInOutQuad: 'easeInOutQuad',
   linear: 'linear',
@@ -179,13 +178,8 @@ export const easings = {
  * Create a timeline with consistent defaults
  */
 export function createTimeline(options = {}) {
-  return anime.createTimeline({
-    defaults: {
-      easing: 'easeOutExpo',
-      duration: 600,
-    },
-    ...options,
-  });
+  const tl = (anime as any).timeline(options);
+  return tl;
 }
 
 /**
@@ -218,7 +212,7 @@ export function animatePageTransition(
     }, '-=200');
 
   if (onComplete) {
-    tl.finished.then(onComplete);
+    (tl as any).finished.then(onComplete);
   }
 
   return tl;
@@ -279,14 +273,14 @@ export function animateList(items: Element[], preset: keyof typeof staggerPreset
  * Animate counter
  */
 export function animateCounter(element: Element, from: number, to: number, duration = 1000) {
-  return anime.animate({
-    value: from,
-    to,
+  return (anime as any).animate({
+    targets: { value: from },
+    value: to,
     duration,
     easing: 'easeOutExpo',
-    onUpdate: (self) => {
+    update: (anim: any) => {
       if (element) {
-        element.textContent = Math.round(self.currentValue).toLocaleString();
+        element.textContent = Math.round(anim.animations[0].currentValue).toLocaleString();
       }
     },
   });
@@ -308,10 +302,10 @@ export function animateProgress(progress: Element, to: number, duration = 800) {
  */
 export function animateHeight(element: Element, height: number | 'auto', duration = 400) {
   if (height === 'auto') {
-    const currentHeight = element.offsetHeight;
-    element.style.height = 'auto';
-    const targetHeight = element.offsetHeight;
-    element.style.height = `${currentHeight}px`;
+    const currentHeight = (element as HTMLElement).offsetHeight;
+    (element as HTMLElement).style.height = 'auto';
+    const targetHeight = (element as HTMLElement).offsetHeight;
+    (element as HTMLElement).style.height = `${currentHeight}px`;
     
     return anime.animate(element, {
       height: targetHeight,
@@ -332,10 +326,10 @@ export function animateHeight(element: Element, height: number | 'auto', duratio
  */
 export function animateWidth(element: Element, width: number | 'auto', duration = 400) {
   if (width === 'auto') {
-    const currentWidth = element.offsetWidth;
-    element.style.width = 'auto';
-    const targetWidth = element.offsetWidth;
-    element.style.width = `${currentWidth}px`;
+    const currentWidth = (element as HTMLElement).offsetWidth;
+    (element as HTMLElement).style.width = 'auto';
+    const targetWidth = (element as HTMLElement).offsetWidth;
+    (element as HTMLElement).style.width = `${currentWidth}px`;
     
     return anime.animate(element, {
       width: targetWidth,
@@ -359,17 +353,16 @@ export function createScrollAnimation(
   animation: any,
   options = {}
 ) {
-  return anime.onScroll({
+  return (anime as any).onScroll({
     target: element,
     ...options,
-    onUpdate: (self) => {
-      const progress = self.progress;
+    update: (anim: any) => {
+      const progress = anim.progress;
       anime.animate(element, {
         ...animation,
         duration: 0,
         easing: 'linear',
-        complete: () => {},
-      }).seek(progress * 100);
+      }).seek(progress);
     },
   });
 }
@@ -575,10 +568,10 @@ export function morphPath(element: SVGPathElement, toPath: string, duration = 80
 export function createParallax(elements: Element[], speeds: number[]) {
   const animations = elements.map((element, index) => {
     const speed = speeds[index] || 0.5;
-    return anime.onScroll({
+    return (anime as any).onScroll({
       target: element,
-      onUpdate: (self) => {
-        const translateY = -self.progress * 100 * speed;
+      update: (anim: any) => {
+        const translateY = -anim.progress * 100 * speed;
         anime.animate(element, {
           translateY,
           duration: 0,
@@ -588,7 +581,7 @@ export function createParallax(elements: Element[], speeds: number[]) {
     });
   });
 
-  return () => animations.forEach(a => a.pause());
+  return () => animations.forEach((a: any) => a.pause());
 }
 
 /**
