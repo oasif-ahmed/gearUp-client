@@ -31,17 +31,8 @@ export default async function PublicHome() {
       {/* Dynamic Hero Section */}
       <Hero />
 
-      {/* Editorial Navigation Bar Header space / divider line */}
-      <div className="max-w-6xl mx-auto px-4 pt-12 pb-6 border-b border-border flex justify-between items-center text-xs tracking-widest uppercase font-mono text-muted-foreground">
-        <span>Est. 2026 / Rental Architecture</span>
-        <span className="flex items-center gap-1.5 text-emerald-700 font-semibold">
-          <span className="h-1.5 w-1.5 rounded-full bg-emerald-600 animate-pulse" />
-          Live Inventory Hub
-        </span>
-      </div>
-
       {/* Statistics / Trust Bar */}
-      <section className="border-y border-border bg-card py-8">
+      <section className="border-y border-border bg-card py-8 mt-12">
         <div className="max-w-6xl mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-8 font-mono">
           <div className="space-y-1">
             <span className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">100%</span>

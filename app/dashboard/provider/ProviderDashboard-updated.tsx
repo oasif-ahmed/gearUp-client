@@ -470,9 +470,9 @@
 //   return (
 //     <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 xl:px-8 py-10 lg:py-12 space-y-8">
 //       {/* Header Section */}
-//       <div className="flex flex-col md:flex-row md:items-end justify-between border-b border-zinc-200 pb-6 gap-4">
+//       <div className="flex flex-col md:flex-row md:items-end justify-between border-b border-border pb-6 gap-4">
 //         <div>
-//           <span className="text-xs font-mono uppercase tracking-widest text-zinc-500">
+//           <span className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
 //             [ Management Console ]
 //           </span>
 
@@ -487,7 +487,7 @@
 //             className={`px-4 py-2 text-xs font-mono uppercase tracking-wider rounded-none border transition-colors ${
 //               activeTab === "gear"
 //                 ? "bg-zinc-900 text-white border-zinc-900"
-//                 : "bg-white text-zinc-700 border-zinc-200 hover:bg-zinc-50"
+//                 : "bg-card text-foreground border-border hover:bg-muted"
 //             }`}
 //           >
 //             Gear Inventory
@@ -498,7 +498,7 @@
 //             className={`px-4 py-2 text-xs font-mono uppercase tracking-wider rounded-none border transition-colors ${
 //               activeTab === "orders"
 //                 ? "bg-zinc-900 text-white border-zinc-900"
-//                 : "bg-white text-zinc-700 border-zinc-200 hover:bg-zinc-50"
+//                 : "bg-card text-foreground border-border hover:bg-muted"
 //             }`}
 //           >
 //             Rental Invoices & Orders
@@ -510,14 +510,14 @@
 //       {activeTab === "gear" && (
 //   <div className="space-y-6">
 //           {/* Add New Gear Form */}
-//           <div className="min-w-0 border border-zinc-200 bg-white p-5 sm:p-6 lg:p-8 rounded-none shadow-sm">
+//           <div className="min-w-0 border border-border bg-card p-5 sm:p-6 lg:p-8 rounded-none shadow-sm">
 //             <div className="mb-6 border-b border-zinc-100 pb-4">
 //               <h2 className="text-sm font-mono uppercase tracking-tight text-zinc-900 flex items-center gap-2">
 //                 <Plus className="h-4 w-4" />
 //                 Add New Equipment Listing
 //               </h2>
 
-//               <p className="text-xs text-zinc-500 mt-1">
+//               <p className="text-xs text-muted-foreground mt-1">
 //                 Register professional equipment with technical specs,
 //                 deposits, and gallery media.
 //               </p>
@@ -532,7 +532,7 @@
 //                 <div className="md:col-span-2 space-y-1.5">
 //                   <Label
 //                     htmlFor="name"
-//                     className="text-xs font-mono uppercase text-zinc-700"
+//                     className="text-xs font-mono uppercase text-foreground"
 //                   >
 //                     Gear Name
 //                   </Label>
@@ -543,7 +543,7 @@
 //                     value={gearName}
 //                     onChange={(e) => setGearName(e.target.value)}
 //                     placeholder="e.g., Nikon Z6 II Mirrorless Camera"
-//                     className="rounded-none border-zinc-200 bg-background text-xs"
+//                     className="rounded-none border-border bg-background text-xs"
 //                     required
 //                   />
 //                 </div>
@@ -551,7 +551,7 @@
 //                 <div className="space-y-1.5">
 //                   <Label
 //                     htmlFor="brand"
-//                     className="text-xs font-mono uppercase text-zinc-700"
+//                     className="text-xs font-mono uppercase text-foreground"
 //                   >
 //                     Brand
 //                   </Label>
@@ -562,7 +562,7 @@
 //                     value={brand}
 //                     onChange={(e) => setBrand(e.target.value)}
 //                     placeholder="e.g., Nikon"
-//                     className="rounded-none border-zinc-200 bg-background text-xs"
+//                     className="rounded-none border-border bg-background text-xs"
 //                     required
 //                   />
 //                 </div>
@@ -573,7 +573,7 @@
 //                 <div className="space-y-1.5">
 //                   <Label
 //                     htmlFor="categoryId"
-//                     className="text-xs font-mono uppercase text-zinc-700"
+//                     className="text-xs font-mono uppercase text-foreground"
 //                   >
 //                     Category
 //                   </Label>
@@ -585,12 +585,12 @@
 //                   >
 //                     <SelectTrigger
 //                       id="categoryId"
-//                       className="rounded-none border-zinc-200 text-xs"
+//                       className="rounded-none border-border text-xs"
 //                     >
 //                       <SelectValue placeholder="Select category" />
 //                     </SelectTrigger>
 
-//                     <SelectContent className="rounded-none border-zinc-200 text-xs">
+//                     <SelectContent className="rounded-none border-border text-xs">
 //                       {categories.map((cat) => (
 //                         <SelectItem
 //                           key={cat.id}
@@ -607,7 +607,7 @@
 //                 <div className="space-y-1.5">
 //                   <Label
 //                     htmlFor="condition"
-//                     className="text-xs font-mono uppercase text-zinc-700"
+//                     className="text-xs font-mono uppercase text-foreground"
 //                   >
 //                     Gear Condition
 //                   </Label>
@@ -620,12 +620,12 @@
 //                   >
 //                     <SelectTrigger
 //                       id="condition"
-//                       className="rounded-none border-zinc-200 text-xs"
+//                       className="rounded-none border-border text-xs"
 //                     >
 //                       <SelectValue placeholder="Select condition" />
 //                     </SelectTrigger>
 
-//                     <SelectContent className="rounded-none border-zinc-200 text-xs">
+//                     <SelectContent className="rounded-none border-border text-xs">
 //                       {Object.values(GearCondition).map((value) => (
 //                         <SelectItem
 //                           key={value}
@@ -642,7 +642,7 @@
 //                 <div className="space-y-1.5">
 //                   <Label
 //                     htmlFor="status"
-//                     className="text-xs font-mono uppercase text-zinc-700"
+//                     className="text-xs font-mono uppercase text-foreground"
 //                   >
 //                     Listing Status
 //                   </Label>
@@ -655,12 +655,12 @@
 //                   >
 //                     <SelectTrigger
 //                       id="status"
-//                       className="rounded-none border-zinc-200 text-xs"
+//                       className="rounded-none border-border text-xs"
 //                     >
 //                       <SelectValue placeholder="Select status" />
 //                     </SelectTrigger>
 
-//                     <SelectContent className="rounded-none border-zinc-200 text-xs">
+//                     <SelectContent className="rounded-none border-border text-xs">
 //                       {Object.values(GearStatus).map((value) => (
 //                         <SelectItem
 //                           key={value}
@@ -680,7 +680,7 @@
 //                 <div className="space-y-1.5">
 //                   <Label
 //                     htmlFor="pricePerDay"
-//                     className="text-xs font-mono uppercase text-zinc-700"
+//                     className="text-xs font-mono uppercase text-foreground"
 //                   >
 //                     Price Per Day (৳)
 //                   </Label>
@@ -698,7 +698,7 @@
 //                       )
 //                     }
 //                     placeholder="2500"
-//                     className="rounded-none border-zinc-200 bg-background text-xs font-mono"
+//                     className="rounded-none border-border bg-background text-xs font-mono"
 //                     required
 //                   />
 //                 </div>
@@ -706,7 +706,7 @@
 //                 <div className="space-y-1.5">
 //                   <Label
 //                     htmlFor="securityDeposit"
-//                     className="text-xs font-mono uppercase text-zinc-700"
+//                     className="text-xs font-mono uppercase text-foreground"
 //                   >
 //                     Security Deposit (৳)
 //                   </Label>
@@ -724,7 +724,7 @@
 //                       )
 //                     }
 //                     placeholder="10000"
-//                     className="rounded-none border-zinc-200 bg-background text-xs font-mono"
+//                     className="rounded-none border-border bg-background text-xs font-mono"
 //                     required
 //                   />
 //                 </div>
@@ -732,7 +732,7 @@
 //                 <div className="space-y-1.5">
 //                   <Label
 //                     htmlFor="quantity"
-//                     className="text-xs font-mono uppercase text-zinc-700"
+//                     className="text-xs font-mono uppercase text-foreground"
 //                   >
 //                     Quantity Stock
 //                   </Label>
@@ -750,7 +750,7 @@
 //                       )
 //                     }
 //                     placeholder="2"
-//                     className="rounded-none border-zinc-200 bg-background text-xs font-mono"
+//                     className="rounded-none border-border bg-background text-xs font-mono"
 //                     required
 //                   />
 //                 </div>
@@ -760,7 +760,7 @@
 //               <div className="space-y-1.5">
 //                 <Label
 //                   htmlFor="description"
-//                   className="text-xs font-mono uppercase text-zinc-700"
+//                   className="text-xs font-mono uppercase text-foreground"
 //                 >
 //                   Description
 //                 </Label>
@@ -772,7 +772,7 @@
 //                   value={description}
 //                   onChange={(e) => setDescription(e.target.value)}
 //                   placeholder="Full-frame 24.5 MP mirrorless camera ideal for 4K video and low-light photography..."
-//                   className="rounded-none border-zinc-200 bg-background text-xs resize-none"
+//                   className="rounded-none border-border bg-background text-xs resize-none"
 //                   required
 //                 />
 //               </div>
@@ -806,7 +806,7 @@
 
 //               {/* Image Upload */}
 //               <div className="space-y-3 border-t border-zinc-100 pt-4">
-//                 <Label className="text-xs font-mono uppercase text-zinc-700 flex items-center gap-1.5">
+//                 <Label className="text-xs font-mono uppercase text-foreground flex items-center gap-1.5">
 //                   <ImageIcon className="h-3.5 w-3.5" />
 //                   Gear Images
 //                 </Label>
@@ -824,7 +824,7 @@
 //                   type="button"
 //                   variant="outline"
 //                   onClick={() => fileInputRef.current?.click()}
-//                   className="rounded-none text-xs border-zinc-200 h-9 px-4 font-mono gap-1.5"
+//                   className="rounded-none text-xs border-border h-9 px-4 font-mono gap-1.5"
 //                 >
 //                   <Upload className="h-3.5 w-3.5" />
 //                   Choose Images
@@ -834,7 +834,7 @@
 //                   {previews.map((src, idx) => (
 //                     <div
 //                       key={idx}
-//                       className="relative border border-zinc-200 bg-zinc-50"
+//                       className="relative border border-border bg-muted"
 //                     >
 //                       <img
 //                         src={src}
@@ -845,12 +845,12 @@
 //                       <button
 //                         type="button"
 //                         onClick={() => handleRemoveImage(idx)}
-//                         className="absolute top-1 right-1 bg-white border border-zinc-200 p-0.5 text-zinc-500 hover:text-red-600 transition-colors"
+//                         className="absolute top-1 right-1 bg-card border border-border p-0.5 text-muted-foreground hover:text-red-600 transition-colors"
 //                       >
 //                         <X className="h-3.5 w-3.5" />
 //                       </button>
 
-//                       <p className="truncate px-2 py-1 text-[10px] font-mono text-zinc-600">
+//                       <p className="truncate px-2 py-1 text-[10px] font-mono text-foreground">
 //                         {imageFiles[idx].name}
 //                       </p>
 //                     </div>
@@ -860,7 +860,7 @@
 
 //               {/* Dynamic Specifications */}
 //               <div className="space-y-3 border-t border-zinc-100 pt-4">
-//                 <Label className="text-xs font-mono uppercase text-zinc-700 flex items-center gap-1.5">
+//                 <Label className="text-xs font-mono uppercase text-foreground flex items-center gap-1.5">
 //                   <Layers className="h-3.5 w-3.5" />
 //                   Technical Specifications
 //                 </Label>
@@ -870,21 +870,21 @@
 //                     placeholder="Key (e.g., sensor)"
 //                     value={specKey}
 //                     onChange={(e) => setSpecKey(e.target.value)}
-//                     className="rounded-none border-zinc-200 text-xs font-mono md:col-span-2"
+//                     className="rounded-none border-border text-xs font-mono md:col-span-2"
 //                   />
 
 //                   <Input
 //                     placeholder="Value (e.g., Full Frame CMOS)"
 //                     value={specValue}
 //                     onChange={(e) => setSpecValue(e.target.value)}
-//                     className="rounded-none border-zinc-200 text-xs font-mono md:col-span-2"
+//                     className="rounded-none border-border text-xs font-mono md:col-span-2"
 //                   />
 
 //                   <Button
 //                     type="button"
 //                     variant="outline"
 //                     onClick={handleAddSpec}
-//                     className="rounded-none text-xs border-zinc-200 h-9 font-mono"
+//                     className="rounded-none text-xs border-border h-9 font-mono"
 //                   >
 //                     Add Specification
 //                   </Button>
@@ -894,7 +894,7 @@
 //                   {specifications.map((spec, idx) => (
 //                     <div
 //                       key={idx}
-//                       className="flex items-center justify-between border border-zinc-200 px-3 py-1.5 bg-zinc-50 text-xs font-mono"
+//                       className="flex items-center justify-between border border-border px-3 py-1.5 bg-muted text-xs font-mono"
 //                     >
 //                       <div className="truncate">
 //                         <span className="text-zinc-400 uppercase text-[10px]">
@@ -949,14 +949,14 @@
 //           </div>
 
 //           {/* Inventory Table */}
-//           <div className="w-full min-w-0 border border-zinc-200 bg-white p-5 sm:p-6 lg:p-6 2xl:p-8 rounded-none shadow-sm">
+//           <div className="w-full min-w-0 border border-border bg-card p-5 sm:p-6 lg:p-6 2xl:p-8 rounded-none shadow-sm">
 //             <div className="mb-6 flex items-center justify-between border-b border-zinc-100 pb-4">
 //               <div>
 //                 <h2 className="text-sm font-mono uppercase tracking-tight text-zinc-900">
 //                   Active Inventory
 //                 </h2>
 
-//                 <p className="text-xs text-zinc-500 mt-1">
+//                 <p className="text-xs text-muted-foreground mt-1">
 //                   Manage stock allocations and equipment state.
 //                 </p>
 //               </div>
@@ -969,24 +969,24 @@
 //             <div className="w-full overflow-x-auto">
 //               <Table className="min-w-[620px]">
 //                 <TableHeader>
-//                   <TableRow className="border-zinc-200 hover:bg-transparent">
-//                     <TableHead className="text-xs font-mono uppercase text-zinc-500">
+//                   <TableRow className="border-border hover:bg-transparent">
+//                     <TableHead className="text-xs font-mono uppercase text-muted-foreground">
 //                       Name
 //                     </TableHead>
 
-//                     <TableHead className="text-xs font-mono uppercase text-zinc-500">
+//                     <TableHead className="text-xs font-mono uppercase text-muted-foreground">
 //                       Category
 //                     </TableHead>
 
-//                     <TableHead className="text-xs font-mono uppercase text-zinc-500">
+//                     <TableHead className="text-xs font-mono uppercase text-muted-foreground">
 //                       Rate/Day
 //                     </TableHead>
 
-//                     <TableHead className="text-xs font-mono uppercase text-zinc-500">
+//                     <TableHead className="text-xs font-mono uppercase text-muted-foreground">
 //                       Stock
 //                     </TableHead>
 
-//                     <TableHead className="text-xs font-mono uppercase text-zinc-500 text-right">
+//                     <TableHead className="text-xs font-mono uppercase text-muted-foreground text-right">
 //                       Actions
 //                     </TableHead>
 //                   </TableRow>
@@ -1002,7 +1002,7 @@
 //                         {item.name}
 //                       </TableCell>
 
-//                       <TableCell className="text-zinc-600">
+//                       <TableCell className="text-foreground">
 //                         {item.category?.name}
 //                       </TableCell>
 
@@ -1010,7 +1010,7 @@
 //                         ৳{item.pricePerDay}
 //                       </TableCell>
 
-//                       <TableCell className="font-mono text-zinc-600">
+//                       <TableCell className="font-mono text-foreground">
 //                         {item.quantity}
 //                       </TableCell>
 
@@ -1019,7 +1019,7 @@
 //                           variant="outline"
 //                           size="sm"
 //                           onClick={() => setRestockItem(item)}
-//                           className="h-7 text-xs rounded-none border-zinc-200 text-zinc-800 hover:bg-zinc-100 gap-1.5 font-mono"
+//                           className="h-7 text-xs rounded-none border-border text-zinc-800 hover:bg-muted gap-1.5 font-mono"
 //                         >
 //                           <RefreshCw className="h-3 w-3" />
 //                           Restock
@@ -1029,7 +1029,7 @@
 //                           variant="ghost"
 //                           size="sm"
 //                           onClick={() => handleOpenEdit(item)}
-//                           className="h-7 text-xs rounded-none hover:bg-zinc-100 font-mono"
+//                           className="h-7 text-xs rounded-none hover:bg-muted font-mono"
 //                         >
 //                           Edit
 //                         </Button>
@@ -1049,7 +1049,7 @@
 //                     <TableRow>
 //                       <TableCell
 //                         colSpan={5}
-//                         className="text-center text-xs text-zinc-500 py-8"
+//                         className="text-center text-xs text-muted-foreground py-8"
 //                       >
 //                         No equipment listed yet.
 //                       </TableCell>
@@ -1065,14 +1065,14 @@
 //       {/* TAB 2: INVOICES & RENTAL ORDERS */}
 //       {activeTab === "orders" && (
 //         <div className="space-y-6">
-//           <div className="border border-zinc-200 bg-white p-8 rounded-none shadow-xs">
+//           <div className="border border-border bg-card p-8 rounded-none shadow-xs">
 //             <div className="mb-6 flex items-center justify-between border-b border-zinc-100 pb-4">
 //               <div>
 //                 <h2 className="text-sm font-mono uppercase tracking-tight text-zinc-900">
 //                   Rental Invoices & Manifests
 //                 </h2>
 
-//                 <p className="text-xs text-zinc-500 mt-1">
+//                 <p className="text-xs text-muted-foreground mt-1">
 //                   Select any transaction to inspect the official paper invoice
 //                   receipt.
 //                 </p>
@@ -1088,9 +1088,9 @@
 //                 <div
 //                   key={ord.id}
 //                   onClick={() => setSelectedInvoice(ord)}
-//                   className="group border border-zinc-200 bg-[#FDFBF7] p-6 rounded-none hover:border-zinc-900 cursor-pointer transition-all relative flex flex-col justify-between space-y-4 shadow-2xs"
+//                   className="group border border-border bg-[#FDFBF7] p-6 rounded-none hover:border-zinc-900 cursor-pointer transition-all relative flex flex-col justify-between space-y-4 shadow-2xs"
 //                 >
-//                   <div className="flex items-start justify-between border-b border-zinc-200/80 pb-3">
+//                   <div className="flex items-start justify-between border-b border-border/80 pb-3">
 //                     <div>
 //                       <span className="text-[10px] font-mono text-zinc-400 uppercase tracking-widest">
 //                         [ RENTAL INVOICE ]
@@ -1107,14 +1107,14 @@
 //                           ? "bg-blue-50 text-blue-800 border-blue-200"
 //                           : ord.status === "PICKED_UP"
 //                             ? "bg-emerald-50 text-emerald-800 border-emerald-200"
-//                             : "bg-zinc-100 text-zinc-800 border-zinc-200"
+//                             : "bg-muted text-zinc-800 border-border"
 //                       }`}
 //                     >
 //                       {ord.status}
 //                     </span>
 //                   </div>
 
-//                   <div className="space-y-1.5 text-xs text-zinc-700 font-mono">
+//                   <div className="space-y-1.5 text-xs text-foreground font-mono">
 //                     <div className="flex justify-between">
 //                       <span className="text-zinc-400">Client:</span>
 
@@ -1137,8 +1137,8 @@
 //                     </div>
 //                   </div>
 
-//                   <div className="pt-3 border-t border-zinc-200/80 flex items-center justify-between text-xs font-mono">
-//                     <span className="text-zinc-500">
+//                   <div className="pt-3 border-t border-border/80 flex items-center justify-between text-xs font-mono">
+//                     <span className="text-muted-foreground">
 //                       Total: ৳
 //                       {(ord.dailyRate * ord.totalDays).toLocaleString()}
 //                     </span>
@@ -1158,7 +1158,7 @@
 //       {/* PAPER INVOICE MODAL */}
 //       {selectedInvoice && (
 //         <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/60 backdrop-blur-xs p-4">
-//           <div className="w-full max-w-xl border border-zinc-300 bg-[#FDFBF7] p-8 rounded-none shadow-2xl space-y-6 relative font-serif">
+//           <div className="w-full max-w-xl border border-border bg-[#FDFBF7] p-8 rounded-none shadow-2xl space-y-6 relative font-serif">
 //             <button
 //               onClick={() => setSelectedInvoice(null)}
 //               className="absolute top-6 right-6 text-zinc-400 hover:text-zinc-900 transition-colors"
@@ -1166,8 +1166,8 @@
 //               <X className="h-5 w-5" />
 //             </button>
 
-//             <div className="text-center border-b border-zinc-300 pb-6 space-y-1">
-//               <span className="text-[10px] font-mono uppercase tracking-widest text-zinc-500">
+//             <div className="text-center border-b border-border pb-6 space-y-1">
+//               <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
 //                 GearUp Rental Corp — Official Statement
 //               </span>
 
@@ -1175,13 +1175,13 @@
 //                 Equipment Rental Invoice
 //               </h2>
 
-//               <p className="text-xs font-mono text-zinc-500">
+//               <p className="text-xs font-mono text-muted-foreground">
 //                 {selectedInvoice.invoiceNo} • Issued:{" "}
 //                 {selectedInvoice.createdAt}
 //               </p>
 //             </div>
 
-//             <div className="grid grid-cols-2 gap-4 text-xs font-mono border-b border-zinc-200 pb-6">
+//             <div className="grid grid-cols-2 gap-4 text-xs font-mono border-b border-border pb-6">
 //               <div>
 //                 <span className="text-zinc-400 block uppercase text-[10px]">
 //                   Billed To:
@@ -1191,7 +1191,7 @@
 //                   {selectedInvoice.clientName}
 //                 </span>
 
-//                 <span className="text-zinc-600">
+//                 <span className="text-foreground">
 //                   {selectedInvoice.clientEmail}
 //                 </span>
 //               </div>
@@ -1205,7 +1205,7 @@
 //                   {selectedInvoice.rentalWindow}
 //                 </span>
 
-//                 <span className="text-zinc-600">
+//                 <span className="text-foreground">
 //                   {selectedInvoice.totalDays} Billing Days
 //                 </span>
 //               </div>
@@ -1218,7 +1218,7 @@
 
 //               <table className="w-full text-xs font-mono border-collapse">
 //                 <thead>
-//                   <tr className="border-b border-zinc-300 text-left text-zinc-500">
+//                   <tr className="border-b border-border text-left text-muted-foreground">
 //                     <th className="pb-2 font-medium">Description</th>
 //                     <th className="pb-2 font-medium text-center">Qty</th>
 //                     <th className="pb-2 font-medium text-right">
@@ -1236,11 +1236,11 @@
 //                       {selectedInvoice.gearName}
 //                     </td>
 
-//                     <td className="py-3 text-center text-zinc-600">
+//                     <td className="py-3 text-center text-foreground">
 //                       {selectedInvoice.quantity}
 //                     </td>
 
-//                     <td className="py-3 text-right text-zinc-600">
+//                     <td className="py-3 text-right text-foreground">
 //                       ৳{selectedInvoice.dailyRate}
 //                     </td>
 
@@ -1254,9 +1254,9 @@
 //               </table>
 //             </div>
 
-//             <div className="border-t border-zinc-300 pt-4 flex justify-between items-center font-mono text-xs">
+//             <div className="border-t border-border pt-4 flex justify-between items-center font-mono text-xs">
 //               <div className="space-y-0.5">
-//                 <span className="text-zinc-500 block text-[10px]">
+//                 <span className="text-muted-foreground block text-[10px]">
 //                   Fulfillment Status:
 //                 </span>
 
@@ -1266,7 +1266,7 @@
 //               </div>
 
 //               <div className="text-right space-y-1">
-//                 <div className="text-zinc-500">
+//                 <div className="text-muted-foreground">
 //                   Subtotal: ৳
 //                   {selectedInvoice.dailyRate *
 //                     selectedInvoice.totalDays}
@@ -1283,9 +1283,9 @@
 //               </div>
 //             </div>
 
-//             <div className="flex items-center justify-between pt-4 border-t border-zinc-300">
+//             <div className="flex items-center justify-between pt-4 border-t border-border">
 //               <div className="flex items-center gap-2">
-//                 <span className="text-[11px] font-mono text-zinc-500">
+//                 <span className="text-[11px] font-mono text-muted-foreground">
 //                   Update Status:
 //                 </span>
 
@@ -1298,11 +1298,11 @@
 //                     )
 //                   }
 //                 >
-//                   <SelectTrigger className="h-7 w-[130px] text-xs rounded-none border-zinc-300 bg-white font-mono">
+//                   <SelectTrigger className="h-7 w-[130px] text-xs rounded-none border-border bg-card font-mono">
 //                     <SelectValue placeholder="Status" />
 //                   </SelectTrigger>
 
-//                   <SelectContent className="rounded-none border-zinc-300 text-xs font-mono">
+//                   <SelectContent className="rounded-none border-border text-xs font-mono">
 //                     <SelectItem value="PLACED" className="rounded-none text-xs">
 //                       PLACED
 //                     </SelectItem>
@@ -1352,12 +1352,12 @@
 //       {/* EDIT GEAR MODAL */}
 //       {editingItem && (
 //         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-zinc-950/60 backdrop-blur-sm p-4">
-//           <div className="w-full max-w-3xl max-h-[90vh] overflow-y-auto border border-zinc-200 bg-white p-5 sm:p-7 shadow-2xl">
+//           <div className="w-full max-w-3xl max-h-[90vh] overflow-y-auto border border-border bg-card p-5 sm:p-7 shadow-2xl">
 //             <div className="flex items-center justify-between border-b border-zinc-100 pb-4 mb-5">
 //               <div>
 //                 <span className="text-[10px] font-mono uppercase tracking-widest text-zinc-400">[ Inventory Management ]</span>
 //                 <h2 className="text-lg font-semibold text-zinc-900">Edit Gear Item</h2>
-//                 <p className="text-xs text-zinc-500 mt-1">Update listing details, images, stock, and specifications.</p>
+//                 <p className="text-xs text-muted-foreground mt-1">Update listing details, images, stock, and specifications.</p>
 //               </div>
 //               <button type="button" onClick={() => setEditingItem(null)} className="text-zinc-400 hover:text-zinc-900" aria-label="Close edit modal">
 //                 <X className="h-5 w-5" />
@@ -1417,13 +1417,13 @@
 //               <div className="space-y-3 border-t border-zinc-100 pt-4">
 //                 <Label className="flex items-center gap-2"><ImageIcon className="h-4 w-4" /> Existing Images</Label>
 //                 {editExistingImages.length === 0 ? (
-//                   <p className="text-xs text-zinc-500">No existing images. Add new images below if needed.</p>
+//                   <p className="text-xs text-muted-foreground">No existing images. Add new images below if needed.</p>
 //                 ) : (
 //                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
 //                     {editExistingImages.map((src, index) => (
-//                       <div key={`${src}-${index}`} className="relative border border-zinc-200">
+//                       <div key={`${src}-${index}`} className="relative border border-border">
 //                         <img src={src} alt={`Gear image ${index + 1}`} className="h-28 w-full object-cover" />
-//                         <button type="button" onClick={() => setEditExistingImages((prev) => prev.filter((_, i) => i !== index))} className="absolute top-1 right-1 bg-white border p-1 text-red-600" aria-label="Remove existing image"><X className="h-3.5 w-3.5" /></button>
+//                         <button type="button" onClick={() => setEditExistingImages((prev) => prev.filter((_, i) => i !== index))} className="absolute top-1 right-1 bg-card border p-1 text-red-600" aria-label="Remove existing image"><X className="h-3.5 w-3.5" /></button>
 //                       </div>
 //                     ))}
 //                   </div>
@@ -1451,7 +1451,7 @@
 //                 </div>
 //                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
 //                   {editSpecifications.map((spec, index) => (
-//                     <div key={`${spec.key}-${index}`} className="flex items-center justify-between gap-2 border bg-zinc-50 px-3 py-2 text-xs">
+//                     <div key={`${spec.key}-${index}`} className="flex items-center justify-between gap-2 border bg-muted px-3 py-2 text-xs">
 //                       <span className="min-w-0 truncate"><strong>{spec.key}:</strong> {spec.value}</span>
 //                       <button type="button" onClick={() => setEditSpecifications((prev) => prev.filter((_, i) => i !== index))} className="text-red-600" aria-label={`Remove ${spec.key}`}><Trash2 className="h-3.5 w-3.5" /></button>
 //                     </div>
@@ -1473,7 +1473,7 @@
 //       {/* RESTOCK MODAL */}
 //       {restockItem && (
 //         <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/40 backdrop-blur-xs p-4">
-//           <div className="w-full max-w-md border border-zinc-200 bg-white p-6 rounded-none shadow-lg space-y-4">
+//           <div className="w-full max-w-md border border-border bg-card p-6 rounded-none shadow-lg space-y-4">
 //             <div className="flex items-center justify-between border-b border-zinc-100 pb-3">
 //               <div>
 //                 <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-400">
@@ -1498,7 +1498,7 @@
 //               className="space-y-4"
 //             >
 //               <div className="space-y-1">
-//                 <p className="text-xs text-zinc-500 font-mono">
+//                 <p className="text-xs text-muted-foreground font-mono">
 //                   Target Item:
 //                 </p>
 
@@ -1510,7 +1510,7 @@
 //               <div className="space-y-1.5">
 //                 <Label
 //                   htmlFor="addQuantity"
-//                   className="text-xs font-mono uppercase text-zinc-700"
+//                   className="text-xs font-mono uppercase text-foreground"
 //                 >
 //                   Additional Quantity to Add
 //                 </Label>
@@ -1523,7 +1523,7 @@
 //                   onChange={(e) =>
 //                     setRestockQuantity(Number(e.target.value))
 //                   }
-//                   className="rounded-none border-zinc-200 text-xs font-mono focus:ring-1 focus:ring-zinc-900"
+//                   className="rounded-none border-border text-xs font-mono focus:ring-1 focus:ring-zinc-900"
 //                   required
 //                 />
 //               </div>
@@ -1533,7 +1533,7 @@
 //                   type="button"
 //                   variant="outline"
 //                   onClick={() => setRestockItem(null)}
-//                   className="rounded-none text-xs h-9 border-zinc-200"
+//                   className="rounded-none text-xs h-9 border-border"
 //                 >
 //                   Cancel
 //                 </Button>

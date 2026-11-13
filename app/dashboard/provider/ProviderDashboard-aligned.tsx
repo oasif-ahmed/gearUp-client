@@ -579,9 +579,9 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
   return (
     <div className="container mx-auto px-4 py-12 max-w-6xl space-y-10">
       {/* Header Section */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between border-b border-zinc-200 pb-6 gap-4">
+      <div className="flex flex-col md:flex-row md:items-end justify-between border-b border-border pb-6 gap-4">
         <div>
-          <span className="text-xs font-mono uppercase tracking-widest text-zinc-500">
+          <span className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
             [ Management Console ]
           </span>
 
@@ -590,7 +590,7 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
           </h1>
         </div>
 
-        <div className="flex flex-wrap items-center gap-1 bg-white border border-zinc-200 p-1">
+        <div className="flex flex-wrap items-center gap-1 bg-card border border-border p-1">
           <button
             onClick={() => {
               setActiveTab("gear");
@@ -599,7 +599,7 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
             className={`px-3 py-2 text-xs font-mono uppercase tracking-wider transition-colors ${
               activeTab === "gear" && gearView === "add"
                 ? "bg-zinc-900 text-white font-semibold"
-                : "text-zinc-600 hover:bg-zinc-50"
+                : "text-foreground hover:bg-muted"
             }`}
           >
             Add Equipment
@@ -613,7 +613,7 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
             className={`px-3 py-2 text-xs font-mono uppercase tracking-wider transition-colors ${
               activeTab === "gear" && gearView === "inventory"
                 ? "bg-zinc-900 text-white font-semibold"
-                : "text-zinc-600 hover:bg-zinc-50"
+                : "text-foreground hover:bg-muted"
             }`}
           >
             Active Inventory ({inventory.length})
@@ -624,7 +624,7 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
             className={`px-3 py-2 text-xs font-mono uppercase tracking-wider transition-colors ${
               activeTab === "orders"
                 ? "bg-zinc-900 text-white font-semibold"
-                : "text-zinc-600 hover:bg-zinc-50"
+                : "text-foreground hover:bg-muted"
             }`}
           >
             Rental Invoices & Orders
@@ -642,14 +642,14 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
         <div className="w-full max-w-[1340px] mx-auto space-y-6">
           {/* Add New Gear Form */}
           {gearView === "add" && (
-          <div className="min-w-0 border border-zinc-200 bg-white p-5 sm:p-6 lg:p-8 rounded-none shadow-sm">
+          <div className="min-w-0 border border-border bg-card p-5 sm:p-6 lg:p-8 rounded-none shadow-sm">
             <div className="mb-6 border-b border-zinc-100 pb-4">
               <h2 className="text-sm font-mono uppercase tracking-tight text-zinc-900 flex items-center gap-2">
                 <Plus className="h-4 w-4" />
                 Add New Equipment Listing
               </h2>
 
-              <p className="text-xs text-zinc-500 mt-1">
+              <p className="text-xs text-muted-foreground mt-1">
                 Register professional equipment with technical specs, deposits,
                 and gallery media.
               </p>
@@ -661,7 +661,7 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
                 <div className="md:col-span-2 space-y-1.5">
                   <Label
                     htmlFor="name"
-                    className="text-xs font-mono uppercase text-zinc-700"
+                    className="text-xs font-mono uppercase text-foreground"
                   >
                     Gear Name
                   </Label>
@@ -672,7 +672,7 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
                     value={gearName}
                     onChange={(e) => setGearName(e.target.value)}
                     placeholder="e.g., Nikon Z6 II Mirrorless Camera"
-                    className="rounded-none border-zinc-200 bg-background text-xs"
+                    className="rounded-none border-border bg-background text-xs"
                     required
                   />
                 </div>
@@ -680,7 +680,7 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
                 <div className="space-y-1.5">
                   <Label
                     htmlFor="brand"
-                    className="text-xs font-mono uppercase text-zinc-700"
+                    className="text-xs font-mono uppercase text-foreground"
                   >
                     Brand
                   </Label>
@@ -691,7 +691,7 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
                     value={brand}
                     onChange={(e) => setBrand(e.target.value)}
                     placeholder="e.g., Nikon"
-                    className="rounded-none border-zinc-200 bg-background text-xs"
+                    className="rounded-none border-border bg-background text-xs"
                     required
                   />
                 </div>
@@ -702,7 +702,7 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
                 <div className="space-y-1.5">
                   <Label
                     htmlFor="categoryId"
-                    className="text-xs font-mono uppercase text-zinc-700"
+                    className="text-xs font-mono uppercase text-foreground"
                   >
                     Category
                   </Label>
@@ -714,12 +714,12 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
                   >
                     <SelectTrigger
                       id="categoryId"
-                      className="rounded-none border-zinc-200 text-xs"
+                      className="rounded-none border-border text-xs"
                     >
                       <SelectValue placeholder="Select category" />
                     </SelectTrigger>
 
-                    <SelectContent className="rounded-none border-zinc-200 text-xs">
+                    <SelectContent className="rounded-none border-border text-xs">
                       {categories.map((cat) => (
                         <SelectItem
                           key={cat.id}
@@ -736,7 +736,7 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
                 <div className="space-y-1.5">
                   <Label
                     htmlFor="condition"
-                    className="text-xs font-mono uppercase text-zinc-700"
+                    className="text-xs font-mono uppercase text-foreground"
                   >
                     Gear Condition
                   </Label>
@@ -750,12 +750,12 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
                   >
                     <SelectTrigger
                       id="condition"
-                      className="rounded-none border-zinc-200 text-xs"
+                      className="rounded-none border-border text-xs"
                     >
                       <SelectValue placeholder="Select condition" />
                     </SelectTrigger>
 
-                    <SelectContent className="rounded-none border-zinc-200 text-xs">
+                    <SelectContent className="rounded-none border-border text-xs">
                       {Object.values(GearCondition).map((value) => (
                         <SelectItem
                           key={value}
@@ -772,7 +772,7 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
                 <div className="space-y-1.5">
                   <Label
                     htmlFor="status"
-                    className="text-xs font-mono uppercase text-zinc-700"
+                    className="text-xs font-mono uppercase text-foreground"
                   >
                     Listing Status
                   </Label>
@@ -786,12 +786,12 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
                   >
                     <SelectTrigger
                       id="status"
-                      className="rounded-none border-zinc-200 text-xs"
+                      className="rounded-none border-border text-xs"
                     >
                       <SelectValue placeholder="Select status" />
                     </SelectTrigger>
 
-                    <SelectContent className="rounded-none border-zinc-200 text-xs">
+                    <SelectContent className="rounded-none border-border text-xs">
                       {Object.values(GearStatus).map((value) => (
                         <SelectItem
                           key={value}
@@ -811,7 +811,7 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
                 <div className="space-y-1.5">
                   <Label
                     htmlFor="pricePerDay"
-                    className="text-xs font-mono uppercase text-zinc-700"
+                    className="text-xs font-mono uppercase text-foreground"
                   >
                     Price Per Day (৳)
                   </Label>
@@ -827,7 +827,7 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
                       )
                     }
                     placeholder="2500"
-                    className="rounded-none border-zinc-200 bg-background text-xs font-mono"
+                    className="rounded-none border-border bg-background text-xs font-mono"
                     required
                   />
                 </div>
@@ -835,7 +835,7 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
                 <div className="space-y-1.5">
                   <Label
                     htmlFor="securityDeposit"
-                    className="text-xs font-mono uppercase text-zinc-700"
+                    className="text-xs font-mono uppercase text-foreground"
                   >
                     Security Deposit (৳)
                   </Label>
@@ -851,7 +851,7 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
                       )
                     }
                     placeholder="10000"
-                    className="rounded-none border-zinc-200 bg-background text-xs font-mono"
+                    className="rounded-none border-border bg-background text-xs font-mono"
                     required
                   />
                 </div>
@@ -859,7 +859,7 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
                 <div className="space-y-1.5">
                   <Label
                     htmlFor="quantity"
-                    className="text-xs font-mono uppercase text-zinc-700"
+                    className="text-xs font-mono uppercase text-foreground"
                   >
                     Quantity Stock
                   </Label>
@@ -875,7 +875,7 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
                       )
                     }
                     placeholder="2"
-                    className="rounded-none border-zinc-200 bg-background text-xs font-mono"
+                    className="rounded-none border-border bg-background text-xs font-mono"
                     required
                   />
                 </div>
@@ -885,7 +885,7 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
               <div className="space-y-1.5">
                 <Label
                   htmlFor="description"
-                  className="text-xs font-mono uppercase text-zinc-700"
+                  className="text-xs font-mono uppercase text-foreground"
                 >
                   Description
                 </Label>
@@ -897,7 +897,7 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="Full-frame 24.5 MP mirrorless camera ideal for 4K video and low-light photography..."
-                  className="rounded-none border-zinc-200 bg-background text-xs resize-none"
+                  className="rounded-none border-border bg-background text-xs resize-none"
                   required
                 />
               </div>
@@ -923,7 +923,7 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
 
               {/* Image Upload */}
               <div className="space-y-3 border-t border-zinc-100 pt-4">
-                <Label className="text-xs font-mono uppercase text-zinc-700 flex items-center gap-1.5">
+                <Label className="text-xs font-mono uppercase text-foreground flex items-center gap-1.5">
                   <ImageIcon className="h-3.5 w-3.5" />
                   Gear Images
                 </Label>
@@ -941,7 +941,7 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
                   type="button"
                   variant="outline"
                   onClick={() => fileInputRef.current?.click()}
-                  className="rounded-none text-xs border-zinc-200 h-9 px-4 font-mono gap-1.5"
+                  className="rounded-none text-xs border-border h-9 px-4 font-mono gap-1.5"
                 >
                   <Upload className="h-3.5 w-3.5" />
                   Choose Images
@@ -951,7 +951,7 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
                   {previews.map((src, idx) => (
                     <div
                       key={idx}
-                      className="relative border border-zinc-200 bg-zinc-50"
+                      className="relative border border-border bg-muted"
                     >
                       <img
                         src={src}
@@ -962,12 +962,12 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
                       <button
                         type="button"
                         onClick={() => handleRemoveImage(idx)}
-                        className="absolute top-1 right-1 bg-white border border-zinc-200 p-0.5 text-zinc-500 hover:text-red-600 transition-colors"
+                        className="absolute top-1 right-1 bg-card border border-border p-0.5 text-muted-foreground hover:text-red-600 transition-colors"
                       >
                         <X className="h-3.5 w-3.5" />
                       </button>
 
-                      <p className="truncate px-2 py-1 text-[10px] font-mono text-zinc-600">
+                      <p className="truncate px-2 py-1 text-[10px] font-mono text-foreground">
                         {imageFiles[idx].name}
                       </p>
                     </div>
@@ -977,7 +977,7 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
 
               {/* Dynamic Specifications */}
               <div className="space-y-3 border-t border-zinc-100 pt-4">
-                <Label className="text-xs font-mono uppercase text-zinc-700 flex items-center gap-1.5">
+                <Label className="text-xs font-mono uppercase text-foreground flex items-center gap-1.5">
                   <Layers className="h-3.5 w-3.5" />
                   Technical Specifications
                 </Label>
@@ -987,21 +987,21 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
                     placeholder="Key (e.g., sensor)"
                     value={specKey}
                     onChange={(e) => setSpecKey(e.target.value)}
-                    className="rounded-none border-zinc-200 text-xs font-mono md:col-span-2"
+                    className="rounded-none border-border text-xs font-mono md:col-span-2"
                   />
 
                   <Input
                     placeholder="Value (e.g., Full Frame CMOS)"
                     value={specValue}
                     onChange={(e) => setSpecValue(e.target.value)}
-                    className="rounded-none border-zinc-200 text-xs font-mono md:col-span-2"
+                    className="rounded-none border-border text-xs font-mono md:col-span-2"
                   />
 
                   <Button
                     type="button"
                     variant="outline"
                     onClick={handleAddSpec}
-                    className="rounded-none text-xs border-zinc-200 h-9 font-mono"
+                    className="rounded-none text-xs border-border h-9 font-mono"
                   >
                     Add Specification
                   </Button>
@@ -1011,7 +1011,7 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
                   {specifications.map((spec, idx) => (
                     <div
                       key={idx}
-                      className="flex items-center justify-between border border-zinc-200 px-3 py-1.5 bg-zinc-50 text-xs font-mono"
+                      className="flex items-center justify-between border border-border px-3 py-1.5 bg-muted text-xs font-mono"
                     >
                       <div className="truncate">
                         <span className="text-zinc-400 uppercase text-[10px]">
@@ -1064,14 +1064,14 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
 
           {/* Inventory Table */}
           {gearView === "inventory" && (
-          <div className="w-full min-w-0 border border-zinc-200 bg-white p-5 sm:p-6 lg:p-6 2xl:p-8 rounded-none shadow-sm">
+          <div className="w-full min-w-0 border border-border bg-card p-5 sm:p-6 lg:p-6 2xl:p-8 rounded-none shadow-sm">
             <div className="mb-6 flex items-center justify-between border-b border-zinc-100 pb-4">
               <div>
                 <h2 className="text-sm font-mono uppercase tracking-tight text-zinc-900">
                   Active Inventory
                 </h2>
 
-                <p className="text-xs text-zinc-500 mt-1">
+                <p className="text-xs text-muted-foreground mt-1">
                   Manage stock allocations and equipment state.
                 </p>
               </div>
@@ -1084,24 +1084,24 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
             <div className="w-full overflow-x-auto">
               <Table className="min-w-[620px]">
                 <TableHeader>
-                  <TableRow className="border-zinc-200 hover:bg-transparent">
-                    <TableHead className="text-xs font-mono uppercase text-zinc-500">
+                  <TableRow className="border-border hover:bg-transparent">
+                    <TableHead className="text-xs font-mono uppercase text-muted-foreground">
                       Name
                     </TableHead>
 
-                    <TableHead className="text-xs font-mono uppercase text-zinc-500">
+                    <TableHead className="text-xs font-mono uppercase text-muted-foreground">
                       Category
                     </TableHead>
 
-                    <TableHead className="text-xs font-mono uppercase text-zinc-500">
+                    <TableHead className="text-xs font-mono uppercase text-muted-foreground">
                       Rate/Day
                     </TableHead>
 
-                    <TableHead className="text-xs font-mono uppercase text-zinc-500">
+                    <TableHead className="text-xs font-mono uppercase text-muted-foreground">
                       Stock
                     </TableHead>
 
-                    <TableHead className="text-xs font-mono uppercase text-zinc-500 text-right">
+                    <TableHead className="text-xs font-mono uppercase text-muted-foreground text-right">
                       Actions
                     </TableHead>
                   </TableRow>
@@ -1114,7 +1114,7 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
                         {item.name}
                       </TableCell>
 
-                      <TableCell className="text-zinc-600">
+                      <TableCell className="text-foreground">
                         {item.category?.name}
                       </TableCell>
 
@@ -1122,7 +1122,7 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
                         ৳{item.pricePerDay}
                       </TableCell>
 
-                      <TableCell className="font-mono text-zinc-600">
+                      <TableCell className="font-mono text-foreground">
                         {item.quantity}
                       </TableCell>
 
@@ -1131,7 +1131,7 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
                           variant="outline"
                           size="sm"
                           onClick={() => setRestockItem(item)}
-                          className="h-7 text-xs rounded-none border-zinc-200 text-zinc-800 hover:bg-zinc-100 gap-1.5 font-mono"
+                          className="h-7 text-xs rounded-none border-border text-zinc-800 hover:bg-muted gap-1.5 font-mono"
                         >
                           <RefreshCw className="h-3 w-3" />
                           Restock
@@ -1141,7 +1141,7 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
                           variant="ghost"
                           size="sm"
                           onClick={() => handleOpenEdit(item)}
-                          className="h-7 text-xs rounded-none hover:bg-zinc-100 font-mono"
+                          className="h-7 text-xs rounded-none hover:bg-muted font-mono"
                         >
                           Edit
                         </Button>
@@ -1162,7 +1162,7 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
                     <TableRow>
                       <TableCell
                         colSpan={5}
-                        className="text-center text-xs text-zinc-500 py-8"
+                        className="text-center text-xs text-muted-foreground py-8"
                       >
                         No equipment listed yet.
                       </TableCell>
@@ -1179,14 +1179,14 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
       {/* TAB 2: INVOICES & RENTAL ORDERS */}
       {activeTab === "orders" && (
         <div className="space-y-6">
-          <div className="border border-zinc-200 bg-white p-8 rounded-none shadow-xs">
+          <div className="border border-border bg-card p-8 rounded-none shadow-xs">
             <div className="mb-6 flex items-center justify-between border-b border-zinc-100 pb-4">
               <div>
                 <h2 className="text-sm font-mono uppercase tracking-tight text-zinc-900">
                   Rental Invoices & Manifests
                 </h2>
 
-                <p className="text-xs text-zinc-500 mt-1">
+                <p className="text-xs text-muted-foreground mt-1">
                   Select any transaction to inspect the official paper invoice
                   receipt.
                 </p>
@@ -1207,9 +1207,9 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
                     setSelectedInvoice(ord);
                     window.history.pushState({}, "", `/dashboard/provider?orderId=${ord.id}`);
                   }}
-                  className="group border border-zinc-200 bg-[#FDFBF7] p-6 rounded-none hover:border-zinc-900 cursor-pointer transition-all relative flex flex-col justify-between space-y-4 shadow-2xs"
+                  className="group border border-border bg-[#FDFBF7] p-6 rounded-none hover:border-zinc-900 cursor-pointer transition-all relative flex flex-col justify-between space-y-4 shadow-2xs"
                 >
-                  <div className="flex items-start justify-between border-b border-zinc-200/80 pb-3">
+                  <div className="flex items-start justify-between border-b border-border/80 pb-3">
                     <div>
                       <span className="text-[10px] font-mono text-zinc-400 uppercase tracking-widest">
                         [ RENTAL INVOICE ]
@@ -1226,14 +1226,14 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
                           ? "bg-blue-50 text-blue-800 border-blue-200"
                           : ord.status === "PICKED_UP"
                             ? "bg-emerald-50 text-emerald-800 border-emerald-200"
-                            : "bg-zinc-100 text-zinc-800 border-zinc-200"
+                            : "bg-muted text-zinc-800 border-border"
                       }`}
                     >
                       {ord.status}
                     </span>
                   </div>
 
-                  <div className="space-y-1.5 text-xs text-zinc-700 font-mono">
+                  <div className="space-y-1.5 text-xs text-foreground font-mono">
                     <div className="flex justify-between">
                       <span className="text-zinc-400">Client:</span>
 
@@ -1259,8 +1259,8 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
                     </div>
                   </div>
 
-                  <div className="pt-3 border-t border-zinc-200/80 flex items-center justify-between text-xs font-mono">
-                    <span className="text-zinc-500">
+                  <div className="pt-3 border-t border-border/80 flex items-center justify-between text-xs font-mono">
+                    <span className="text-muted-foreground">
                       Total: ৳{Number(ord.totalAmount).toLocaleString()}
                     </span>
 
@@ -1279,7 +1279,7 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
       {/* PAPER INVOICE MODAL */}
       {selectedInvoice && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/60 backdrop-blur-xs p-4">
-          <div className="w-full max-w-xl border border-zinc-300 bg-[#FDFBF7] p-8 rounded-none shadow-2xl space-y-6 relative font-serif">
+          <div className="w-full max-w-xl border border-border bg-[#FDFBF7] p-8 rounded-none shadow-2xl space-y-6 relative font-serif">
             <button
               onClick={() => {
                 setSelectedInvoice(null);
@@ -1290,8 +1290,8 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
               <X className="h-5 w-5" />
             </button>
 
-            <div className="text-center border-b border-zinc-300 pb-6 space-y-1">
-              <span className="text-[10px] font-mono uppercase tracking-widest text-zinc-500">
+            <div className="text-center border-b border-border pb-6 space-y-1">
+              <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
                 GearUp Rental Corp — Official Statement
               </span>
 
@@ -1299,13 +1299,13 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
                 Equipment Rental Invoice
               </h2>
 
-              <p className="text-xs font-mono text-zinc-500">
+              <p className="text-xs font-mono text-muted-foreground">
                 INV-{selectedInvoice.id.slice(0, 8).toUpperCase()} • Issued:{" "}
                 {new Date(selectedInvoice.createdAt).toLocaleDateString()}
               </p>
             </div>
 
-            <div className="grid grid-cols-2 gap-4 text-xs font-mono border-b border-zinc-200 pb-6">
+            <div className="grid grid-cols-2 gap-4 text-xs font-mono border-b border-border pb-6">
               <div>
                 <span className="text-zinc-400 block uppercase text-[10px]">
                   Billed To:
@@ -1315,7 +1315,7 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
                   {selectedInvoice.customer.name}
                 </span>
 
-                <span className="text-zinc-600">
+                <span className="text-foreground">
                   {selectedInvoice.customer.email}
                 </span>
               </div>
@@ -1329,7 +1329,7 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
                    {new Date(selectedInvoice.startDate).toLocaleDateString()} - {new Date(selectedInvoice.endDate).toLocaleDateString()}
                 </span>
 
-                <span className="text-zinc-600">
+                <span className="text-foreground">
                   {Math.ceil((new Date(selectedInvoice.endDate).getTime() - new Date(selectedInvoice.startDate).getTime()) / (1000 * 3600 * 24)) + 1} Billing Days
                 </span>
               </div>
@@ -1342,7 +1342,7 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
 
               <table className="w-full text-xs font-mono border-collapse">
                 <thead>
-                  <tr className="border-b border-zinc-300 text-left text-zinc-500">
+                  <tr className="border-b border-border text-left text-muted-foreground">
                     <th className="pb-2 font-medium">Description</th>
                     <th className="pb-2 font-medium text-center">Qty</th>
                     <th className="pb-2 font-medium text-right">Rate/Day</th>
@@ -1357,11 +1357,11 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
                         {item.gearItem.name}
                       </td>
 
-                      <td className="py-3 text-center text-zinc-600">
+                      <td className="py-3 text-center text-foreground">
                         {item.quantity}
                       </td>
 
-                      <td className="py-3 text-right text-zinc-600">
+                      <td className="py-3 text-right text-foreground">
                         ৳{Number(item.pricePerDay).toLocaleString()}
                       </td>
 
@@ -1374,9 +1374,9 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
               </table>
             </div>
 
-            <div className="border-t border-zinc-300 pt-4 flex justify-between items-center font-mono text-xs">
+            <div className="border-t border-border pt-4 flex justify-between items-center font-mono text-xs">
               <div className="space-y-0.5">
-                <span className="text-zinc-500 block text-[10px]">
+                <span className="text-muted-foreground block text-[10px]">
                   Fulfillment Status:
                 </span>
 
@@ -1386,7 +1386,7 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
               </div>
 
               <div className="text-right space-y-1">
-                <div className="text-zinc-500">
+                <div className="text-muted-foreground">
                   Subtotal: ৳
                   {Number(selectedInvoice.totalAmount).toLocaleString()}
                 </div>
@@ -1399,9 +1399,9 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
               </div>
             </div>
 
-            <div className="flex items-center justify-between pt-4 border-t border-zinc-300">
+            <div className="flex items-center justify-between pt-4 border-t border-border">
               <div className="flex items-center gap-2">
-                <span className="text-[11px] font-mono text-zinc-500">
+                <span className="text-[11px] font-mono text-muted-foreground">
                   Update Status:
                 </span>
 
@@ -1413,11 +1413,11 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
                       setShowStatusError(false);
                     }}
                   >
-                    <SelectTrigger className="h-7 w-[130px] text-xs rounded-none border-zinc-300 bg-white font-mono">
+                    <SelectTrigger className="h-7 w-[130px] text-xs rounded-none border-border bg-card font-mono">
                       <SelectValue placeholder="Status" />
                     </SelectTrigger>
 
-                    <SelectContent className="rounded-none border-zinc-300 text-xs font-mono">
+                    <SelectContent className="rounded-none border-border text-xs font-mono">
                       {STATUS_FLOW.map((statusOption) => {
                         const currentIndex = STATUS_FLOW.indexOf(selectedInvoice.status);
                         const optionIndex = STATUS_FLOW.indexOf(statusOption);
@@ -1491,7 +1491,7 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
       {/* EDIT GEAR MODAL */}
       {editingItem && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-zinc-950/60 backdrop-blur-sm p-4">
-          <div className="w-full max-w-3xl max-h-[90vh] overflow-y-auto border border-zinc-200 bg-white p-5 sm:p-7 shadow-2xl">
+          <div className="w-full max-w-3xl max-h-[90vh] overflow-y-auto border border-border bg-card p-5 sm:p-7 shadow-2xl">
             <div className="flex items-center justify-between border-b border-zinc-100 pb-4 mb-5">
               <div>
                 <span className="text-[10px] font-mono uppercase tracking-widest text-zinc-400">
@@ -1500,7 +1500,7 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
                 <h2 className="text-lg font-semibold text-zinc-900">
                   Edit Gear Item
                 </h2>
-                <p className="text-xs text-zinc-500 mt-1">
+                <p className="text-xs text-muted-foreground mt-1">
                   Update listing details, images, stock, and specifications.
                 </p>
               </div>
@@ -1539,7 +1539,7 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-xs font-mono uppercase text-zinc-700">
+                  <Label className="text-xs font-mono uppercase text-foreground">
                     Category
                   </Label>
                   <Select
@@ -1548,12 +1548,12 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
                       handleEditFieldChange("categoryId", value)
                     }
                   >
-                    <SelectTrigger className="rounded-none border-zinc-200 text-xs font-mono">
+                    <SelectTrigger className="rounded-none border-border text-xs font-mono">
                       <SelectValue placeholder="Select category" />
                     </SelectTrigger>
                     <SelectContent
                       position="popper"
-                      className="z-[70] rounded-none border-zinc-200 text-xs font-mono"
+                      className="z-[70] rounded-none border-border text-xs font-mono"
                     >
                       {categories.map((category) => (
                         <SelectItem
@@ -1568,7 +1568,7 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
                   </Select>
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-xs font-mono uppercase text-zinc-700">
+                  <Label className="text-xs font-mono uppercase text-foreground">
                     Condition
                   </Label>
                   <Select
@@ -1577,12 +1577,12 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
                       handleEditFieldChange("condition", value)
                     }
                   >
-                    <SelectTrigger className="rounded-none border-zinc-200 text-xs font-mono">
+                    <SelectTrigger className="rounded-none border-border text-xs font-mono">
                       <SelectValue placeholder="Select condition" />
                     </SelectTrigger>
                     <SelectContent
                       position="popper"
-                      className="z-[70] rounded-none border-zinc-200 text-xs font-mono"
+                      className="z-[70] rounded-none border-border text-xs font-mono"
                     >
                       {Object.values(GearCondition).map((value) => (
                         <SelectItem
@@ -1639,7 +1639,7 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-xs font-mono uppercase text-zinc-700">
+                  <Label className="text-xs font-mono uppercase text-foreground">
                     Status
                   </Label>
                   <Select
@@ -1648,12 +1648,12 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
                       handleEditFieldChange("status", value)
                     }
                   >
-                    <SelectTrigger className="rounded-none border-zinc-200 text-xs font-mono">
+                    <SelectTrigger className="rounded-none border-border text-xs font-mono">
                       <SelectValue placeholder="Select status" />
                     </SelectTrigger>
                     <SelectContent
                       position="popper"
-                      className="z-[70] rounded-none border-zinc-200 text-xs font-mono"
+                      className="z-[70] rounded-none border-border text-xs font-mono"
                     >
                       {Object.values(GearStatus).map((value) => (
                         <SelectItem
@@ -1687,7 +1687,7 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
                   <ImageIcon className="h-4 w-4" /> Existing Images
                 </Label>
                 {editExistingImages.length === 0 ? (
-                  <p className="text-xs text-zinc-500">
+                  <p className="text-xs text-muted-foreground">
                     No existing images. Add new images below if needed.
                   </p>
                 ) : (
@@ -1695,7 +1695,7 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
                     {editExistingImages.map((src, index) => (
                       <div
                         key={`${src}-${index}`}
-                        className="relative border border-zinc-200"
+                        className="relative border border-border"
                       >
                         <img
                           src={src}
@@ -1709,7 +1709,7 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
                               prev.filter((_, i) => i !== index),
                             )
                           }
-                          className="absolute top-1 right-1 bg-white border p-1 text-red-600"
+                          className="absolute top-1 right-1 bg-card border p-1 text-red-600"
                           aria-label="Remove existing image"
                         >
                           <X className="h-3.5 w-3.5" />
@@ -1778,7 +1778,7 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
                   {editSpecifications.map((spec, index) => (
                     <div
                       key={`${spec.key}-${index}`}
-                      className="flex items-center justify-between gap-2 border bg-zinc-50 px-3 py-2 text-xs"
+                      className="flex items-center justify-between gap-2 border bg-muted px-3 py-2 text-xs"
                     >
                       <span className="min-w-0 truncate">
                         <strong>{spec.key}:</strong> {spec.value}
@@ -1831,7 +1831,7 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
       {/* RESTOCK MODAL */}
       {restockItem && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/40 backdrop-blur-xs p-4">
-          <div className="w-full max-w-md border border-zinc-200 bg-white p-6 rounded-none shadow-lg space-y-4">
+          <div className="w-full max-w-md border border-border bg-card p-6 rounded-none shadow-lg space-y-4">
             <div className="flex items-center justify-between border-b border-zinc-100 pb-3">
               <div>
                 <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-400">
@@ -1853,7 +1853,7 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
 
             <form onSubmit={handleRestockSubmit} className="space-y-4">
               <div className="space-y-1">
-                <p className="text-xs text-zinc-500 font-mono">Target Item:</p>
+                <p className="text-xs text-muted-foreground font-mono">Target Item:</p>
 
                 <p className="text-xs font-semibold text-zinc-900">
                   {restockItem.name}
@@ -1863,7 +1863,7 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
               <div className="space-y-1.5">
                 <Label
                   htmlFor="addQuantity"
-                  className="text-xs font-mono uppercase text-zinc-700"
+                  className="text-xs font-mono uppercase text-foreground"
                 >
                   Additional Quantity to Add
                 </Label>
@@ -1874,7 +1874,7 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
                   min="1"
                   value={restockQuantity}
                   onChange={(e) => setRestockQuantity(Number(e.target.value))}
-                  className="rounded-none border-zinc-200 text-xs font-mono focus:ring-1 focus:ring-zinc-900"
+                  className="rounded-none border-border text-xs font-mono focus:ring-1 focus:ring-zinc-900"
                   required
                 />
               </div>
@@ -1884,7 +1884,7 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
                   type="button"
                   variant="outline"
                   onClick={() => setRestockItem(null)}
-                  className="rounded-none text-xs h-9 border-zinc-200"
+                  className="rounded-none text-xs h-9 border-border"
                 >
                   Cancel
                 </Button>

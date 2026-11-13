@@ -143,13 +143,16 @@ export default function Navbar({ user, k }: NavbarProps) {
                 </Link>
               );
             })}
+          </div>
 
-            {/* Theme Toggle */}
+          {/* Actions & User Profile */}
+          <div className="hidden items-center space-x-3 md:flex font-mono">
+            {/* Theme Toggle beside user image/actions */}
             {mounted && (
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-8 px-3 rounded-none text-muted-foreground hover:text-foreground hover:bg-accent/10 uppercase"
+                className="h-8 px-2 rounded-none text-muted-foreground hover:text-foreground hover:bg-accent/10 uppercase"
                 onClick={() =>
                   setTheme(theme === "dark" ? "light" : "dark")
                 }
@@ -162,10 +165,14 @@ export default function Navbar({ user, k }: NavbarProps) {
                 )}
               </Button>
             )}
-          </div>
 
-          {/* Actions & User Profile */}
-          <div className="hidden items-center space-x-3 md:flex font-mono">
+            {/* Role Badge in Navbar */}
+            {user && (
+              <span className="text-[10px] font-semibold font-mono uppercase bg-accent/20 text-foreground px-2 py-1 rounded-none border border-dashed border-border hidden sm:inline-block">
+                {user?.role || "CUSTOMER"}
+              </span>
+            )}
+
             {!user ? (
               <>
                 <Button
@@ -189,9 +196,9 @@ export default function Navbar({ user, k }: NavbarProps) {
                 <DropdownMenuTrigger asChild>
                   <Button
                     variant="ghost"
-                    className="relative h-8 w-8 rounded-none p-0 focus-visible:ring-0 border border-dashed border-border"
+                    className="relative h-auto py-1 px-2 rounded-none focus-visible:ring-0 border border-dashed border-border flex items-center gap-2.5 hover:bg-accent/10"
                   >
-                    <div className="h-8 w-8 rounded-none bg-accent flex items-center justify-center overflow-hidden">
+                    <div className="h-8 w-8 rounded-none bg-accent flex items-center justify-center overflow-hidden shrink-0">
                       {user?.profile?.profilePhoto ? (
                         <img
                           src={user?.profile?.profilePhoto}
@@ -204,6 +211,9 @@ export default function Navbar({ user, k }: NavbarProps) {
                         </span>
                       )}
                     </div>
+                    <span className="text-xs font-bold leading-none text-foreground">
+                      {user?.name || "User"}
+                    </span>
                   </Button>
                 </DropdownMenuTrigger>
 
@@ -390,6 +400,26 @@ export default function Navbar({ user, k }: NavbarProps) {
           <div className="mt-3 flex flex-col gap-2 border-t border-dashed border-border pt-3">
             {user ? (
               <>
+                <div className="px-3 py-1.5 flex items-center gap-2.5 border border-dashed border-border bg-accent/5">
+                  <div className="h-8 w-8 rounded-none bg-accent flex items-center justify-center overflow-hidden shrink-0">
+                    {user?.profile?.profilePhoto ? (
+                      <img
+                        src={user?.profile?.profilePhoto}
+                        alt={user?.name || "User Avatar"}
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <span className="text-xs font-semibold font-mono text-accent-foreground">
+                        {getInitials(user?.name || "User")}
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex flex-col text-left">
+                    <span className="text-xs font-bold text-foreground">{user?.name || "User"}</span>
+                    <span className="text-[10px] text-muted-foreground uppercase font-semibold">{user?.role || "CUSTOMER"}</span>
+                  </div>
+                </div>
+
                 {isProvider && (
                   <Link
                     href="/dashboard/provider"

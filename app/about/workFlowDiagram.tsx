@@ -95,7 +95,7 @@ export default function WorkflowDiagram() {
   );
 
   return (
-    <div className="w-full h-[500px] bg-[#FDFBF7] border border-zinc-200 relative">
+    <div className="w-full h-[500px] bg-[#FDFBF7] border border-border relative">
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -104,8 +104,8 @@ export default function WorkflowDiagram() {
         onConnect={onConnect}
         fitView
       >
-        <Controls className="bg-white border border-zinc-200 shadow-xs rounded-none" />
-        <MiniMap className="bg-white border border-zinc-200" zoomable pannable />
+        <Controls className="bg-card border border-border shadow-xs rounded-none" />
+        <MiniMap className="bg-card border border-border" zoomable pannable />
         <Background gap={16} size={1} color="#e4e4e7" />
       </ReactFlow>
     </div>

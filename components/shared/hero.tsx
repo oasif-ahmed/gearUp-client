@@ -121,10 +121,10 @@ export default function Hero() {
           <div className="lg:col-span-7 space-y-8">
             <div ref={badgeRef} className="flex items-center gap-2 opacity-0">
               <Badge className="rounded-none bg-primary text-primary-foreground hover:bg-primary text-[10px] uppercase tracking-widest px-2.5 py-1 font-mono">
-                [ Automated Billing Layer ]
+                [ Sports Gear Rental Hub ]
               </Badge>
               <span className="text-[10px] uppercase text-muted-foreground tracking-wider font-mono">
-                • V2.4 Engine Active
+                • Inventory Live & Ready
               </span>
             </div>
 
@@ -133,13 +133,13 @@ export default function Hero() {
                 ref={headlineRef} 
                 className="text-4xl sm:text-6xl font-light tracking-tight text-foreground font-serif leading-[1.1] opacity-0"
               >
-                The financial infrastructure for modern equipment logistics.
+                Rent professional-grade outdoor and sports equipment instantly.
               </h1>
               <p 
                 ref={textRef} 
                 className="text-sm sm:text-base text-muted-foreground max-w-xl leading-relaxed font-sans pt-2 opacity-0"
               >
-                Automate escrow settlements, multi-tier vendor payouts, and real-time invoice reconciliation with precision ledger tracking and zero manual friction.
+                Access top-tier gear for your next adventure. Browse a curated selection of reliable equipment with secure reservations and frictionless fulfillment.
               </p>
             </div>
 
@@ -148,8 +148,8 @@ export default function Hero() {
                 asChild
                 className="rounded-none bg-primary text-primary-foreground hover:opacity-90 text-xs font-mono uppercase px-7 h-12 shadow-xs flex items-center gap-2 opacity-0"
               >
-                <Link href="/register">
-                  Start Free Trial <ArrowRight className="h-4 w-4" />
+                <Link href="/gear-items">
+                  Browse Catalog <ArrowRight className="h-4 w-4" />
                 </Link>
               </Button>
               <Button
@@ -157,7 +157,7 @@ export default function Hero() {
                 variant="outline"
                 className="rounded-none border-border bg-card text-foreground hover:bg-accent text-xs font-mono uppercase px-6 h-12 opacity-0"
               >
-                <Link href="/about">View Architecture</Link>
+                <Link href="/about">How It Works</Link>
               </Button>
             </div>
 
@@ -190,11 +190,11 @@ export default function Hero() {
                 <div className="flex items-center gap-2">
                   <FileText className="h-4 w-4 text-foreground" />
                   <span className="font-bold uppercase text-xs tracking-wider text-foreground font-mono">
-                    Invoice #INV-2026-089
+                    Rental Summary #REF-2026
                   </span>
                 </div>
                 <Badge variant="outline" className="rounded-none text-[9px] uppercase font-mono bg-emerald-500/10 text-emerald-600 border-emerald-500/20">
-                  Paid & Settled
+                  Ready to Rent
                 </Badge>
               </div>
 
@@ -206,7 +206,7 @@ export default function Hero() {
                     activeTab === "growth" ? "bg-background text-foreground shadow-2xs font-bold" : "text-muted-foreground hover:text-foreground"
                   }`}
                 >
-                  Growth Tier
+                  Daily Rate
                 </button>
                 <button
                   onClick={() => setActiveTab("enterprise")}
@@ -214,43 +214,43 @@ export default function Hero() {
                     activeTab === "enterprise" ? "bg-background text-foreground shadow-2xs font-bold" : "text-muted-foreground hover:text-foreground"
                   }`}
                 >
-                  Enterprise SLA
+                  Weekly Bundle
                 </button>
               </div>
 
               {/* Line Items */}
               <div className="space-y-3 font-sans text-xs">
                 <div className="flex justify-between py-2 border-b border-border text-muted-foreground">
-                  <span>Manduka PRO Premium Yoga and Exercise Mat</span>
-                  <span className="font-mono font-medium text-foreground">$1,450.00</span>
+                  <span>Pro Carbon Mountain Bike</span>
+                  <span className="font-mono font-medium text-foreground">$150.00/day</span>
                 </div>
                 <div className="flex justify-between py-2 border-b border-border text-muted-foreground">
-                  <span>CAP Barbell 30kg Rubber Coated Hex Dumbbell Set</span>
-                  <span className="font-mono font-medium text-foreground">$320.00</span>
+                  <span>Professional Camping Kit</span>
+                  <span className="font-mono font-medium text-foreground">$80.00/day</span>
                 </div>
                 <div className="flex justify-between py-2 border-b border-border text-muted-foreground">
-                  <span>Reebok Professional Adjustable Weight Bench</span>
-                  <span className="font-mono font-medium text-foreground">$21.84</span>
+                  <span>Portable Navigation System</span>
+                  <span className="font-mono font-medium text-foreground">$20.00/day</span>
                 </div>
               </div>
 
               {/* Total Calculation */}
               <div className="bg-background p-4 border border-border space-y-2 font-mono">
                 <div className="flex justify-between text-[11px] text-muted-foreground">
-                  <span>Subtotal</span>
-                  <span>$1,791.84</span>
+                  <span>Daily Subtotal</span>
+                  <span>$250.00</span>
                 </div>
                 <div className="flex justify-between text-sm font-bold text-foreground pt-1 border-t border-border">
-                  <span>Total Due</span>
-                  <span className="text-emerald-600">$1,791.84 USD</span>
+                  <span>Total Per Day</span>
+                  <span className="text-emerald-600">$250.00 USD</span>
                 </div>
               </div>
 
               {/* Panel Footer Action */}
               <div className="flex items-center justify-between pt-2">
-                <span className="text-[10px] text-muted-foreground font-mono">Generated via Stripe Connect</span>
+                <span className="text-[10px] text-muted-foreground font-mono">Secure Rental Agreement</span>
                 <button className="inline-flex items-center gap-1.5 text-[11px] font-mono text-foreground hover:underline font-semibold">
-                  <Download className="h-3.5 w-3.5" /> Download PDF
+                  <Download className="h-3.5 w-3.5" /> Save Quote
                 </button>
               </div>
 
