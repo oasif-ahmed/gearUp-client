@@ -15,6 +15,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import Hero from "@/components/shared/hero";
 import SocialProof15 from "@/components/shared/socialProof";
 
+export const dynamic = 'force-dynamic';
+
 export default async function PublicHome() {
   let featuredGear = [];
   try {

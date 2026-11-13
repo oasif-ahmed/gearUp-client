@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useCallback } from 'react';
-import * as anime from 'animejs';
+import { animate, createTimeline as createAnimeTimeline, stagger, onScroll } from 'animejs';
+
+export { animate };
 
 /**
  * Senior-level animation utilities using animejs v4
@@ -178,7 +180,7 @@ export const easings = {
  * Create a timeline with consistent defaults
  */
 export function createTimeline(options = {}) {
-  const tl = (anime as any).timeline(options);
+  const tl = createAnimeTimeline(options);
   return tl;
 }
 
@@ -186,10 +188,10 @@ export function createTimeline(options = {}) {
  * Animate elements with stagger
  */
 export function staggerElements(elements: Element[], preset: keyof typeof staggerPresets = 'normal', customAnimation = {}) {
-  const stagger = staggerPresets[preset];
-  return anime.animate(elements, {
+  const staggerPreset = staggerPresets[preset];
+  return animate(elements, {
     ...animationPresets.staggerItem,
-    delay: anime.stagger(stagger.each, { start: stagger.start }),
+    delay: stagger(staggerPreset.each, { start: staggerPreset.start }),
     ...customAnimation,
   });
 }
@@ -222,7 +224,7 @@ export function animatePageTransition(
  * Animate modal open/close
  */
 export function animateModal(modal: Element, isOpening: boolean) {
-  return anime.animate(modal, {
+  return animate(modal, {
     ...(isOpening ? animationPresets.modalEnter : animationPresets.modalExit),
   });
 }
@@ -231,7 +233,7 @@ export function animateModal(modal: Element, isOpening: boolean) {
  * Animate card hover
  */
 export function animateCardHover(card: Element, isHovering: boolean) {
-  return anime.animate(card, {
+  return animate(card, {
     ...(isHovering ? animationPresets.cardHover : {
       translateY: 0,
       boxShadow: 'none',
@@ -245,14 +247,14 @@ export function animateCardHover(card: Element, isHovering: boolean) {
  * Animate button press
  */
 export function animateButtonPress(button: Element) {
-  return anime.animate(button, animationPresets.buttonPress);
+  return animate(button, animationPresets.buttonPress);
 }
 
 /**
  * Animate form field focus
  */
 export function animateFieldFocus(field: Element, isFocused: boolean) {
-  return anime.animate(field, {
+  return animate(field, {
     ...(isFocused ? animationPresets.fieldFocus : {
       borderColor: 'var(--border)',
       boxShadow: 'none',
@@ -273,24 +275,27 @@ export function animateList(items: Element[], preset: keyof typeof staggerPreset
  * Animate counter
  */
 export function animateCounter(element: Element, from: number, to: number, duration = 1000) {
-  return (anime as any).animate({
-    targets: { value: from },
-    value: to,
-    duration,
-    easing: 'easeOutExpo',
-    update: (anim: any) => {
-      if (element) {
-        element.textContent = Math.round(anim.animations[0].currentValue).toLocaleString();
-      }
+  return animate(
+    {
+      value: from
     },
-  });
+    {
+      value: to,
+      duration,
+      easing: 'easeOutExpo',
+      update: (anim: any) => {
+        if (element) {
+          element.textContent = Math.round(anim.animations[0].currentValue).toLocaleString();
+        }
+      },
+    });
 }
 
 /**
  * Animate progress bar
  */
 export function animateProgress(progress: Element, to: number, duration = 800) {
-  return anime.animate(progress, {
+  return animate(progress, {
     width: `${to}%`,
     duration,
     easing: 'easeOutExpo',
@@ -307,14 +312,14 @@ export function animateHeight(element: Element, height: number | 'auto', duratio
     const targetHeight = (element as HTMLElement).offsetHeight;
     (element as HTMLElement).style.height = `${currentHeight}px`;
     
-    return anime.animate(element, {
+    return animate(element, {
       height: targetHeight,
       duration: 400,
       easing: 'easeOutExpo',
     });
   }
   
-  return anime.animate(element, {
+  return animate(element, {
     height,
     duration,
     easing: 'easeOutExpo',
@@ -331,14 +336,14 @@ export function animateWidth(element: Element, width: number | 'auto', duration 
     const targetWidth = (element as HTMLElement).offsetWidth;
     (element as HTMLElement).style.width = `${currentWidth}px`;
     
-    return anime.animate(element, {
+    return animate(element, {
       width: targetWidth,
       duration: 400,
       easing: 'easeOutExpo',
     });
   }
   
-  return anime.animate(element, {
+  return animate(element, {
     width,
     duration,
     easing: 'easeOutExpo',
@@ -353,12 +358,12 @@ export function createScrollAnimation(
   animation: any,
   options = {}
 ) {
-  return (anime as any).onScroll({
+  return onScroll({
     target: element,
     ...options,
-    update: (anim: any) => {
+    onUpdate: (anim: any) => {
       const progress = anim.progress;
-      anime.animate(element, {
+      animate(element, {
         ...animation,
         duration: 0,
         easing: 'linear',
@@ -387,7 +392,7 @@ export function animatePageLoad(
     if (sectionElements.length > 0) {
       tl.add(sectionElements, {
         ...animationPresets.staggerItem,
-        delay: anime.stagger(50, { start: 100 }),
+        delay: stagger(50, { start: 100 }),
       }, `-=${400}`);
     }
   });
@@ -401,7 +406,7 @@ export function animatePageLoad(
 export function animateValidation(field: Element, isValid: boolean) {
   const color = isValid ? '#22c55e' : '#ef4444';
   
-  return anime.animate(field, {
+  return animate(field, {
     borderColor: color,
     boxShadow: `0 0 0 3px ${isValid ? 'rgba(34, 197, 94, 0.15)' : 'rgba(239, 68, 68, 0.15)'}`,
     duration: 300,
@@ -413,7 +418,7 @@ export function animateValidation(field: Element, isValid: boolean) {
  * Animate toast notification
  */
 export function animateToast(toast: Element, isEntering: boolean) {
-  return anime.animate(toast, {
+  return animate(toast, {
     ...(isEntering 
       ? { ...animationPresets.slideRight, opacity: [0, 1] }
       : { ...animationPresets.slideRight, opacity: [1, 0], direction: 'reverse' }),
@@ -424,7 +429,7 @@ export function animateToast(toast: Element, isEntering: boolean) {
  * Create a magnetic hover effect
  */
 export function createMagneticEffect(element: Element, strength = 0.3) {
-  let animation: ReturnType<typeof anime.animate> | null = null;
+  let animation: any = null;
 
   const handleMove = (e: MouseEvent) => {
     const rect = element.getBoundingClientRect();
@@ -433,7 +438,7 @@ export function createMagneticEffect(element: Element, strength = 0.3) {
 
     if (animation) animation.pause();
     
-    animation = anime.animate(element, {
+    animation = animate(element, {
       translateX: x * strength,
       translateY: y * strength,
       duration: 400,
@@ -443,7 +448,7 @@ export function createMagneticEffect(element: Element, strength = 0.3) {
 
   const handleLeave = () => {
     if (animation) animation.pause();
-    anime.animate(element, {
+    animate(element, {
       translateX: 0,
       translateY: 0,
       duration: 600,
@@ -488,7 +493,7 @@ export function createRipple(event: React.MouseEvent<HTMLElement>) {
 
   element.appendChild(ripple);
 
-  anime.animate(ripple, {
+  animate(ripple, {
     scale: [0, 2],
     opacity: [0.3, 0],
     duration: 600,
@@ -501,7 +506,7 @@ export function createRipple(event: React.MouseEvent<HTMLElement>) {
  * Create a floating animation
  */
 export function floatElement(element: Element, distance = 10, duration = 3000) {
-  return anime.animate(element, {
+  return animate(element, {
     translateY: [-distance, distance],
     duration,
     easing: 'easeInOutQuad',
@@ -538,11 +543,11 @@ export function countUp(element: Element, end: number, duration = 2000, decimals
   const start = 0;
   const obj = { value: start };
   
-  return anime.animate(obj, {
+  return animate(obj, {
     value: end,
     duration,
     easing: 'easeOutExpo',
-    onUpdate: () => {
+    update: () => {
       const value = obj.value;
       if (element) {
         element.textContent = value.toFixed(decimals).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
@@ -555,7 +560,7 @@ export function countUp(element: Element, end: number, duration = 2000, decimals
  * Create a morphing shape animation
  */
 export function morphPath(element: SVGPathElement, toPath: string, duration = 800) {
-  return anime.animate(element, {
+  return animate(element, {
     d: toPath,
     duration,
     easing: 'easeInOutQuad',
@@ -568,11 +573,11 @@ export function morphPath(element: SVGPathElement, toPath: string, duration = 80
 export function createParallax(elements: Element[], speeds: number[]) {
   const animations = elements.map((element, index) => {
     const speed = speeds[index] || 0.5;
-    return (anime as any).onScroll({
+    return onScroll({
       target: element,
-      update: (anim: any) => {
+      onUpdate: (anim: any) => {
         const translateY = -anim.progress * 100 * speed;
-        anime.animate(element, {
+        animate(element, {
           translateY,
           duration: 0,
           easing: 'linear',
@@ -594,12 +599,12 @@ export function revealText(element: HTMLElement, options = {}) {
   
   const spans = element.querySelectorAll('span');
   
-  return anime.animate(spans, {
+  return animate(spans, {
     opacity: [0, 1],
     translateY: [20, 0],
     duration: 600,
     easing: 'easeOutExpo',
-    delay: anime.stagger(50),
+    delay: stagger(50),
     ...options,
   });
 }
@@ -608,7 +613,7 @@ export function revealText(element: HTMLElement, options = {}) {
  * Create a loading skeleton animation
  */
 export function skeletonAnimation(element: Element) {
-  return anime.animate(element, {
+  return animate(element, {
     backgroundPosition: ['-200% center', '200% center'],
     duration: 1500,
     easing: 'linear',
@@ -620,7 +625,7 @@ export function skeletonAnimation(element: Element) {
  * Create a focus ring animation
  */
 export function focusRing(element: Element) {
-  return anime.animate(element, {
+  return animate(element, {
     boxShadow: [
       '0 0 0 0 var(--ring)',
       '0 0 0 4px var(--ring)',
@@ -678,11 +683,5 @@ export default {
   skeletonAnimation,
   focusRing,
   batchAnimate,
+  animate,
 };
-
-// Simple wrapper for direct anime.animate calls
-export function animate(targets: any, parameters: any) {
-  return anime.animate(targets, parameters);
-}
-
-export { anime };

@@ -8,6 +8,8 @@ import {
   getCategoriesWithGear,
 } from "@/services/admin.service";
 
+export const dynamic = 'force-dynamic';
+
 export default async function AdminDashboardPage() {
   // Fetch all required administrative data concurrently on the server
   const [users, gearItems, rentalOrders, categories] = await Promise.all([

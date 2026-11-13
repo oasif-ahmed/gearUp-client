@@ -16,6 +16,8 @@ import { getMyReviews } from "@/services/review.service";
 
 import CustomerCart from "./customerCart";
 
+export const dynamic = 'force-dynamic';
+
 export default async function CustomerCartPage() {
   const [rentalOrders, gearItemsResponse, paymentHistory, myReviews] =
     await Promise.all([
