@@ -1,5 +1,5 @@
 import './globals.css'
-import { Roboto } from 'next/font/google'
+import { Manrope, Roboto } from 'next/font/google'
 import { getMe } from '@/services/getMe'
 import { ThemeProvider } from '@/components/theme-provider'
 import AppShell from '@/components/shared/appShell'
@@ -7,6 +7,12 @@ import AppShell from '@/components/shared/appShell'
 const roboto = Roboto({
   subsets: ['latin'],
   variable: '--font-roboto',
+  display: 'swap',
+})
+
+const manrope = Manrope({
+  subsets: ['latin'],
+  variable: '--font-manrope',
   display: 'swap',
 })
 
@@ -23,7 +29,7 @@ export default async function RootLayout({
   const user = await getMe();
 
   return (
-    <html lang="en" className={roboto.variable} suppressHydrationWarning>
+    <html lang="en" className={`${roboto.variable} ${manrope.variable}`} suppressHydrationWarning>
       <body className="bg-background text-foreground antialiased selection:bg-primary selection:text-primary-foreground">
         <ThemeProvider defaultTheme="light">
           <AppShell user={user}>{children}</AppShell>

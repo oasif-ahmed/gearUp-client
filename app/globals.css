@@ -3,26 +3,26 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* Neutral base palette with sage accent */
+/* Soft off-white cream base with sage accent */
 :root {
-  --background: #FAFAFA;
+  --background: #F8F6F0;
   --foreground: #18181b;
-  --card: #FFFFFF;
+  --card: #FCFAF5;
   --card-foreground: #18181b;
-  --popover: #FFFFFF;
+  --popover: #FCFAF5;
   --popover-foreground: #18181b;
   --primary: #B2BD7E;
   --primary-foreground: #18181b;
-  --secondary: #F4F4F5;
+  --secondary: #F1EEE6;
   --secondary-foreground: #18181b;
-  --muted: #F4F4F5;
-  --muted-foreground: #71717A;
+  --muted: #F1EEE6;
+  --muted-foreground: #706F65;
   --accent: #B2BD7E;
   --accent-foreground: #18181b;
   --destructive: #EF4444;
   --destructive-foreground: #FFFFFF;
-  --border: #E4E4E7;
-  --input: #E4E4E7;
+  --border: #E4E0D6;
+  --input: #E4E0D6;
   --ring: #B2BD7E;
   --radius: 0;
 }
@@ -73,26 +73,26 @@
   --radius: 0;
 }
 
-/* Porcelain + ink: refined near-white canvas with charcoal text and sage accent */
+/* Porcelain + ink: refined ivory canvas with charcoal text and sage accent */
 .theme-porcelain {
-  --background: #F7F7F4;
+  --background: #F6F4EC;
   --foreground: #1C1F1A;
-  --card: #FFFFFF;
+  --card: #FCFAF5;
   --card-foreground: #1C1F1A;
-  --popover: #FFFFFF;
+  --popover: #FCFAF5;
   --popover-foreground: #1C1F1A;
   --primary: #B2BD7E;
   --primary-foreground: #1C1F1A;
-  --secondary: #F0F1EA;
+  --secondary: #EFECE3;
   --secondary-foreground: #1C1F1A;
-  --muted: #F0F1EA;
-  --muted-foreground: #6A6F63;
+  --muted: #EFECE3;
+  --muted-foreground: #6B685E;
   --accent: #B2BD7E;
   --accent-foreground: #1C1F1A;
   --destructive: #B42318;
   --destructive-foreground: #FFFFFF;
-  --border: #DEE0D7;
-  --input: #DEE0D7;
+  --border: #E2DED2;
+  --input: #E2DED2;
   --ring: #B2BD7E;
   --radius: 0;
 }
@@ -118,8 +118,8 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
 
-  /* Apple system font stacks */
-  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  /* Hero font is now the app-wide default sans */
+  --font-sans: var(--font-roboto), sans-serif;
   --font-serif: "New York", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif;
   --font-mono: "SF Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
 
@@ -128,10 +128,36 @@
   --radius-lg: var(--radius);
 }
 
-/* Roboto is scoped to the hero first */
+/* Roboto is the app-wide default; this keeps the hero explicit */
+html,
+body {
+  font-family: var(--font-roboto), sans-serif;
+}
+
 .roboto-text,
 .roboto-text * {
   font-family: var(--font-roboto), sans-serif;
+}
+
+/* Mobile navigation animations */
+@keyframes nav-menu-open {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes nav-fade-in-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-nav-menu-open {
+  animation: nav-menu-open 220ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  will-change: opacity, transform;
+}
+
+.animate-fade-in-up {
+  animation: nav-fade-in-up 260ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  will-change: opacity, transform;
 }
 
 /* Brand marquee */
@@ -183,6 +209,30 @@
 
 .btn-pulse:hover {
   animation: button-pulse 1.5s ease-in-out infinite;
+}
+
+/* Universal button interaction animation */
+button,
+[role="button"],
+[data-slot="button"],
+.btn {
+  transition-property: transform, box-shadow, background-color, border-color, color, opacity;
+  transition-duration: 180ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+button:not(:disabled):not([aria-disabled="true"]):hover,
+[role="button"]:not([aria-disabled="true"]):hover,
+[data-slot="button"]:not(:disabled):not([aria-disabled="true"]):hover,
+.btn:not([aria-disabled="true"]):hover {
+  transform: translateY(-1px);
+}
+
+button:not(:disabled):not([aria-disabled="true"]):active,
+[role="button"]:not([aria-disabled="true"]):active,
+[data-slot="button"]:not(:disabled):not([aria-disabled="true"]):active,
+.btn:not([aria-disabled="true"]):active {
+  transform: translateY(0) scale(0.97);
 }
 
 /* Subtle rounded corners for common elements */
@@ -270,5 +320,16 @@ table, [role="grid"] {
 
   .marquee-track {
     animation: none !important;
+  }
+
+  button:not(:disabled):hover,
+  [role="button"]:not([aria-disabled="true"]):hover,
+  [data-slot="button"]:not(:disabled):hover,
+  .btn:hover,
+  button:not(:disabled):active,
+  [role="button"]:not([aria-disabled="true"]):active,
+  [data-slot="button"]:not(:disabled):active,
+  .btn:active {
+    transform: none !important;
   }
 }
