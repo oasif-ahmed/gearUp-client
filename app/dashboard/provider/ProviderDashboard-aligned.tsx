@@ -585,7 +585,7 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
             [ Management Console ]
           </span>
 
-          <h1 className="text-3xl font-light tracking-tight text-zinc-900 mt-1">
+          <h1 className="text-3xl font-light tracking-tight text-foreground mt-1">
             Provider Dashboard
           </h1>
         </div>
@@ -598,7 +598,7 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
             }}
             className={`px-3 py-2 text-xs font-mono uppercase tracking-wider transition-colors ${
               activeTab === "gear" && gearView === "add"
-                ? "bg-zinc-900 text-white font-semibold"
+                ? "bg-primary text-primary-foreground font-semibold"
                 : "text-foreground hover:bg-muted"
             }`}
           >
@@ -612,7 +612,7 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
             }}
             className={`px-3 py-2 text-xs font-mono uppercase tracking-wider transition-colors ${
               activeTab === "gear" && gearView === "inventory"
-                ? "bg-zinc-900 text-white font-semibold"
+                ? "bg-primary text-primary-foreground font-semibold"
                 : "text-foreground hover:bg-muted"
             }`}
           >
@@ -623,7 +623,7 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
             onClick={() => setActiveTab("orders")}
             className={`px-3 py-2 text-xs font-mono uppercase tracking-wider transition-colors ${
               activeTab === "orders"
-                ? "bg-zinc-900 text-white font-semibold"
+                ? "bg-primary text-primary-foreground font-semibold"
                 : "text-foreground hover:bg-muted"
             }`}
           >
@@ -643,8 +643,8 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
           {/* Add New Gear Form */}
           {gearView === "add" && (
           <div className="min-w-0 border border-border bg-card p-5 sm:p-6 lg:p-8 rounded-none shadow-sm">
-            <div className="mb-6 border-b border-zinc-100 pb-4">
-              <h2 className="text-sm font-mono uppercase tracking-tight text-zinc-900 flex items-center gap-2">
+            <div className="mb-6 border-b border-border pb-4">
+              <h2 className="text-sm font-mono uppercase tracking-tight text-foreground flex items-center gap-2">
                 <Plus className="h-4 w-4" />
                 Add New Equipment Listing
               </h2>
@@ -922,7 +922,7 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
               />
 
               {/* Image Upload */}
-              <div className="space-y-3 border-t border-zinc-100 pt-4">
+              <div className="space-y-3 border-t border-border pt-4">
                 <Label className="text-xs font-mono uppercase text-foreground flex items-center gap-1.5">
                   <ImageIcon className="h-3.5 w-3.5" />
                   Gear Images
@@ -976,7 +976,7 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
               </div>
 
               {/* Dynamic Specifications */}
-              <div className="space-y-3 border-t border-zinc-100 pt-4">
+              <div className="space-y-3 border-t border-border pt-4">
                 <Label className="text-xs font-mono uppercase text-foreground flex items-center gap-1.5">
                   <Layers className="h-3.5 w-3.5" />
                   Technical Specifications
@@ -1014,11 +1014,11 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
                       className="flex items-center justify-between border border-border px-3 py-1.5 bg-muted text-xs font-mono"
                     >
                       <div className="truncate">
-                        <span className="text-zinc-400 uppercase text-[10px]">
+                        <span className="text-muted-foreground uppercase text-[10px]">
                           {spec.key}:{" "}
                         </span>
 
-                        <span className="text-zinc-900 font-medium">
+                        <span className="text-foreground font-medium">
                           {spec.value}
                         </span>
                       </div>
@@ -1026,7 +1026,7 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
                       <button
                         type="button"
                         onClick={() => handleRemoveSpec(idx)}
-                        className="text-zinc-400 hover:text-red-600 transition-colors ml-2"
+                        className="text-muted-foreground hover:text-red-600 transition-colors ml-2"
                       >
                         <X className="h-3.5 w-3.5" />
                       </button>
@@ -1049,11 +1049,11 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
               )}
 
               {/* Form Action */}
-              <div className="flex justify-end pt-4 border-t border-zinc-100">
+              <div className="flex justify-end pt-4 border-t border-border">
                 <button
                   type="submit"
                   disabled={isPending || !categoryId}
-                  className="rounded-none bg-zinc-900 px-8 py-3 text-xs font-mono uppercase tracking-wider text-white hover:bg-zinc-800 transition-colors disabled:cursor-not-allowed disabled:opacity-60"
+                  className="rounded-none bg-primary px-8 py-3 text-xs font-mono uppercase tracking-wider text-primary-foreground hover:bg-primary/90 transition-colors disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {isPending ? "Uploading & Publishing..." : "Publish Listing"}
                 </button>
@@ -1065,9 +1065,9 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
           {/* Inventory Table */}
           {gearView === "inventory" && (
           <div className="w-full min-w-0 border border-border bg-card p-5 sm:p-6 lg:p-6 2xl:p-8 rounded-none shadow-sm">
-            <div className="mb-6 flex items-center justify-between border-b border-zinc-100 pb-4">
+            <div className="mb-6 flex items-center justify-between border-b border-border pb-4">
               <div>
-                <h2 className="text-sm font-mono uppercase tracking-tight text-zinc-900">
+                <h2 className="text-sm font-mono uppercase tracking-tight text-foreground">
                   Active Inventory
                 </h2>
 
@@ -1076,7 +1076,7 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
                 </p>
               </div>
 
-              <span className="text-xs font-mono text-zinc-400">
+              <span className="text-xs font-mono text-muted-foreground">
                 {inventory.length} ITEMS LISTED
               </span>
             </div>
@@ -1109,8 +1109,8 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
 
                 <TableBody>
                   {inventory.map((item) => (
-                    <TableRow key={item.id} className="border-zinc-100 text-xs">
-                      <TableCell className="font-medium text-zinc-900">
+                    <TableRow key={item.id} className="border-border text-xs">
+                      <TableCell className="font-medium text-foreground">
                         {item.name}
                       </TableCell>
 
@@ -1118,7 +1118,7 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
                         {item.category?.name}
                       </TableCell>
 
-                      <TableCell className="font-mono text-zinc-900">
+                      <TableCell className="font-mono text-foreground">
                         ৳{item.pricePerDay}
                       </TableCell>
 
@@ -1131,7 +1131,7 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
                           variant="outline"
                           size="sm"
                           onClick={() => setRestockItem(item)}
-                          className="h-7 text-xs rounded-none border-border text-zinc-800 hover:bg-muted gap-1.5 font-mono"
+                          className="h-7 text-xs rounded-none border-border text-foreground hover:bg-muted gap-1.5 font-mono"
                         >
                           <RefreshCw className="h-3 w-3" />
                           Restock
@@ -1180,9 +1180,9 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
       {activeTab === "orders" && (
         <div className="space-y-6">
           <div className="border border-border bg-card p-8 rounded-none shadow-xs">
-            <div className="mb-6 flex items-center justify-between border-b border-zinc-100 pb-4">
+            <div className="mb-6 flex items-center justify-between border-b border-border pb-4">
               <div>
-                <h2 className="text-sm font-mono uppercase tracking-tight text-zinc-900">
+                <h2 className="text-sm font-mono uppercase tracking-tight text-foreground">
                   Rental Invoices & Manifests
                 </h2>
 
@@ -1192,7 +1192,7 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
                 </p>
               </div>
 
-              <span className="text-xs font-mono text-zinc-400">
+              <span className="text-xs font-mono text-muted-foreground">
                 {rentalOrders.length} TOTAL INVOICES
               </span>
             </div>
@@ -1207,15 +1207,15 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
                     setSelectedInvoice(ord);
                     window.history.pushState({}, "", `/dashboard/provider?orderId=${ord.id}`);
                   }}
-                  className="group border border-border bg-[#FDFBF7] p-6 rounded-none hover:border-zinc-900 cursor-pointer transition-all relative flex flex-col justify-between space-y-4 shadow-2xs"
+                  className="group border border-border bg-card p-6 rounded-none hover:border-primary cursor-pointer transition-all relative flex flex-col justify-between space-y-4 shadow-2xs"
                 >
                   <div className="flex items-start justify-between border-b border-border/80 pb-3">
                     <div>
-                      <span className="text-[10px] font-mono text-zinc-400 uppercase tracking-widest">
+                      <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">
                         [ RENTAL INVOICE ]
                       </span>
 
-                      <h3 className="text-sm font-mono font-semibold text-zinc-900 mt-0.5">
+                      <h3 className="text-sm font-mono font-semibold text-foreground mt-0.5">
                         INV-{ord.id.slice(0, 8).toUpperCase()}
                       </h3>
                     </div>
@@ -1226,7 +1226,7 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
                           ? "bg-blue-50 text-blue-800 border-blue-200"
                           : ord.status === "PICKED_UP"
                             ? "bg-emerald-50 text-emerald-800 border-emerald-200"
-                            : "bg-muted text-zinc-800 border-border"
+                            : "bg-muted text-foreground border-border"
                       }`}
                     >
                       {ord.status}
@@ -1235,24 +1235,24 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
 
                   <div className="space-y-1.5 text-xs text-foreground font-mono">
                     <div className="flex justify-between">
-                      <span className="text-zinc-400">Client:</span>
+                      <span className="text-muted-foreground">Client:</span>
 
-                      <span className="font-medium text-zinc-900">
+                      <span className="font-medium text-foreground">
                         {ord.customer.name}
                       </span>
                     </div>
 
                     <div className="flex justify-between">
-                      <span className="text-zinc-400">Asset:</span>
+                      <span className="text-muted-foreground">Asset:</span>
 
-                      <span className="text-zinc-900 truncate max-w-[150px]">
+                      <span className="text-foreground truncate max-w-[150px]">
                         {ord.items?.[0]?.gearItem?.name} 
                         {ord.items?.length > 1 && ` (+${ord.items.length - 1} more)`}
                       </span>
                     </div>
 
                     <div className="flex justify-between">
-                      <span className="text-zinc-400">Duration:</span>
+                      <span className="text-muted-foreground">Duration:</span>
                       <span>
                         {new Date(ord.startDate).toLocaleDateString()} - {new Date(ord.endDate).toLocaleDateString()}
                       </span>
@@ -1264,7 +1264,7 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
                       Total: ৳{Number(ord.totalAmount).toLocaleString()}
                     </span>
 
-                    <span className="text-zinc-900 group-hover:underline flex items-center gap-1 font-medium">
+                    <span className="text-foreground group-hover:underline flex items-center gap-1 font-medium">
                       Inspect Paper Receipt
                       <ArrowUpRight className="h-3 w-3" />
                     </span>
@@ -1278,14 +1278,14 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
 
       {/* PAPER INVOICE MODAL */}
       {selectedInvoice && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/60 backdrop-blur-xs p-4">
-          <div className="w-full max-w-xl border border-border bg-[#FDFBF7] p-8 rounded-none shadow-2xl space-y-6 relative font-serif">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md p-4">
+          <div className="w-full max-w-xl border border-border bg-card p-8 rounded-none shadow-2xl space-y-6 relative font-serif">
             <button
               onClick={() => {
                 setSelectedInvoice(null);
                 window.history.pushState({}, "", "/dashboard/provider");
               }}
-              className="absolute top-6 right-6 text-zinc-400 hover:text-zinc-900 transition-colors"
+              className="absolute top-6 right-6 text-muted-foreground hover:text-foreground transition-colors"
             >
               <X className="h-5 w-5" />
             </button>
@@ -1295,7 +1295,7 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
                 GearUp Rental Corp — Official Statement
               </span>
 
-              <h2 className="text-2xl font-normal tracking-tight text-zinc-900">
+              <h2 className="text-2xl font-normal tracking-tight text-foreground">
                 Equipment Rental Invoice
               </h2>
 
@@ -1307,11 +1307,11 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
 
             <div className="grid grid-cols-2 gap-4 text-xs font-mono border-b border-border pb-6">
               <div>
-                <span className="text-zinc-400 block uppercase text-[10px]">
+                <span className="text-muted-foreground block uppercase text-[10px]">
                   Billed To:
                 </span>
 
-                <span className="font-semibold text-zinc-900 text-sm block mt-0.5">
+                <span className="font-semibold text-foreground text-sm block mt-0.5">
                   {selectedInvoice.customer.name}
                 </span>
 
@@ -1321,11 +1321,11 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
               </div>
 
               <div className="text-right">
-                <span className="text-zinc-400 block uppercase text-[10px]">
+                <span className="text-muted-foreground block uppercase text-[10px]">
                   Rental Period:
                 </span>
 
-                <span className="font-medium text-zinc-900 block mt-0.5">
+                <span className="font-medium text-foreground block mt-0.5">
                    {new Date(selectedInvoice.startDate).toLocaleDateString()} - {new Date(selectedInvoice.endDate).toLocaleDateString()}
                 </span>
 
@@ -1336,7 +1336,7 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
             </div>
 
             <div className="space-y-3">
-              <span className="text-[10px] font-mono uppercase tracking-widest text-zinc-400 block">
+              <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground block">
                 Itemized Manifest
               </span>
 
@@ -1353,7 +1353,7 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
                 <tbody className="divide-y divide-zinc-200">
                   {selectedInvoice.items.map((item) => (
                     <tr key={item.id}>
-                      <td className="py-3 text-zinc-900 font-sans font-medium">
+                      <td className="py-3 text-foreground font-sans font-medium">
                         {item.gearItem.name}
                       </td>
 
@@ -1365,7 +1365,7 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
                         ৳{Number(item.pricePerDay).toLocaleString()}
                       </td>
 
-                      <td className="py-3 text-right font-semibold text-zinc-900">
+                      <td className="py-3 text-right font-semibold text-foreground">
                         ৳{(Number(item.pricePerDay) * item.quantity).toLocaleString()}
                       </td>
                     </tr>
@@ -1380,7 +1380,7 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
                   Fulfillment Status:
                 </span>
 
-                <span className="font-semibold text-zinc-900 uppercase">
+                <span className="font-semibold text-foreground uppercase">
                   {selectedInvoice.status}
                 </span>
               </div>
@@ -1391,7 +1391,7 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
                   {Number(selectedInvoice.totalAmount).toLocaleString()}
                 </div>
 
-                <div className="text-sm font-semibold text-zinc-900">
+                <div className="text-sm font-semibold text-foreground">
                   Total Due: ৳
                   {Number(selectedInvoice.totalAmount).toLocaleString()}{" "}
                   BDT
@@ -1458,7 +1458,7 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
 
                   <Button
                     onClick={() => handleSaveStatusUpdate(selectedInvoice.id, tempStatus)}
-                    className="rounded-none bg-zinc-900 text-white hover:bg-zinc-800 text-xs h-7 px-4 font-mono"
+                    className="rounded-none bg-primary text-primary-foreground hover:bg-primary/90 text-xs h-7 px-4 font-mono"
                     disabled={isUpdatingStatus}
                   >
                     {isUpdatingStatus ? "Saving..." : "Save Changes"}
@@ -1479,7 +1479,7 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
                   setSelectedInvoice(null);
                   window.history.pushState({}, "", "/dashboard/provider");
                 }}
-                className="rounded-none bg-zinc-900 text-white hover:bg-zinc-800 text-xs h-8 px-5 font-mono"
+                className="rounded-none bg-primary text-primary-foreground hover:bg-primary/90 text-xs h-8 px-5 font-mono"
               >
                 Close Receipt
               </Button>
@@ -1490,14 +1490,14 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
 
       {/* EDIT GEAR MODAL */}
       {editingItem && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-zinc-950/60 backdrop-blur-sm p-4">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 backdrop-blur-md p-4">
           <div className="w-full max-w-3xl max-h-[90vh] overflow-y-auto border border-border bg-card p-5 sm:p-7 shadow-2xl">
-            <div className="flex items-center justify-between border-b border-zinc-100 pb-4 mb-5">
+            <div className="flex items-center justify-between border-b border-border pb-4 mb-5">
               <div>
-                <span className="text-[10px] font-mono uppercase tracking-widest text-zinc-400">
+                <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
                   [ Inventory Management ]
                 </span>
-                <h2 className="text-lg font-semibold text-zinc-900">
+                <h2 className="text-lg font-semibold text-foreground">
                   Edit Gear Item
                 </h2>
                 <p className="text-xs text-muted-foreground mt-1">
@@ -1507,7 +1507,7 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
               <button
                 type="button"
                 onClick={() => setEditingItem(null)}
-                className="text-zinc-400 hover:text-zinc-900"
+                className="text-muted-foreground hover:text-foreground"
                 aria-label="Close edit modal"
               >
                 <X className="h-5 w-5" />
@@ -1682,7 +1682,7 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
                 />
               </div>
 
-              <div className="space-y-3 border-t border-zinc-100 pt-4">
+              <div className="space-y-3 border-t border-border pt-4">
                 <Label className="flex items-center gap-2">
                   <ImageIcon className="h-4 w-4" /> Existing Images
                 </Label>
@@ -1751,7 +1751,7 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
                 )}
               </div>
 
-              <div className="space-y-3 border-t border-zinc-100 pt-4">
+              <div className="space-y-3 border-t border-border pt-4">
                 <Label className="flex items-center gap-2">
                   <Layers className="h-4 w-4" /> Technical Specifications
                 </Label>
@@ -1810,7 +1810,7 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
                 </p>
               )}
 
-              <div className="flex justify-end gap-2 border-t border-zinc-100 pt-4">
+              <div className="flex justify-end gap-2 border-t border-border pt-4">
                 <Button
                   type="button"
                   variant="outline"
@@ -1830,22 +1830,22 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
 
       {/* RESTOCK MODAL */}
       {restockItem && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/40 backdrop-blur-xs p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md p-4">
           <div className="w-full max-w-md border border-border bg-card p-6 rounded-none shadow-lg space-y-4">
-            <div className="flex items-center justify-between border-b border-zinc-100 pb-3">
+            <div className="flex items-center justify-between border-b border-border pb-3">
               <div>
-                <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-400">
+                <span className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
                   [ Inventory Increment ]
                 </span>
 
-                <h3 className="text-base font-semibold text-zinc-900">
+                <h3 className="text-base font-semibold text-foreground">
                   Restock Equipment
                 </h3>
               </div>
 
               <button
                 onClick={() => setRestockItem(null)}
-                className="text-zinc-400 hover:text-zinc-900 transition-colors"
+                className="text-muted-foreground hover:text-foreground transition-colors"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -1855,7 +1855,7 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
               <div className="space-y-1">
                 <p className="text-xs text-muted-foreground font-mono">Target Item:</p>
 
-                <p className="text-xs font-semibold text-zinc-900">
+                <p className="text-xs font-semibold text-foreground">
                   {restockItem.name}
                 </p>
               </div>
@@ -1879,7 +1879,7 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
                 />
               </div>
 
-              <div className="flex justify-end gap-2 pt-2 border-t border-zinc-100 font-mono">
+              <div className="flex justify-end gap-2 pt-2 border-t border-border font-mono">
                 <Button
                   type="button"
                   variant="outline"
@@ -1892,7 +1892,7 @@ export default function ProviderDashboard(props: ProviderDashboardProps) {
                 <Button
                   type="submit"
                   disabled={isRestocking}
-                  className="rounded-none bg-zinc-900 text-white hover:bg-zinc-800 text-xs h-9 px-4"
+                  className="rounded-none bg-primary text-primary-foreground hover:bg-primary/90 text-xs h-9 px-4"
                 >
                   {isRestocking ? "Updating..." : "Confirm Restock"}
                 </Button>

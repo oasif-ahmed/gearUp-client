@@ -148,10 +148,17 @@ const LoginForm = () => {
             {/* Ensured button is fully clickable with proper stacking context */}
             <Button
               type="submit"
-              className="w-full h-9 rounded-none bg-primary text-primary-foreground hover:opacity-90 text-xs font-medium cursor-pointer relative z-20 font-mono uppercase tracking-wider"
+              className="w-full h-9 rounded-none bg-primary text-primary-foreground hover:opacity-90 text-xs font-medium cursor-pointer relative z-20 font-mono uppercase tracking-wider flex items-center justify-center"
               disabled={pending}
             >
-              {pending ? <Spinner /> : "Login"}
+              {pending ? (
+                <>
+                  <Spinner />
+                  Logging in...
+                </>
+              ) : (
+                "Login"
+              )}
             </Button>
 
             <div className="grid grid-cols-1 gap-2 pt-2">

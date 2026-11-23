@@ -322,7 +322,7 @@ export default function CustomerCart({
       return "bg-red-50 text-red-700 border border-red-200 hover:bg-red-100";
     }
 
-    return "bg-primary text-white hover:bg-primary/90";
+    return "bg-primary text-primary-foreground hover:bg-primary/90";
   };
 
   // ============================================
@@ -599,7 +599,7 @@ export default function CustomerCart({
               <ShoppingCart className="h-3.5 w-3.5" />
               Cart
               {cartItems.length > 0 && (
-                <span className="ml-1 px-1.5 py-0.5 bg-emerald-600 text-white text-[10px] rounded-full">
+                <span className="ml-1 px-1.5 py-0.5 bg-emerald-600 text-primary-foreground text-[10px] rounded-full">
                   {cartItems.reduce(
                     (sum, item) => sum + Number(item.quantity),
                     0,
@@ -645,7 +645,7 @@ export default function CustomerCart({
 
                   <Button
                     asChild
-                    className="rounded-none bg-primary text-white hover:bg-primary/90 text-xs font-mono uppercase px-6"
+                    className="rounded-none bg-primary text-primary-foreground hover:bg-primary/90 text-xs font-mono uppercase px-6"
                   >
                     <a href="/gear-items">Browse Gear Directory</a>
                   </Button>
@@ -879,7 +879,7 @@ export default function CustomerCart({
 
                   <Button
                     asChild
-                    className="rounded-none bg-primary text-white hover:bg-primary/90 text-xs font-mono uppercase px-6"
+                    className="rounded-none bg-primary text-primary-foreground hover:bg-primary/90 text-xs font-mono uppercase px-6"
                   >
                     <a href="/gear-items">Browse Gear Directory</a>
                   </Button>
@@ -1064,7 +1064,7 @@ export default function CustomerCart({
 
                     <Button
                       onClick={handleCheckout}
-                      className="w-full rounded-none bg-primary text-white hover:bg-primary/90 text-xs font-mono uppercase h-10 tracking-wider flex items-center justify-center gap-2"
+                      className="w-full rounded-none bg-primary text-primary-foreground hover:bg-primary/90 text-xs font-mono uppercase h-10 tracking-wider flex items-center justify-center gap-2"
                     >
                       <CreditCard className="h-4 w-4" />
                       Checkout & Place Combined Order
@@ -1168,7 +1168,7 @@ export default function CustomerCart({
                             variant="outline"
                             size="sm"
                             onClick={(e) => e.stopPropagation()}
-                            className="h-7 px-2.5 rounded-none text-[10px] font-mono uppercase border-border hover:bg-primary hover:text-white"
+                            className="h-7 px-2.5 rounded-none text-[10px] font-mono uppercase border-border hover:bg-primary hover:text-primary-foreground"
                           >
                             <a href={`/gear-items/${gearId}`}>
                               View Product <ExternalLink className="h-3 w-3 ml-1" />
@@ -1189,7 +1189,7 @@ export default function CustomerCart({
         {/* ====================================== */}
 
         {selectedInvoice && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-primary/60 backdrop-blur-xs p-4">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md p-4">
             <div className="w-full max-w-xl max-h-[90vh] overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden border border-border bg-background p-8 rounded-none shadow-2xl space-y-6 relative font-mono text-xs">
               <button
                 type="button"
@@ -1465,7 +1465,7 @@ export default function CustomerCart({
 
                 <Button
                   onClick={closeInvoice}
-                  className="rounded-none bg-primary text-white hover:bg-primary/90 text-xs font-mono uppercase px-6 h-9"
+                  className="rounded-none bg-primary text-primary-foreground hover:bg-primary/90 text-xs font-mono uppercase px-6 h-9"
                 >
                   Close Receipt
                 </Button>
@@ -1479,7 +1479,7 @@ export default function CustomerCart({
         {/* ====================================== */}
 
         {selectedReview && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-primary/60 backdrop-blur-xs p-4">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md p-4">
             <div className="w-full max-w-lg max-h-[90vh] overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden border border-border bg-background p-8 rounded-none shadow-2xl space-y-6 relative font-mono text-xs">
               <button
                 type="button"
@@ -1529,7 +1529,7 @@ export default function CustomerCart({
                             asChild
                             variant="outline"
                             size="sm"
-                            className="h-7 px-2.5 rounded-none text-[10px] font-mono uppercase border-border hover:bg-primary hover:text-white"
+                            className="h-7 px-2.5 rounded-none text-[10px] font-mono uppercase border-border hover:bg-primary hover:text-primary-foreground"
                           >
                             <a href={`/gear-items/${gearId}`}>
                               View Product <ExternalLink className="h-3 w-3 ml-1" />
@@ -1571,7 +1571,7 @@ export default function CustomerCart({
               <div className="pt-4 border-t border-border flex justify-end">
                 <Button
                   onClick={closeReviewModal}
-                  className="rounded-none bg-primary text-white hover:bg-primary/90 text-xs font-mono uppercase px-6 h-9"
+                  className="rounded-none bg-primary text-primary-foreground hover:bg-primary/90 text-xs font-mono uppercase px-6 h-9"
                 >
                   Close Review
                 </Button>

@@ -17,7 +17,7 @@ import {
   Moon,
 } from "lucide-react";
 import { logoutUser } from "@/services/auth.service";
-import { useTheme } from "next-themes";
+import { useTheme } from "@/components/theme-provider";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -113,7 +113,7 @@ export default function Navbar({ user, k }: NavbarProps) {
           {/* Logo */}
           <div className="flex items-center gap-2">
             <Link href="/" className="flex items-center space-x-2 group">
-              <div className="flex h-8 w-8 items-center justify-center bg-foreground text-background shadow-xs rounded-none group-hover:bg-foreground/90 transition-colors">
+              <div className="flex h-8 w-8 items-center justify-center bg-primary text-primary-foreground shadow-xs rounded-none group-hover:bg-primary/90 transition-colors">
                 <Rocket className="h-4 w-4" />
               </div>
 
@@ -166,13 +166,6 @@ export default function Navbar({ user, k }: NavbarProps) {
               </Button>
             )}
 
-            {/* Role Badge in Navbar */}
-            {user && (
-              <span className="text-[10px] font-semibold font-mono uppercase bg-accent/20 text-foreground px-2 py-1 rounded-none border border-dashed border-border hidden sm:inline-block">
-                {user?.role || "CUSTOMER"}
-              </span>
-            )}
-
             {!user ? (
               <>
                 <Button
@@ -186,7 +179,7 @@ export default function Navbar({ user, k }: NavbarProps) {
 
                 <Button
                   size="sm"
-                  className="h-8 text-xs bg-foreground text-background hover:bg-foreground/90 rounded-none px-3 uppercase tracking-wider font-semibold"
+                  className="h-8 text-xs bg-primary text-primary-foreground hover:bg-primary/90 rounded-none px-3 uppercase tracking-wider font-semibold"
                 >
                   <Link href="/register">Register</Link>
                 </Button>
@@ -218,29 +211,28 @@ export default function Navbar({ user, k }: NavbarProps) {
                 </DropdownMenuTrigger>
 
                 <DropdownMenuContent
-                  className="w-56 rounded-lg border-dashed border-border bg-card text-foreground font-mono text-xs shadow-xl animate-fade-in-up"
+                  className="w-56 rounded-lg border-dashed border-border bg-card text-foreground font-mono text-xs shadow-xl"
                   align="end"
-                  forceMount
                 >
-                  <DropdownMenuLabel className="font-normal animate-fade-in">
-                    <div className="flex flex-col space-y-1 animate-fade-in-up">
-                      <p className="text-xs font-bold leading-none text-foreground animate-fade-in-up">
+                  <DropdownMenuLabel className="font-normal">
+                    <div className="flex flex-col space-y-1">
+                      <p className="text-xs font-bold leading-none text-foreground">
                         {user?.name || "User"}
                       </p>
 
-                      <p className="text-[10px] leading-none text-muted-foreground animate-fade-in-up">
+                      <p className="text-[10px] leading-none text-muted-foreground">
                         {user?.email || "user@example.com"}
                       </p>
                     </div>
                   </DropdownMenuLabel>
 
-                  <DropdownMenuSeparator className="bg-border animate-fade-in" />
+                  <DropdownMenuSeparator className="bg-border" />
 
                   {isProvider && (
                     <DropdownMenuItem asChild>
                       <Link
                         href="/dashboard/provider"
-                        className="cursor-pointer text-xs rounded-lg hover:bg-accent/10 focus:bg-accent/10 transition-all duration-200 hover:translate-x-1 animate-fade-in-up"
+                        className="cursor-pointer text-xs rounded-lg hover:bg-accent/10 focus:bg-accent/10 transition-all duration-200 hover:translate-x-1"
                       >
                         <LayoutDashboard className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
                         <span>Provider Dashboard</span>
@@ -489,7 +481,7 @@ export default function Navbar({ user, k }: NavbarProps) {
 
                 <Link
                   href="/register"
-                  className="inline-flex items-center justify-center bg-foreground text-background px-3 py-2 text-xs font-bold hover:opacity-90 uppercase"
+                  className="inline-flex items-center justify-center bg-primary text-primary-foreground px-3 py-2 text-xs font-bold hover:opacity-90 uppercase"
                   onClick={() => setIsOpen(false)}
                 >
                   Register

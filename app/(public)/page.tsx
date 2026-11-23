@@ -2,13 +2,10 @@ import { getAllGearItems } from "@/services/gear-item.service";
 import GearItemCard from "@/components/gear/gearItemCard";
 import Link from "next/link";
 import { 
-  ArrowRight, 
-  ArrowUpRight, 
   ShieldCheck, 
   Clock, 
   Truck, 
-  CheckCircle2, 
-  Sparkles
+  CheckCircle2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -18,37 +15,49 @@ import SocialProof15 from "@/components/shared/socialProof";
 export const dynamic = 'force-dynamic';
 
 export default async function PublicHome() {
-  let featuredGear = [];
+  let allGear: any[] = [];
   try {
     const response = await getAllGearItems();
-    featuredGear = response?.data?.gearItems?.slice(0, 3) || [];
+    allGear = response?.data?.gearItems || [];
   } catch (err) {
     console.error("Failed to fetch featured gear", err);
   }
+
+  const featuredGear = allGear.slice(0, 3);
+  const brands = Array.from(
+    new Set(allGear.map((item: any) => item?.brand).filter(Boolean))
+  ).slice(0, 12);
+  const marqueeItems = brands.length > 0
+    ? brands
+    : ["Outdoor", "Camping", "Cycling", "Fitness", "Travel"];
 
   return (
     <div className="min-h-screen w-full bg-background text-foreground selection:bg-primary selection:text-primary-foreground">
       {/* Dynamic Hero Section */}
       <Hero />
 
-      {/* Statistics / Trust Bar */}
-      <section className="border-y border-border bg-card py-8 mt-12">
-        <div className="max-w-6xl mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-8 font-mono">
-          <div className="space-y-1">
-            <span className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">100%</span>
-            <p className="text-xs text-muted-foreground uppercase tracking-wider">Verified Equipment</p>
-          </div>
-          <div className="space-y-1">
-            <span className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">24/7</span>
-            <p className="text-xs text-muted-foreground uppercase tracking-wider">Secure Reservations</p>
-          </div>
-          <div className="space-y-1">
-            <span className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">0-Risk</span>
-            <p className="text-xs text-muted-foreground uppercase tracking-wider">Deposit Protection</p>
-          </div>
-          <div className="space-y-1">
-            <span className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">Fast</span>
-            <p className="text-xs text-muted-foreground uppercase tracking-wider">Frictionless Checkout</p>
+      {/* Brand Marquee */}
+      <section className="relative mt-12 overflow-hidden border-y border-border bg-card py-5">
+        <div className="marquee-mask relative w-full overflow-hidden">
+          <div className="marquee-track flex w-max items-center">
+            {[0, 1].map((copy) => (
+              <div
+                key={copy}
+                className="flex shrink-0 items-center"
+                aria-hidden={copy === 1}
+              >
+                {marqueeItems.map((brand, index) => (
+                  <div
+                    key={`${copy}-${brand}-${index}`}
+                    className="flex items-center whitespace-nowrap px-7"
+                  >
+                    <span className="font-mono text-sm font-bold uppercase tracking-[0.18em] text-foreground sm:text-base">
+                      {brand}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -73,22 +82,14 @@ export default async function PublicHome() {
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-2">
             {featuredGear.map((item: any) => (
               <Link
                 href={`/gear-items/${item.id}`}
                 key={item.id}
-                className="group block"
+                className="group block h-full"
               >
-                <div className="bg-card border border-border p-5 transition-all duration-300 group-hover:border-primary group-hover:shadow-md h-full flex flex-col justify-between">
-                  <GearItemCard {...item} />
-                  
-                  {/* Interactive card footer enhancement */}
-                  <div className="mt-4 pt-4 border-t border-border flex items-center justify-between text-xs font-mono text-muted-foreground group-hover:text-foreground">
-                    <span>Inspect Specs & Availability</span>
-                    <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
-                  </div>
-                </div>
+                <GearItemCard {...item} />
               </Link>
             ))}
           </div>
@@ -161,50 +162,66 @@ export default async function PublicHome() {
 
       {/* Trust & Guarantee Banner */}
       <section className="bg-primary text-primary-foreground py-20">
-        <div className="max-w-6xl mx-auto px-4 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+        <div className="max-w-6xl mx-auto px-4 grid grid-cols-1 gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
           <div className="space-y-6">
             <span className="text-xs font-mono uppercase tracking-widest text-primary-foreground/60">
-              [ Enterprise Reliability ]
+              [ Built for Peace of Mind ]
             </span>
-            <h2 className="text-3xl sm:text-4xl font-serif font-light tracking-tight">
-              Engineered for Complete Peace of Mind
+            <h2 className="text-3xl sm:text-4xl font-serif font-medium tracking-tight">
+              Gear you can count on.
             </h2>
             <p className="text-sm font-mono text-primary-foreground/80 leading-relaxed max-w-lg">
-              Every asset listed in our catalog undergoes rigorous diagnostic and physical inspection before deployment. Manage all your rental receipts, transactions, and live status reports directly from your dashboard.
+              Every item is checked before it goes live. Your rentals, receipts, and order status all stay in one place — so you can book without second-guessing.
             </p>
             <div className="pt-2">
               <Button
                 asChild
                 className="bg-primary-foreground text-primary hover:opacity-90 rounded-none text-xs font-mono uppercase px-6 h-11"
               >
-                <Link href="/customer-cart">Access Customer Portal</Link>
+                <Link href="/customer-cart">Open customer portal</Link>
               </Button>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 font-mono text-xs">
-            <div className="bg-primary/90 border border-border p-5 space-y-2">
-              <ShieldCheck className="h-5 w-5 text-emerald-400 mb-1" />
-              <h4 className="font-bold text-primary-foreground uppercase tracking-wider">Secure Payments</h4>
-              <p className="text-primary-foreground/80">Integrated checkout gateways ensuring encrypted transaction safety.</p>
+          <div className="grid grid-cols-2 gap-3 font-mono sm:gap-4">
+            {/* Large */}
+            <div className="col-span-2 flex flex-col justify-between border border-primary-foreground/20 bg-primary-foreground/10 p-6 sm:p-7">
+              <ShieldCheck className="h-7 w-7 text-emerald-400" />
+              <div className="mt-10">
+                <h4 className="text-base font-bold uppercase tracking-wider">Secure payments</h4>
+                <p className="mt-2 max-w-md text-xs leading-relaxed text-primary-foreground/75">
+                  Safe checkout with encrypted payments and a clear receipt after every booking.
+                </p>
+              </div>
             </div>
 
-            <div className="bg-primary/90 border border-border p-5 space-y-2">
-              <Clock className="h-5 w-5 text-sky-400 mb-1" />
-              <h4 className="font-bold text-primary-foreground uppercase tracking-wider">Flexible Windows</h4>
-              <p className="text-primary-foreground/80">Customizable daily billing windows tailored to project scopes.</p>
+            {/* Medium - tall */}
+            <div className="row-span-2 flex flex-col justify-between border border-primary-foreground/20 bg-primary-foreground/5 p-5">
+              <Clock className="h-6 w-6 text-sky-400" />
+              <div className="mt-8">
+                <h4 className="text-xs font-bold uppercase tracking-wider">Flexible windows</h4>
+                <p className="mt-2 text-[10px] leading-relaxed text-primary-foreground/70">
+                  Daily rental periods that fit your plans.
+                </p>
+              </div>
             </div>
 
-            <div className="bg-primary/90 border border-border p-5 space-y-2">
-              <Truck className="h-5 w-5 text-amber-400 mb-1" />
-              <h4 className="font-bold text-primary-foreground uppercase tracking-wider">Rapid Dispatch</h4>
-              <p className="text-primary-foreground/80">Quick order confirmation and fulfillment status tracking.</p>
+            {/* Small */}
+            <div className="border border-primary-foreground/20 bg-primary-foreground/5 p-4">
+              <Truck className="h-5 w-5 text-amber-400" />
+              <h4 className="mt-5 text-[10px] font-bold uppercase tracking-wider">Rapid dispatch</h4>
+              <p className="mt-1.5 text-[10px] leading-relaxed text-primary-foreground/70">
+                Quick confirmation and order updates.
+              </p>
             </div>
 
-            <div className="bg-primary/90 border border-border p-5 space-y-2">
-              <CheckCircle2 className="h-5 w-5 text-violet-400 mb-1" />
-              <h4 className="font-bold text-primary-foreground uppercase tracking-wider">Verified Reviews</h4>
-              <p className="text-primary-foreground/80">Real customer feedback and gear condition transparency.</p>
+            {/* Small */}
+            <div className="border border-primary-foreground/20 bg-primary-foreground/5 p-4">
+              <CheckCircle2 className="h-5 w-5 text-violet-400" />
+              <h4 className="mt-5 text-[10px] font-bold uppercase tracking-wider">Verified reviews</h4>
+              <p className="mt-1.5 text-[10px] leading-relaxed text-primary-foreground/70">
+                Honest feedback from real renters.
+              </p>
             </div>
           </div>
         </div>
@@ -213,16 +230,6 @@ export default async function PublicHome() {
       {/* Rotating Customer Story Spotlight */}
       <SocialProof15 />
 
-      {/* Minimalist Footer Note */}
-      <footer className="max-w-6xl mx-auto px-4 py-12 border-t border-border text-xs text-muted-foreground flex flex-col sm:flex-row justify-between items-center gap-4 font-mono">
-        <span>Gear Rental Operations — Est. 2026</span>
-        <div className="flex items-center gap-6">
-          <Link href="/gear-items" className="hover:text-foreground transition-colors">Catalog Directory</Link>
-          <Link href="/customer-cart" className="hover:text-foreground transition-colors">Customer Portal</Link>
-          <Link href="/about" className="hover:text-foreground transition-colors">Terms & Info</Link>
-        </div>
-        <span className="text-emerald-600 font-medium">System Active</span>
-      </footer>
     </div>
   );
 }

@@ -95,7 +95,7 @@ export default function WorkflowDiagram() {
   );
 
   return (
-    <div className="w-full h-[500px] bg-[#FDFBF7] border border-border relative">
+    <div className="w-full h-[500px] bg-background border border-border relative">
       <ReactFlow
         nodes={nodes}
         edges={edges}

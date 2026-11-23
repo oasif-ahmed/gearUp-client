@@ -1,13 +1,13 @@
 'use client'
 
 import React from 'react'
-import { useTheme } from 'next-themes'
+import { useTheme } from '@/components/theme-provider'
 import { toast } from 'sonner'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
-import { Bell, Moon, Sun, Palette, Monitor } from 'lucide-react'
+import { Bell, Moon, Sun, Palette, Monitor, Leaf, Gem } from 'lucide-react'
 
 const SettingPage = () => {
   const { theme, setTheme } = useTheme()
@@ -18,9 +18,17 @@ const SettingPage = () => {
     toast.success(`Notifications ${!notifications ? 'enabled' : 'disabled'}`)
   }
 
-  const handleThemeChange = (newTheme: string) => {
+  const themeLabels: Record<"light" | "dark" | "green" | "porcelain" | "system", string> = {
+    light: 'Light',
+    dark: 'Dark',
+    green: 'Green',
+    porcelain: 'Porcelain',
+    system: 'System',
+  }
+
+  const handleThemeChange = (newTheme: "light" | "dark" | "green" | "porcelain" | "system") => {
     setTheme(newTheme)
-    toast.success(`Global theme changed to ${newTheme === 'dark' ? 'Dark Cream' : newTheme}`)
+    toast.success(`Global theme changed to ${themeLabels[newTheme]}`)
   }
 
   return (
@@ -45,17 +53,17 @@ const SettingPage = () => {
             <CardHeader className="pb-3">
               <CardTitle className="text-lg font-mono">Global Theme Strategy</CardTitle>
               <CardDescription className="font-mono text-xs">
-                Select how the website appears to you. The Dark mode is specifically tuned to a warm "Dark Cream" palette.
+                Select how the website appears to you. Porcelain is a refined light palette with ink text and a sage accent.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
                 <button 
                   onClick={() => handleThemeChange('light')}
                   className={`flex flex-col items-center justify-center p-6 border-2 transition-all ${theme === 'light' ? 'border-primary bg-primary/5' : 'border-border hover:border-muted-foreground/50'}`}
                 >
                   <Sun className={`h-8 w-8 mb-3 ${theme === 'light' ? 'text-primary' : 'text-muted-foreground'}`} />
-                  <span className="font-mono text-xs font-bold uppercase">Light Cream</span>
+                  <span className="font-mono text-xs font-bold uppercase">Light</span>
                 </button>
 
                 <button 
@@ -63,7 +71,23 @@ const SettingPage = () => {
                   className={`flex flex-col items-center justify-center p-6 border-2 transition-all ${theme === 'dark' ? 'border-primary bg-primary/5' : 'border-border hover:border-muted-foreground/50'}`}
                 >
                   <Moon className={`h-8 w-8 mb-3 ${theme === 'dark' ? 'text-primary' : 'text-muted-foreground'}`} />
-                  <span className="font-mono text-xs font-bold uppercase">Dark Cream</span>
+                  <span className="font-mono text-xs font-bold uppercase">Dark</span>
+                </button>
+
+                <button 
+                  onClick={() => handleThemeChange('green')}
+                  className={`flex flex-col items-center justify-center p-6 border-2 transition-all ${theme === 'green' ? 'border-primary bg-primary/5' : 'border-border hover:border-muted-foreground/50'}`}
+                >
+                  <Leaf className={`h-8 w-8 mb-3 ${theme === 'green' ? 'text-primary' : 'text-muted-foreground'}`} />
+                  <span className="font-mono text-xs font-bold uppercase">Green</span>
+                </button>
+
+                <button 
+                  onClick={() => handleThemeChange('porcelain')}
+                  className={`flex flex-col items-center justify-center p-6 border-2 transition-all ${theme === 'porcelain' ? 'border-primary bg-primary/5' : 'border-border hover:border-muted-foreground/50'}`}
+                >
+                  <Gem className={`h-8 w-8 mb-3 ${theme === 'porcelain' ? 'text-primary' : 'text-muted-foreground'}`} />
+                  <span className="font-mono text-xs font-bold uppercase">Porcelain</span>
                 </button>
 
                 <button 

@@ -23,7 +23,7 @@ export default async function GearItemDetailsPage({
   const gearItem = gearResponse?.gearItem || gearResponse;
 
   return (
-    <main className="min-h-screen bg-[#FDFBF7]">
+    <main className="min-h-screen bg-background">
       <GearDetailsClient
         gearItem={gearItem}
         initialReviews={reviews}

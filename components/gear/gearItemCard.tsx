@@ -1,9 +1,8 @@
 "use client";
 
 import React, { useRef, useEffect } from "react";
-import { Package, Tag } from "lucide-react";
+import { ArrowUpRight, Package } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { floatElement, animate, animationPresets } from "@/lib/animations";
 
 interface GearItemCardProps {
   id: string;
@@ -37,12 +36,9 @@ interface GearItemCardProps {
 }
 
 const GearItemCard: React.FC<GearItemCardProps> = ({
-  id,
   name,
-  description,
   brand,
   images,
-  specifications = {},
   condition,
   pricePerDay,
   securityDeposit,
@@ -71,98 +67,118 @@ const GearItemCard: React.FC<GearItemCardProps> = ({
     }
   };
 
-  const statusVariant = (stat: string): "default" | "secondary" | "destructive" | "outline" => {
-    switch (stat) {
-      case "AVAILABLE": return "default";
-      case "UNAVAILABLE": return "destructive";
-      case "MAINTENANCE": return "secondary";
-      default: return "outline";
-    }
-  };
-
-  // Collect all available specification attributes dynamically
-  const activeSpecs = Object.entries(specifications || {}).filter(
-    ([_, value]) => value !== undefined && value !== null && value !== ""
-  );
+  const isAvailable = status === "AVAILABLE";
 
   // Card entrance animation
   useEffect(() => {
     if (cardRef.current) {
-      // Staggered entrance animation
-      import("@/lib/animations").then(({ animate, animationPresets }) => {
-        animate(cardRef.current!, {
-          opacity: [0, 1],
-          translateY: [30, 0],
-          scale: [0.95, 1],
-          duration: 700,
-          easing: "easeOutExpo",
-        });
+      import("@/lib/animations").then(({ animate }) => {
+        if (cardRef.current) {
+          animate(cardRef.current, {
+            opacity: [0, 1],
+            translateY: [20, 0],
+            scale: [0.97, 1],
+            duration: 550,
+            easing: "easeOutExpo",
+          });
+        }
       });
     }
   }, []);
 
   return (
-    <div 
+    <div
       ref={cardRef}
-      className="group relative rounded-lg border border-border bg-card shadow-sm transition-all duration-300 hover:border-primary overflow-hidden flex flex-col h-full font-mono"
+      className="gear-item-card group relative flex h-full flex-col overflow-hidden rounded-none border border-border bg-card shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-accent/60 hover:shadow-lg font-mono"
     >
-      
-      {/* 1. Full Image Cover Background */}
-      <div className="relative h-72 w-full overflow-hidden bg-muted shrink-0">
+      {/* Compact image area */}
+      <div className="relative h-40 w-full shrink-0 overflow-hidden bg-muted">
         <img
           src={imageUrl}
           alt={name}
-          className="w-full h-full object-cover transition-all duration-700 group-hover:scale-105"
+          className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
         />
-        
-        {/* Floating Badges */}
-        <div className="absolute top-3 left-3 flex flex-col gap-1.5 z-10">
-          <Badge className="rounded-none text-[9px] uppercase font-mono px-2 py-0.5 bg-background text-foreground border-none">
-            {formatCondition(condition)}
-          </Badge>
-          <div className="bg-primary px-2 py-0.5 text-[9px] font-mono uppercase font-bold text-primary-foreground">
-            {category?.name || "General"}
-          </div>
-        </div>
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-black/10" />
 
-        {/* 2. Content Overlay with Gradient */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 z-10 bg-gradient-to-t from-black/80 via-black/40 to-transparent">
+        {/* Category tag */}
+        <span className="absolute left-2.5 top-2.5 z-10 rounded-none bg-accent px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-widest text-accent-foreground shadow-sm">
+          {category?.name || "General"}
+        </span>
 
-          {/* Brand & Title */}
-          <div className="space-y-0.5 mb-2">
-            <span className="text-[9px] font-mono text-white/70 uppercase tracking-widest block">
+        {/* Condition tag */}
+        <Badge
+          variant={conditionVariant(condition)}
+          className="absolute left-2.5 top-8 z-10 rounded-none border-white/20 bg-black/55 px-1.5 py-0 text-[8px] uppercase tracking-wider text-white backdrop-blur-sm hover:bg-black/55"
+        >
+          {formatCondition(condition)}
+        </Badge>
+
+        {/* Availability dot */}
+        <span
+          title={isAvailable ? "Available" : "Unavailable"}
+          className={`absolute right-2.5 top-2.5 z-10 flex h-4 w-4 items-center justify-center rounded-none border border-white/30 bg-black/55 backdrop-blur-sm ${
+            isAvailable ? "text-emerald-400" : "text-red-400"
+          }`}
+        >
+          <span className="h-1.5 w-1.5 rounded-none bg-current" />
+        </span>
+
+        {/* Hover affordance */}
+        <span className="absolute bottom-2.5 right-2.5 z-20 flex h-6 w-6 translate-y-1 items-center justify-center rounded-none bg-primary text-primary-foreground opacity-0 shadow-md transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+          <ArrowUpRight className="h-3.5 w-3.5" />
+        </span>
+
+        {/* Name sits on the image so more of the photo is visible */}
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-black/85 via-black/45 to-transparent pb-2.5 pl-3 pr-10 pt-8">
+          <div className="flex items-center gap-1.5">
+            <span className="h-1 w-1 shrink-0 rounded-none bg-accent" />
+            <span className="truncate text-[8px] uppercase tracking-[0.18em] text-white/70">
               {brand || "Standard Brand"}
             </span>
-            <h3 className="text-base font-bold text-white line-clamp-1 font-serif uppercase tracking-tight" title={name}>
-              {name}
-            </h3>
           </div>
 
-          {/* Details (Always visible) */}
-          <p className="text-[10px] text-white/90 line-clamp-2 font-mono leading-relaxed mb-3">
-            {description || "Premium gear available for immediate rental."}
-          </p>
+          <h3
+            className="mt-1 truncate font-serif text-[13px] font-semibold leading-tight text-white"
+            title={name}
+          >
+            {name}
+          </h3>
+        </div>
+      </div>
 
-          {/* Price & Inventory Footer */}
-          <div className="pt-2 border-t border-white/20 flex items-center justify-between">
-            <div className="text-left">
-              <p className="text-[9px] text-white/60 uppercase font-mono leading-none mb-1">Rate / Deposit</p>
-              <p className="text-xs font-bold text-white font-mono leading-none">
-                {formatPrice(pricePerDay)}<span className="text-[9px] font-normal text-white/70">/d</span>
-                <span className="text-[9px] font-normal text-white/60 ml-1">({formatPrice(securityDeposit)})</span>
+      {/* Compact card body */}
+      <div className="flex flex-1 flex-col px-3 pb-3 pt-2.5">
+        <div>
+          <div className="flex items-end justify-between gap-2 border-t border-border pt-2">
+            <div>
+              <p className="mb-0.5 text-[8px] uppercase tracking-wider text-muted-foreground">
+                Rate / Day
+              </p>
+              <p className="text-[13px] font-bold leading-none text-foreground">
+                {formatPrice(pricePerDay)}
+                <span className="ml-0.5 text-[8px] font-normal text-muted-foreground">/d</span>
               </p>
             </div>
-            <div className="flex items-center gap-1.5 text-[9px] text-white/90 uppercase font-mono">
-              <Package className="h-3 w-3 text-primary" />
-              <span>{quantity}</span>
+            <div className="text-right">
+              <p className="mb-0.5 text-[8px] uppercase tracking-wider text-muted-foreground">
+                Deposit
+              </p>
+              <p className="text-[11px] font-medium leading-none text-muted-foreground">
+                {formatPrice(securityDeposit)}
+              </p>
             </div>
           </div>
-        </div>
 
-        {/* Status indicator bar at the very bottom */}
-        <div className={`absolute bottom-0 left-0 w-full h-1 z-20 transition-colors ${
-          status === "AVAILABLE" ? "bg-emerald-500" : "bg-destructive"
-        }`} />
+          <div className="mt-2 flex items-center justify-between text-[8px] uppercase tracking-wider text-muted-foreground">
+            <span className="flex items-center gap-1">
+              <Package className="h-2.5 w-2.5" />
+              {quantity} left
+            </span>
+            <span className={isAvailable ? "text-emerald-500" : "text-destructive"}>
+              {isAvailable ? "Ready to rent" : "Not available"}
+            </span>
+          </div>
+        </div>
       </div>
     </div>
   );

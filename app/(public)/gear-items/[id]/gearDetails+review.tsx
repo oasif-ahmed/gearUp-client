@@ -237,7 +237,7 @@ export default function GearDetailsClient({
             </CardDescription>
           </CardHeader>
           <CardFooter>
-            <Button asChild size="sm" className="w-full rounded-none bg-primary text-white hover:bg-primary/90 text-xs uppercase">
+            <Button asChild size="sm" className="w-full rounded-none bg-primary text-primary-foreground hover:bg-primary/90 text-xs uppercase">
               <Link href="/gear-items">Return to Gear Directory</Link>
             </Button>
           </CardFooter>
@@ -288,7 +288,7 @@ export default function GearDetailsClient({
                 </div>
               )}
               <div className="absolute top-4 left-4 flex gap-2 z-10">
-                <Badge className="rounded-none bg-primary text-white hover:bg-primary text-[10px] uppercase px-2 py-0.5">
+                <Badge className="rounded-none bg-primary text-primary-foreground hover:bg-primary text-[10px] uppercase px-2 py-0.5">
                   {gearItem.category?.name || "Equipment"}
                 </Badge>
                 <Badge
@@ -362,10 +362,10 @@ export default function GearDetailsClient({
                 size="lg"
                 onClick={handleAddToCart}
                 disabled={isOutOfStock}
-                className="w-full rounded-none bg-primary text-white hover:bg-primary/90 text-xs uppercase tracking-wider h-11 flex items-center justify-center gap-2"
+                className="w-full rounded-none bg-primary text-primary-foreground hover:bg-primary/90 text-xs uppercase tracking-wider h-11 flex items-center justify-center gap-2"
               >
                 <ShoppingCart className="h-4 w-4" />
-                {isOutOfStock ? "Out of Stock" : `Add to Cart — ৳{gearItem.pricePerDay}/Day`}
+                {isOutOfStock ? "Out of Stock" : `Add to Cart`}
               </Button>
               <p className="text-[10px] text-muted-foreground text-center">
                 Zero hidden fees. Deposit released upon return verification.
@@ -459,7 +459,7 @@ export default function GearDetailsClient({
             <Button
               type="submit"
               disabled={isSubmittingReview}
-              className="rounded-none bg-primary text-white hover:bg-primary/90 text-xs uppercase px-6 h-9 flex items-center gap-2"
+              className="rounded-none bg-primary text-primary-foreground hover:bg-primary/90 text-xs uppercase px-6 h-9 flex items-center gap-2"
             >
               <Send className="h-3.5 w-3.5" />
               {isSubmittingReview ? "Submitting..." : "Post Review"}
@@ -554,7 +554,7 @@ export default function GearDetailsClient({
                             size="sm"
                             disabled={isUpdatingReview}
                             onClick={() => handleUpdateReview(rev.id)}
-                            className="rounded-none bg-primary text-white hover:bg-primary/90 text-[10px] uppercase h-7 px-3 flex items-center gap-1"
+                            className="rounded-none bg-primary text-primary-foreground hover:bg-primary/90 text-[10px] uppercase h-7 px-3 flex items-center gap-1"
                           >
                             <Check className="h-3.5 w-3.5" /> {isUpdatingReview ? "Saving..." : "Save Changes"}
                           </Button>

@@ -476,7 +476,7 @@
 //             [ Management Console ]
 //           </span>
 
-//           <h1 className="text-3xl font-light tracking-tight text-zinc-900 mt-1">
+//           <h1 className="text-3xl font-light tracking-tight text-foreground mt-1">
 //             Provider Dashboard
 //           </h1>
 //         </div>
@@ -486,7 +486,7 @@
 //             onClick={() => setActiveTab("gear")}
 //             className={`px-4 py-2 text-xs font-mono uppercase tracking-wider rounded-none border transition-colors ${
 //               activeTab === "gear"
-//                 ? "bg-zinc-900 text-white border-zinc-900"
+//                 ? "bg-primary text-primary-foreground border-primary"
 //                 : "bg-card text-foreground border-border hover:bg-muted"
 //             }`}
 //           >
@@ -497,7 +497,7 @@
 //             onClick={() => setActiveTab("orders")}
 //             className={`px-4 py-2 text-xs font-mono uppercase tracking-wider rounded-none border transition-colors ${
 //               activeTab === "orders"
-//                 ? "bg-zinc-900 text-white border-zinc-900"
+//                 ? "bg-primary text-primary-foreground border-primary"
 //                 : "bg-card text-foreground border-border hover:bg-muted"
 //             }`}
 //           >
@@ -511,8 +511,8 @@
 //   <div className="space-y-6">
 //           {/* Add New Gear Form */}
 //           <div className="min-w-0 border border-border bg-card p-5 sm:p-6 lg:p-8 rounded-none shadow-sm">
-//             <div className="mb-6 border-b border-zinc-100 pb-4">
-//               <h2 className="text-sm font-mono uppercase tracking-tight text-zinc-900 flex items-center gap-2">
+//             <div className="mb-6 border-b border-border pb-4">
+//               <h2 className="text-sm font-mono uppercase tracking-tight text-foreground flex items-center gap-2">
 //                 <Plus className="h-4 w-4" />
 //                 Add New Equipment Listing
 //               </h2>
@@ -805,7 +805,7 @@
 //               />
 
 //               {/* Image Upload */}
-//               <div className="space-y-3 border-t border-zinc-100 pt-4">
+//               <div className="space-y-3 border-t border-border pt-4">
 //                 <Label className="text-xs font-mono uppercase text-foreground flex items-center gap-1.5">
 //                   <ImageIcon className="h-3.5 w-3.5" />
 //                   Gear Images
@@ -859,7 +859,7 @@
 //               </div>
 
 //               {/* Dynamic Specifications */}
-//               <div className="space-y-3 border-t border-zinc-100 pt-4">
+//               <div className="space-y-3 border-t border-border pt-4">
 //                 <Label className="text-xs font-mono uppercase text-foreground flex items-center gap-1.5">
 //                   <Layers className="h-3.5 w-3.5" />
 //                   Technical Specifications
@@ -897,11 +897,11 @@
 //                       className="flex items-center justify-between border border-border px-3 py-1.5 bg-muted text-xs font-mono"
 //                     >
 //                       <div className="truncate">
-//                         <span className="text-zinc-400 uppercase text-[10px]">
+//                         <span className="text-muted-foreground uppercase text-[10px]">
 //                           {spec.key}:{" "}
 //                         </span>
 
-//                         <span className="text-zinc-900 font-medium">
+//                         <span className="text-foreground font-medium">
 //                           {spec.value}
 //                         </span>
 //                       </div>
@@ -909,7 +909,7 @@
 //                       <button
 //                         type="button"
 //                         onClick={() => handleRemoveSpec(idx)}
-//                         className="text-zinc-400 hover:text-red-600 transition-colors ml-2"
+//                         className="text-muted-foreground hover:text-red-600 transition-colors ml-2"
 //                       >
 //                         <X className="h-3.5 w-3.5" />
 //                       </button>
@@ -934,11 +934,11 @@
 //               )}
 
 //               {/* Form Action */}
-//               <div className="flex justify-end pt-4 border-t border-zinc-100">
+//               <div className="flex justify-end pt-4 border-t border-border">
 //                 <button
 //                   type="submit"
 //                   disabled={isPending || !categoryId}
-//                   className="rounded-none bg-zinc-900 px-8 py-3 text-xs font-mono uppercase tracking-wider text-white hover:bg-zinc-800 transition-colors disabled:cursor-not-allowed disabled:opacity-60"
+//                   className="rounded-none bg-primary px-8 py-3 text-xs font-mono uppercase tracking-wider text-primary-foreground hover:bg-primary/90 transition-colors disabled:cursor-not-allowed disabled:opacity-60"
 //                 >
 //                   {isPending
 //                     ? "Uploading & Publishing..."
@@ -950,9 +950,9 @@
 
 //           {/* Inventory Table */}
 //           <div className="w-full min-w-0 border border-border bg-card p-5 sm:p-6 lg:p-6 2xl:p-8 rounded-none shadow-sm">
-//             <div className="mb-6 flex items-center justify-between border-b border-zinc-100 pb-4">
+//             <div className="mb-6 flex items-center justify-between border-b border-border pb-4">
 //               <div>
-//                 <h2 className="text-sm font-mono uppercase tracking-tight text-zinc-900">
+//                 <h2 className="text-sm font-mono uppercase tracking-tight text-foreground">
 //                   Active Inventory
 //                 </h2>
 
@@ -961,7 +961,7 @@
 //                 </p>
 //               </div>
 
-//               <span className="text-xs font-mono text-zinc-400">
+//               <span className="text-xs font-mono text-muted-foreground">
 //                 {inventory.length} ITEMS LISTED
 //               </span>
 //             </div>
@@ -996,9 +996,9 @@
 //                   {inventory.map((item) => (
 //                     <TableRow
 //                       key={item.id}
-//                       className="border-zinc-100 text-xs"
+//                       className="border-border text-xs"
 //                     >
-//                       <TableCell className="font-medium text-zinc-900">
+//                       <TableCell className="font-medium text-foreground">
 //                         {item.name}
 //                       </TableCell>
 
@@ -1006,7 +1006,7 @@
 //                         {item.category?.name}
 //                       </TableCell>
 
-//                       <TableCell className="font-mono text-zinc-900">
+//                       <TableCell className="font-mono text-foreground">
 //                         ৳{item.pricePerDay}
 //                       </TableCell>
 
@@ -1019,7 +1019,7 @@
 //                           variant="outline"
 //                           size="sm"
 //                           onClick={() => setRestockItem(item)}
-//                           className="h-7 text-xs rounded-none border-border text-zinc-800 hover:bg-muted gap-1.5 font-mono"
+//                           className="h-7 text-xs rounded-none border-border text-foreground hover:bg-muted gap-1.5 font-mono"
 //                         >
 //                           <RefreshCw className="h-3 w-3" />
 //                           Restock
@@ -1066,9 +1066,9 @@
 //       {activeTab === "orders" && (
 //         <div className="space-y-6">
 //           <div className="border border-border bg-card p-8 rounded-none shadow-xs">
-//             <div className="mb-6 flex items-center justify-between border-b border-zinc-100 pb-4">
+//             <div className="mb-6 flex items-center justify-between border-b border-border pb-4">
 //               <div>
-//                 <h2 className="text-sm font-mono uppercase tracking-tight text-zinc-900">
+//                 <h2 className="text-sm font-mono uppercase tracking-tight text-foreground">
 //                   Rental Invoices & Manifests
 //                 </h2>
 
@@ -1078,7 +1078,7 @@
 //                 </p>
 //               </div>
 
-//               <span className="text-xs font-mono text-zinc-400">
+//               <span className="text-xs font-mono text-muted-foreground">
 //                 {orders.length} TOTAL INVOICES
 //               </span>
 //             </div>
@@ -1088,15 +1088,15 @@
 //                 <div
 //                   key={ord.id}
 //                   onClick={() => setSelectedInvoice(ord)}
-//                   className="group border border-border bg-[#FDFBF7] p-6 rounded-none hover:border-zinc-900 cursor-pointer transition-all relative flex flex-col justify-between space-y-4 shadow-2xs"
+//                   className="group border border-border bg-card p-6 rounded-none hover:border-primary cursor-pointer transition-all relative flex flex-col justify-between space-y-4 shadow-2xs"
 //                 >
 //                   <div className="flex items-start justify-between border-b border-border/80 pb-3">
 //                     <div>
-//                       <span className="text-[10px] font-mono text-zinc-400 uppercase tracking-widest">
+//                       <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">
 //                         [ RENTAL INVOICE ]
 //                       </span>
 
-//                       <h3 className="text-sm font-mono font-semibold text-zinc-900 mt-0.5">
+//                       <h3 className="text-sm font-mono font-semibold text-foreground mt-0.5">
 //                         {ord.invoiceNo}
 //                       </h3>
 //                     </div>
@@ -1107,7 +1107,7 @@
 //                           ? "bg-blue-50 text-blue-800 border-blue-200"
 //                           : ord.status === "PICKED_UP"
 //                             ? "bg-emerald-50 text-emerald-800 border-emerald-200"
-//                             : "bg-muted text-zinc-800 border-border"
+//                             : "bg-muted text-foreground border-border"
 //                       }`}
 //                     >
 //                       {ord.status}
@@ -1116,23 +1116,23 @@
 
 //                   <div className="space-y-1.5 text-xs text-foreground font-mono">
 //                     <div className="flex justify-between">
-//                       <span className="text-zinc-400">Client:</span>
+//                       <span className="text-muted-foreground">Client:</span>
 
-//                       <span className="font-medium text-zinc-900">
+//                       <span className="font-medium text-foreground">
 //                         {ord.clientName}
 //                       </span>
 //                     </div>
 
 //                     <div className="flex justify-between">
-//                       <span className="text-zinc-400">Asset:</span>
+//                       <span className="text-muted-foreground">Asset:</span>
 
-//                       <span className="text-zinc-900">
+//                       <span className="text-foreground">
 //                         {ord.gearName} (Qty: {ord.quantity})
 //                       </span>
 //                     </div>
 
 //                     <div className="flex justify-between">
-//                       <span className="text-zinc-400">Duration:</span>
+//                       <span className="text-muted-foreground">Duration:</span>
 //                       <span>{ord.rentalWindow}</span>
 //                     </div>
 //                   </div>
@@ -1143,7 +1143,7 @@
 //                       {(ord.dailyRate * ord.totalDays).toLocaleString()}
 //                     </span>
 
-//                     <span className="text-zinc-900 group-hover:underline flex items-center gap-1 font-medium">
+//                     <span className="text-foreground group-hover:underline flex items-center gap-1 font-medium">
 //                       Inspect Paper Receipt
 //                       <ArrowUpRight className="h-3 w-3" />
 //                     </span>
@@ -1157,11 +1157,11 @@
 
 //       {/* PAPER INVOICE MODAL */}
 //       {selectedInvoice && (
-//         <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/60 backdrop-blur-xs p-4">
-//           <div className="w-full max-w-xl border border-border bg-[#FDFBF7] p-8 rounded-none shadow-2xl space-y-6 relative font-serif">
+//         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md p-4">
+//           <div className="w-full max-w-xl border border-border bg-card p-8 rounded-none shadow-2xl space-y-6 relative font-serif">
 //             <button
 //               onClick={() => setSelectedInvoice(null)}
-//               className="absolute top-6 right-6 text-zinc-400 hover:text-zinc-900 transition-colors"
+//               className="absolute top-6 right-6 text-muted-foreground hover:text-foreground transition-colors"
 //             >
 //               <X className="h-5 w-5" />
 //             </button>
@@ -1171,7 +1171,7 @@
 //                 GearUp Rental Corp — Official Statement
 //               </span>
 
-//               <h2 className="text-2xl font-normal tracking-tight text-zinc-900">
+//               <h2 className="text-2xl font-normal tracking-tight text-foreground">
 //                 Equipment Rental Invoice
 //               </h2>
 
@@ -1183,11 +1183,11 @@
 
 //             <div className="grid grid-cols-2 gap-4 text-xs font-mono border-b border-border pb-6">
 //               <div>
-//                 <span className="text-zinc-400 block uppercase text-[10px]">
+//                 <span className="text-muted-foreground block uppercase text-[10px]">
 //                   Billed To:
 //                 </span>
 
-//                 <span className="font-semibold text-zinc-900 text-sm block mt-0.5">
+//                 <span className="font-semibold text-foreground text-sm block mt-0.5">
 //                   {selectedInvoice.clientName}
 //                 </span>
 
@@ -1197,11 +1197,11 @@
 //               </div>
 
 //               <div className="text-right">
-//                 <span className="text-zinc-400 block uppercase text-[10px]">
+//                 <span className="text-muted-foreground block uppercase text-[10px]">
 //                   Rental Period:
 //                 </span>
 
-//                 <span className="font-medium text-zinc-900 block mt-0.5">
+//                 <span className="font-medium text-foreground block mt-0.5">
 //                   {selectedInvoice.rentalWindow}
 //                 </span>
 
@@ -1212,7 +1212,7 @@
 //             </div>
 
 //             <div className="space-y-3">
-//               <span className="text-[10px] font-mono uppercase tracking-widest text-zinc-400 block">
+//               <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground block">
 //                 Itemized Manifest
 //               </span>
 
@@ -1232,7 +1232,7 @@
 
 //                 <tbody className="divide-y divide-zinc-200">
 //                   <tr>
-//                     <td className="py-3 text-zinc-900 font-sans font-medium">
+//                     <td className="py-3 text-foreground font-sans font-medium">
 //                       {selectedInvoice.gearName}
 //                     </td>
 
@@ -1244,7 +1244,7 @@
 //                       ৳{selectedInvoice.dailyRate}
 //                     </td>
 
-//                     <td className="py-3 text-right font-semibold text-zinc-900">
+//                     <td className="py-3 text-right font-semibold text-foreground">
 //                       ৳
 //                       {selectedInvoice.dailyRate *
 //                         selectedInvoice.totalDays}
@@ -1260,7 +1260,7 @@
 //                   Fulfillment Status:
 //                 </span>
 
-//                 <span className="font-semibold text-zinc-900 uppercase">
+//                 <span className="font-semibold text-foreground uppercase">
 //                   {selectedInvoice.status}
 //                 </span>
 //               </div>
@@ -1272,7 +1272,7 @@
 //                     selectedInvoice.totalDays}
 //                 </div>
 
-//                 <div className="text-sm font-semibold text-zinc-900">
+//                 <div className="text-sm font-semibold text-foreground">
 //                   Total Due: ৳
 //                   {(
 //                     selectedInvoice.dailyRate *
@@ -1340,7 +1340,7 @@
 
 //               <Button
 //                 onClick={() => setSelectedInvoice(null)}
-//                 className="rounded-none bg-zinc-900 text-white hover:bg-zinc-800 text-xs h-8 px-5 font-mono"
+//                 className="rounded-none bg-primary text-primary-foreground hover:bg-primary/90 text-xs h-8 px-5 font-mono"
 //               >
 //                 Close Receipt
 //               </Button>
@@ -1351,15 +1351,15 @@
 
 //       {/* EDIT GEAR MODAL */}
 //       {editingItem && (
-//         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-zinc-950/60 backdrop-blur-sm p-4">
+//         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 backdrop-blur-md p-4">
 //           <div className="w-full max-w-3xl max-h-[90vh] overflow-y-auto border border-border bg-card p-5 sm:p-7 shadow-2xl">
-//             <div className="flex items-center justify-between border-b border-zinc-100 pb-4 mb-5">
+//             <div className="flex items-center justify-between border-b border-border pb-4 mb-5">
 //               <div>
-//                 <span className="text-[10px] font-mono uppercase tracking-widest text-zinc-400">[ Inventory Management ]</span>
-//                 <h2 className="text-lg font-semibold text-zinc-900">Edit Gear Item</h2>
+//                 <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">[ Inventory Management ]</span>
+//                 <h2 className="text-lg font-semibold text-foreground">Edit Gear Item</h2>
 //                 <p className="text-xs text-muted-foreground mt-1">Update listing details, images, stock, and specifications.</p>
 //               </div>
-//               <button type="button" onClick={() => setEditingItem(null)} className="text-zinc-400 hover:text-zinc-900" aria-label="Close edit modal">
+//               <button type="button" onClick={() => setEditingItem(null)} className="text-muted-foreground hover:text-foreground" aria-label="Close edit modal">
 //                 <X className="h-5 w-5" />
 //               </button>
 //             </div>
@@ -1414,7 +1414,7 @@
 //                 <Textarea id="edit-description" rows={4} value={editForm.description} onChange={(e) => handleEditFieldChange("description", e.target.value)} required />
 //               </div>
 
-//               <div className="space-y-3 border-t border-zinc-100 pt-4">
+//               <div className="space-y-3 border-t border-border pt-4">
 //                 <Label className="flex items-center gap-2"><ImageIcon className="h-4 w-4" /> Existing Images</Label>
 //                 {editExistingImages.length === 0 ? (
 //                   <p className="text-xs text-muted-foreground">No existing images. Add new images below if needed.</p>
@@ -1442,7 +1442,7 @@
 //                 )}
 //               </div>
 
-//               <div className="space-y-3 border-t border-zinc-100 pt-4">
+//               <div className="space-y-3 border-t border-border pt-4">
 //                 <Label className="flex items-center gap-2"><Layers className="h-4 w-4" /> Technical Specifications</Label>
 //                 <div className="grid grid-cols-1 sm:grid-cols-[1fr_1fr_auto] gap-2">
 //                   <Input placeholder="Specification key" value={editSpecKey} onChange={(e) => setEditSpecKey(e.target.value)} />
@@ -1461,7 +1461,7 @@
 
 //               {editMessage && <p role="status" aria-live="polite" className={`text-xs ${editSuccess ? "text-emerald-700" : "text-red-600"}`}>{editMessage}</p>}
 
-//               <div className="flex justify-end gap-2 border-t border-zinc-100 pt-4">
+//               <div className="flex justify-end gap-2 border-t border-border pt-4">
 //                 <Button type="button" variant="outline" onClick={() => setEditingItem(null)} disabled={isUpdating}>Cancel</Button>
 //                 <Button type="submit" disabled={isUpdating}>{isUpdating ? "Saving Changes..." : "Save Changes"}</Button>
 //               </div>
@@ -1472,22 +1472,22 @@
 
 //       {/* RESTOCK MODAL */}
 //       {restockItem && (
-//         <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/40 backdrop-blur-xs p-4">
+//         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md p-4">
 //           <div className="w-full max-w-md border border-border bg-card p-6 rounded-none shadow-lg space-y-4">
-//             <div className="flex items-center justify-between border-b border-zinc-100 pb-3">
+//             <div className="flex items-center justify-between border-b border-border pb-3">
 //               <div>
-//                 <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-400">
+//                 <span className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
 //                   [ Inventory Increment ]
 //                 </span>
 
-//                 <h3 className="text-base font-semibold text-zinc-900">
+//                 <h3 className="text-base font-semibold text-foreground">
 //                   Restock Equipment
 //                 </h3>
 //               </div>
 
 //               <button
 //                 onClick={() => setRestockItem(null)}
-//                 className="text-zinc-400 hover:text-zinc-900 transition-colors"
+//                 className="text-muted-foreground hover:text-foreground transition-colors"
 //               >
 //                 <X className="h-4 w-4" />
 //               </button>
@@ -1502,7 +1502,7 @@
 //                   Target Item:
 //                 </p>
 
-//                 <p className="text-xs font-semibold text-zinc-900">
+//                 <p className="text-xs font-semibold text-foreground">
 //                   {restockItem.name}
 //                 </p>
 //               </div>
@@ -1528,7 +1528,7 @@
 //                 />
 //               </div>
 
-//               <div className="flex justify-end gap-2 pt-2 border-t border-zinc-100 font-mono">
+//               <div className="flex justify-end gap-2 pt-2 border-t border-border font-mono">
 //                 <Button
 //                   type="button"
 //                   variant="outline"
@@ -1541,7 +1541,7 @@
 //                 <Button
 //                   type="submit"
 //                   disabled={isRestocking}
-//                   className="rounded-none bg-zinc-900 text-white hover:bg-zinc-800 text-xs h-9 px-4"
+//                   className="rounded-none bg-primary text-primary-foreground hover:bg-primary/90 text-xs h-9 px-4"
 //                 >
 //                   {isRestocking ? "Updating..." : "Confirm Restock"}
 //                 </Button>
