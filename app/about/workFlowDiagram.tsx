@@ -19,14 +19,14 @@ const initialNodes = [
     type: "default",
     data: { label: "1. Register & Browse Gear" },
     position: { x: 50, y: 50 },
-    style: { background: "#FCFAF5", border: "1px solid #18181b", padding: "12px", fontFamily: "monospace", fontSize: "11px", borderRadius: "0px" },
+    style: { background: "#fff", border: "1px solid #18181b", padding: "12px", fontFamily: "monospace", fontSize: "11px", borderRadius: "0px" },
   },
   {
     id: "cust-2",
     type: "default",
     data: { label: "2. Select Dates & Add to Cart" },
     position: { x: 50, y: 150 },
-    style: { background: "#FCFAF5", border: "1px solid #18181b", padding: "12px", fontFamily: "monospace", fontSize: "11px", borderRadius: "0px" },
+    style: { background: "#fff", border: "1px solid #18181b", padding: "12px", fontFamily: "monospace", fontSize: "11px", borderRadius: "0px" },
   },
   {
     id: "cust-3",
@@ -42,21 +42,21 @@ const initialNodes = [
     type: "default",
     data: { label: "4. Provider Uploads Inventory" },
     position: { x: 380, y: 50 },
-    style: { background: "#FCFAF5", border: "1px solid #18181b", padding: "12px", fontFamily: "monospace", fontSize: "11px", borderRadius: "0px" },
+    style: { background: "#fff", border: "1px solid #18181b", padding: "12px", fontFamily: "monospace", fontSize: "11px", borderRadius: "0px" },
   },
   {
     id: "prov-2",
     type: "default",
     data: { label: "5. Confirm Order & Fulfill Pickup" },
     position: { x: 380, y: 150 },
-    style: { background: "#FCFAF5", border: "1px solid #18181b", padding: "12px", fontFamily: "monospace", fontSize: "11px", borderRadius: "0px" },
+    style: { background: "#fff", border: "1px solid #18181b", padding: "12px", fontFamily: "monospace", fontSize: "11px", borderRadius: "0px" },
   },
   {
     id: "prov-3",
     type: "default",
     data: { label: "6. Return Inspection & Settlement" },
     position: { x: 380, y: 250 },
-    style: { background: "#FCFAF5", border: "1px solid #18181b", padding: "12px", fontFamily: "monospace", fontSize: "11px", borderRadius: "0px" },
+    style: { background: "#fff", border: "1px solid #18181b", padding: "12px", fontFamily: "monospace", fontSize: "11px", borderRadius: "0px" },
   },
 
   // ADMIN OVERSIGHT LANE

@@ -2,12 +2,12 @@
 "use client";
 
 import React, { useState, useEffect, useTransition } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   Menu,
   X,
+  Rocket,
   User,
   Settings,
   LogOut,
@@ -16,7 +16,6 @@ import {
   Sun,
   Moon,
 } from "lucide-react";
-import dumbbellLogo from "../../dumbbell.png";
 import { logoutUser } from "@/services/auth.service";
 import { useTheme } from "@/components/theme-provider";
 
@@ -112,19 +111,14 @@ export default function Navbar({ user, k }: NavbarProps) {
       >
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <div className="flex items-center gap-2.5">
-            <Link href="/" className="flex items-center gap-2.5 group">
-              <span className="flex h-8 w-8 shrink-0 items-center justify-center">
-                <Image
-                  src={dumbbellLogo}
-                  alt=""
-                  priority
-                  className="h-7 w-7 object-contain transition-opacity group-hover:opacity-80"
-                />
-              </span>
+          <div className="flex items-center gap-2">
+            <Link href="/" className="flex items-center space-x-2 group">
+              <div className="flex h-8 w-8 items-center justify-center bg-primary text-primary-foreground shadow-xs rounded-none group-hover:bg-primary/90 transition-colors">
+                <Rocket className="h-4 w-4" />
+              </div>
 
-              <span className="font-[family-name:var(--font-manrope)] whitespace-nowrap text-lg font-extrabold uppercase leading-none tracking-[-0.055em] text-foreground transition-colors group-hover:text-primary sm:text-xl">
-                GEAR<span className="text-primary">UP</span>
+              <span className="text-sm font-bold tracking-tight text-foreground font-mono uppercase tracking-[0.2em]">
+                Gear Up
               </span>
             </Link>
           </div>
@@ -349,7 +343,7 @@ export default function Navbar({ user, k }: NavbarProps) {
 
         {/* Mobile Menu Dropdown */}
         {isOpen && (
-          <div className="mt-3 border-t border-dashed border-border pt-3 md:hidden font-mono text-xs animate-nav-menu-open">
+          <div className="mt-3 border-t border-dashed border-border pt-3 md:hidden font-mono text-xs animate-fade-in-up">
             <div className="flex flex-col space-y-1">
               {navLinks.map((link, index) => {
                 const active = isActive(link.href);
@@ -377,7 +371,6 @@ export default function Navbar({ user, k }: NavbarProps) {
               <Button
                 variant="ghost"
                 className="w-full justify-start px-3 py-2 text-muted-foreground hover:text-foreground hover:bg-accent/10 uppercase animate-fade-in-up"
-                style={{ animationDelay: `${navLinks.length * 80}ms` }}
                 onClick={() =>
                   setTheme(theme === "dark" ? "light" : "dark")
                 }
@@ -396,10 +389,7 @@ export default function Navbar({ user, k }: NavbarProps) {
 
         {/* Mobile User Actions */}
         {isOpen && (
-          <div
-            className="mt-3 flex flex-col gap-2 border-t border-dashed border-border pt-3 animate-fade-in-up"
-            style={{ animationDelay: `${(navLinks.length + 1) * 80}ms` }}
-          >
+          <div className="mt-3 flex flex-col gap-2 border-t border-dashed border-border pt-3">
             {user ? (
               <>
                 <div className="px-3 py-1.5 flex items-center gap-2.5 border border-dashed border-border bg-accent/5">
