@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import * as animeModule from "animejs";
-import { useTheme } from "@/components/theme-provider";
+import { useTheme } from "next-themes";
 import {
   Users,
   Package,
@@ -366,7 +366,7 @@ export default function AdminDashboard({
                         className={`w-10 h-10 flex items-center justify-center border font-bold text-sm uppercase shrink-0 ${
                           isSuspended
                             ? "bg-red-50 border-red-200 text-red-600"
-                            : "bg-primary border-primary text-primary-foreground"
+                            : "bg-primary border-primary text-white"
                         }`}
                       >
                         {u.name ? u.name.slice(0, 2).toUpperCase() : "US"}
@@ -410,7 +410,7 @@ export default function AdminDashboard({
                         onClick={(e) => handleStatusToggle(u.id, userStatus, e)}
                         className={`rounded-none text-[10px] uppercase h-8 px-4 ${
                           isSuspended
-                            ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                            ? "bg-primary text-white hover:bg-primary/90"
                             : "text-red-600 border-red-200 hover:bg-red-50"
                         }`}
                       >
@@ -533,7 +533,7 @@ export default function AdminDashboard({
                     </p>
                   </div>
 
-                  <div className="flex items-center gap-6 bg-card p-3 border border-border w-full md:w-auto justify-between">
+                  <div className="flex items-center gap-6 bg-[#FDFBF7] p-3 border border-border w-full md:w-auto justify-between">
                     <div>
                       <span className="text-[10px] text-muted-foreground block uppercase">
                         Rental Window
@@ -616,14 +616,14 @@ export default function AdminDashboard({
                           setSelectedFile(e.target.files[0]);
                         }
                       }}
-                      className="rounded-none border-border h-9 text-xs file:bg-primary file:text-primary-foreground file:border-0 file:text-[10px] file:uppercase file:px-2 file:h-full file:mr-2 cursor-pointer"
+                      className="rounded-none border-border h-9 text-xs file:bg-primary file:text-white file:border-0 file:text-[10px] file:uppercase file:px-2 file:h-full file:mr-2 cursor-pointer"
                     />
                   </div>
 
                   <Button
                     type="submit"
                     disabled={isSubmittingCat}
-                    className="w-full rounded-none bg-primary text-primary-foreground hover:bg-primary/90 text-xs uppercase h-9 tracking-wider"
+                    className="w-full rounded-none bg-primary text-white hover:bg-primary/90 text-xs uppercase h-9 tracking-wider"
                   >
                     {isSubmittingCat ? "Creating..." : "Save Category"}
                   </Button>
@@ -685,7 +685,7 @@ export default function AdminDashboard({
                       </button>
 
                       {isExpanded && (
-                        <div className="px-4 pb-4 pt-2 border-t border-border bg-card space-y-2">
+                        <div className="px-4 pb-4 pt-2 border-t border-border bg-[#FDFBF7] space-y-2">
                           {items.length > 0 ? (
                             items.map((g: any) => (
                               <div
@@ -750,7 +750,7 @@ export default function AdminDashboard({
 
         {/* 1. USER INSPECTION DETAIL MODAL */}
         {selectedUser && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md p-4">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-primary/60 backdrop-blur-xs p-4">
             <div className="modal-content w-full max-w-lg border border-border bg-muted p-8 rounded-none shadow-2xl space-y-6 relative font-mono text-xs">
               <button
                 type="button"
@@ -864,7 +864,7 @@ export default function AdminDashboard({
                   }}
                   className={`rounded-none text-[10px] uppercase h-9 px-4 ${
                     selectedUser.activeStatus === "SUSPEND"
-                      ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                      ? "bg-primary text-white hover:bg-primary/90"
                       : "text-red-600 border-red-200 hover:bg-red-50"
                   }`}
                 >
@@ -875,7 +875,7 @@ export default function AdminDashboard({
 
                 <Button
                   onClick={closeModal}
-                  className="rounded-none bg-primary text-primary-foreground hover:bg-primary/90 text-xs uppercase px-6 h-9"
+                  className="rounded-none bg-primary text-white hover:bg-primary/90 text-xs uppercase px-6 h-9"
                 >
                   Close Record
                 </Button>
@@ -886,7 +886,7 @@ export default function AdminDashboard({
 
         {/* 2. RENTAL ORDER INSPECTION MODAL */}
         {selectedRental && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md p-4">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-primary/60 backdrop-blur-xs p-4">
             <div className="modal-content w-full max-w-xl border border-border bg-muted p-8 rounded-none shadow-2xl space-y-6 relative font-mono text-xs">
               <button
                 type="button"
@@ -988,7 +988,7 @@ export default function AdminDashboard({
 
         {/* 3. GEAR ASSET INSPECTION MODAL */}
         {selectedGear && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md p-4">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-primary/60 backdrop-blur-xs p-4">
             <div className="modal-content w-full max-w-xl border border-border bg-muted p-8 rounded-none shadow-2xl space-y-6 relative font-mono text-xs">
               <button
                 type="button"

@@ -37,7 +37,7 @@ export function Navbar({
     >
       {/* Brand */}
       <div className="flex items-center gap-2">
-        <span className="flex size-6 items-center justify-center rounded-xs bg-primary text-[11px] font-bold text-primary-foreground">
+        <span className="flex size-6 items-center justify-center rounded-xs bg-foreground text-[11px] font-bold text-background">
           B
         </span>
         <span className="text-sm font-bold uppercase tracking-[0.2em] text-foreground">

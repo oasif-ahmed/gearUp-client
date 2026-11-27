@@ -20,7 +20,7 @@ import {
   Sun,
   Moon,
 } from "lucide-react";
-import { useTheme } from "@/components/theme-provider";
+import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -1020,7 +1020,7 @@ export default function ProviderDashboard({
                 <button
                   type="submit"
                   disabled={isPending || !categoryId}
-                  className="rounded-none bg-primary px-8 py-3 text-xs font-mono uppercase tracking-wider text-primary-foreground hover:bg-primary/90 transition-colors disabled:cursor-not-allowed disabled:opacity-60"
+                  className="rounded-none bg-primary px-8 py-3 text-xs font-mono uppercase tracking-wider text-white hover:bg-primary/90 transition-colors disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {isPending ? "Uploading & Publishing..." : "Publish Listing"}
                 </button>
@@ -1234,7 +1234,7 @@ export default function ProviderDashboard({
 
       {/* PAPER INVOICE MODAL */}
       {selectedInvoice && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-primary/60 backdrop-blur-xs p-4">
           <div className="modal-content w-full max-w-xl border border-border bg-muted p-8 rounded-none shadow-2xl space-y-6 relative font-serif">
             <button
               onClick={() => setSelectedInvoice(null)}
@@ -1420,7 +1420,7 @@ export default function ProviderDashboard({
 
       {/* EDIT GEAR MODAL */}
       {editingItem && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 backdrop-blur-md p-4">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-primary/60 backdrop-blur-sm p-4">
           <div className="modal-content w-full max-w-3xl max-h-[90vh] overflow-y-auto border border-border bg-card p-5 sm:p-7 shadow-2xl">
             <div className="flex items-center justify-between border-b border-border pb-4 mb-5">
               <div>
@@ -1760,7 +1760,7 @@ export default function ProviderDashboard({
 
       {/* RESTOCK MODAL */}
       {restockItem && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-primary/40 backdrop-blur-xs p-4">
           <div className="modal-content w-full max-w-md border border-border bg-card p-6 rounded-none shadow-lg space-y-4">
             <div className="flex items-center justify-between border-b border-border pb-3">
               <div>

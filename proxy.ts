@@ -9,8 +9,6 @@ const AUTH_ROUTES = ["/login", "/register"];
 const PUBLIC_ROUTES = [
   "/",
   "/gear-items",
-  "/features",
-  "/about",
 ];
 
 const isRoute = (pathname: string, routes: string[]) => {

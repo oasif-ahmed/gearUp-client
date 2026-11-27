@@ -3,7 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { useActionState } from "react";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { registerUser } from "@/services/auth.service"; // Adjust path if needed
 
 import { Button } from "@/components/ui/button";
@@ -24,7 +24,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import Spinner from "./shared/Spinner";
 
 const initialState = {
   success: false,
@@ -176,7 +175,7 @@ export function RegisterForm() {
             >
               {pending ? (
                 <>
-                  <Spinner />
+                  <Loader2 className="h-3.5 w-3.5 animate-spin mr-2" />
                   Creating Account...
                 </>
               ) : (
