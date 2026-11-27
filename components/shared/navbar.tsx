@@ -132,12 +132,11 @@ export default function Navbar({ user, k }: NavbarProps) {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`px-3 py-1.5 uppercase transition-all duration-200 rounded-md ${
+                  className={`px-3 py-1.5 uppercase transition-all duration-200 rounded-none ${
                     active
                       ? "bg-accent text-accent-foreground font-semibold shadow-xs"
                       : "text-muted-foreground hover:text-foreground hover:bg-accent/10"
-                  } animate-fade-in-up`}
-                  style={{ animationDelay: `${index * 100}ms` }}
+                  }`}
                 >
                   {link.name}
                 </Link>
@@ -218,29 +217,28 @@ export default function Navbar({ user, k }: NavbarProps) {
                 </DropdownMenuTrigger>
 
                 <DropdownMenuContent
-                  className="w-56 rounded-lg border-dashed border-border bg-card text-foreground font-mono text-xs shadow-xl animate-fade-in-up"
+                  className="profile-menu w-56 rounded-none border-dashed border-border bg-card text-foreground font-mono text-xs shadow-xl"
                   align="end"
-                  forceMount
                 >
-                  <DropdownMenuLabel className="font-normal animate-fade-in">
-                    <div className="flex flex-col space-y-1 animate-fade-in-up">
-                      <p className="text-xs font-bold leading-none text-foreground animate-fade-in-up">
+                  <DropdownMenuLabel className="font-normal">
+                    <div className="flex flex-col space-y-1">
+                      <p className="text-xs font-bold leading-none text-foreground">
                         {user?.name || "User"}
                       </p>
 
-                      <p className="text-[10px] leading-none text-muted-foreground animate-fade-in-up">
+                      <p className="text-[10px] leading-none text-muted-foreground">
                         {user?.email || "user@example.com"}
                       </p>
                     </div>
                   </DropdownMenuLabel>
 
-                  <DropdownMenuSeparator className="bg-border animate-fade-in" />
+                  <DropdownMenuSeparator className="bg-border" />
 
                   {isProvider && (
                     <DropdownMenuItem asChild>
                       <Link
                         href="/dashboard/provider"
-                        className="cursor-pointer text-xs rounded-lg hover:bg-accent/10 focus:bg-accent/10 transition-all duration-200 hover:translate-x-1 animate-fade-in-up"
+                        className="cursor-pointer text-xs rounded-none hover:bg-accent/10 focus:bg-accent/10 transition-all duration-200 hover:translate-x-1"
                       >
                         <LayoutDashboard className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
                         <span>Provider Dashboard</span>
@@ -252,7 +250,7 @@ export default function Navbar({ user, k }: NavbarProps) {
                     <DropdownMenuItem asChild>
                       <Link
                         href="/customer-cart"
-                        className="cursor-pointer text-xs rounded-lg hover:bg-accent/10 focus:bg-accent/10 transition-all duration-200 hover:translate-x-1"
+                        className="cursor-pointer text-xs rounded-none hover:bg-accent/10 focus:bg-accent/10 transition-all duration-200 hover:translate-x-1"
                       >
                         <LayoutDashboard className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
                         <span>My Cart</span>
@@ -264,7 +262,7 @@ export default function Navbar({ user, k }: NavbarProps) {
                     <DropdownMenuItem asChild>
                       <Link
                         href="/dashboard/admin"
-                        className="cursor-pointer text-xs rounded-lg hover:bg-accent/10 focus:bg-accent/10 transition-all duration-200 hover:translate-x-1"
+                        className="cursor-pointer text-xs rounded-none hover:bg-accent/10 focus:bg-accent/10 transition-all duration-200 hover:translate-x-1"
                       >
                         <ShieldAlert className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
                         <span>Admin Dashboard</span>
@@ -275,7 +273,7 @@ export default function Navbar({ user, k }: NavbarProps) {
                   <DropdownMenuItem asChild>
                     <Link
                       href="/profile"
-                      className="cursor-pointer text-xs rounded-lg hover:bg-accent/10 focus:bg-accent/10 transition-all duration-200 hover:translate-x-1"
+                      className="cursor-pointer text-xs rounded-none hover:bg-accent/10 focus:bg-accent/10 transition-all duration-200 hover:translate-x-1"
                     >
                       <User className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
                       <span>Profile</span>
@@ -285,7 +283,7 @@ export default function Navbar({ user, k }: NavbarProps) {
                   <DropdownMenuItem asChild>
                     <Link
                       href="/setting"
-                      className="cursor-pointer text-xs rounded-lg hover:bg-accent/10 focus:bg-accent/10 transition-all duration-200 hover:translate-x-1"
+                      className="cursor-pointer text-xs rounded-none hover:bg-accent/10 focus:bg-accent/10 transition-all duration-200 hover:translate-x-1"
                     >
                       <Settings className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
                       <span>Settings</span>
@@ -293,7 +291,7 @@ export default function Navbar({ user, k }: NavbarProps) {
                   </DropdownMenuItem>
 
                   <DropdownMenuItem
-                    className="cursor-pointer text-xs rounded-lg hover:bg-accent/10 focus:bg-accent/10 flex items-center gap-2 transition-all duration-200 hover:translate-x-1"
+                    className="cursor-pointer text-xs rounded-none hover:bg-accent/10 focus:bg-accent/10 flex items-center gap-2 transition-all duration-200 hover:translate-x-1"
                     onClick={() =>
                       setTheme(theme === "dark" ? "light" : "dark")
                     }
@@ -316,7 +314,7 @@ export default function Navbar({ user, k }: NavbarProps) {
                   <DropdownMenuSeparator className="bg-border" />
 
                   <DropdownMenuItem
-                    className="cursor-pointer text-xs text-destructive focus:bg-destructive/10 focus:text-destructive rounded-lg transition-all duration-200 hover:bg-destructive/10 hover:translate-x-1"
+                    className="cursor-pointer text-xs text-destructive focus:bg-destructive/10 focus:text-destructive rounded-none transition-all duration-200 hover:bg-destructive/10 hover:translate-x-1"
                     disabled={isPending}
                     onClick={handleLogout}
                   >
@@ -351,7 +349,7 @@ export default function Navbar({ user, k }: NavbarProps) {
 
         {/* Mobile Menu Dropdown */}
         {isOpen && (
-          <div className="mt-3 border-t border-dashed border-border pt-3 md:hidden font-mono text-xs animate-fade-in-up">
+          <div className="mt-3 border-t border-dashed border-border pt-3 md:hidden font-mono text-xs">
             <div className="flex flex-col space-y-1">
               {navLinks.map((link, index) => {
                 const active = isActive(link.href);
@@ -364,8 +362,7 @@ export default function Navbar({ user, k }: NavbarProps) {
                       active
                         ? "bg-accent text-accent-foreground font-bold"
                         : "text-muted-foreground hover:bg-accent/10 hover:text-foreground"
-                    } animate-fade-in-up`}
-                    style={{ animationDelay: `${index * 80}ms` }}
+                    }`}
                     onClick={() => setIsOpen(false)}
                   >
                     {link.name}
@@ -378,7 +375,7 @@ export default function Navbar({ user, k }: NavbarProps) {
             {mounted && (
               <Button
                 variant="ghost"
-                className="w-full justify-start px-3 py-2 text-muted-foreground hover:text-foreground hover:bg-accent/10 uppercase animate-fade-in-up"
+                className="w-full justify-start px-3 py-2 text-muted-foreground hover:text-foreground hover:bg-accent/10 uppercase"
                 onClick={() =>
                   setTheme(theme === "dark" ? "light" : "dark")
                 }

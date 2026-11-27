@@ -104,7 +104,7 @@ const GearItemCard: React.FC<GearItemCardProps> = ({
   return (
     <div 
       ref={cardRef}
-      className="group relative rounded-lg border border-border bg-card shadow-sm transition-all duration-300 hover:border-primary overflow-hidden flex flex-col h-full font-mono"
+      className="group relative rounded-none border border-border bg-card shadow-sm transition-all duration-300 hover:border-primary overflow-hidden flex flex-col h-full font-mono"
     >
       
       {/* 1. Full Image Cover Background */}

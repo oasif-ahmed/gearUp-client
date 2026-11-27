@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import Link from "next/link";
-import { ArrowRight, CheckCircle2, FileText, Download, ShieldCheck, Zap } from "lucide-react";
+import Image from "next/image";
+import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { 
@@ -15,8 +16,6 @@ import {
 import { onScroll } from "animejs";
 
 export default function Hero() {
-  const [activeTab, setActiveTab] = useState<"enterprise" | "growth">("growth");
-  
   // Refs for animations
   const sectionRef = useRef<HTMLElement>(null);
   const badgeRef = useRef<HTMLDivElement>(null);
@@ -24,7 +23,7 @@ export default function Hero() {
   const textRef = useRef<HTMLParagraphElement>(null);
   const buttonsRef = useRef<HTMLDivElement>(null);
   const trustRef = useRef<HTMLDivElement>(null);
-  const invoicePanelRef = useRef<HTMLDivElement>(null);
+  const gearPanelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     // 1. Initial Page Load Animation (Staggered Reveal)
@@ -76,17 +75,16 @@ export default function Hero() {
       });
     }
 
-    // Animate Invoice Card Panel with Float Effect
-    if (invoicePanelRef.current) {
-      animate(invoicePanelRef.current, {
+    // Animate Gear Showcase with Float Effect
+    if (gearPanelRef.current) {
+      animate(gearPanelRef.current, {
         ...animationPresets.cardEnter,
         translateX: [40, 0],
         rotate: [2, 0],
         duration: 1200,
       });
 
-      // Continuous Floating animation for Invoice card
-      floatElement(invoicePanelRef.current, 6, 3000);
+      floatElement(gearPanelRef.current, 6, 3000);
     }
 
     // 2. Scroll Animation Setup
@@ -178,82 +176,38 @@ export default function Hero() {
             </div>
           </div>
 
-          {/* Right Column: Interactive Invoice Preview Panel */}
+          {/* Right Column: Previous gear item showcase */}
           <div className="lg:col-span-5">
-            <div 
-              ref={invoicePanelRef} 
-              className="bg-card border border-border shadow-xl p-6 sm:p-8 space-y-6 relative opacity-0"
+            <div
+              ref={gearPanelRef}
+              className="relative mx-auto grid w-full max-w-xl grid-cols-2 items-end gap-x-5 gap-y-1 opacity-0"
             >
-              
-              {/* Panel Header */}
-              <div className="flex items-center justify-between border-b border-border pb-4">
-                <div className="flex items-center gap-2">
-                  <FileText className="h-4 w-4 text-foreground" />
-                  <span className="font-bold uppercase text-xs tracking-wider text-foreground font-mono">
-                    Rental Summary #REF-2026
-                  </span>
-                </div>
-                <Badge variant="outline" className="rounded-none text-[9px] uppercase font-mono bg-emerald-500/10 text-emerald-600 border-emerald-500/20">
-                  Ready to Rent
-                </Badge>
-              </div>
+              <div className="pointer-events-none absolute inset-x-10 bottom-4 h-12 rounded-none bg-black/10 blur-2xl" />
 
-              {/* Toggle Tier */}
-              <div className="grid grid-cols-2 bg-muted p-1 border border-border">
-                <button
-                  onClick={() => setActiveTab("growth")}
-                  className={`py-1.5 text-[10px] uppercase font-mono transition-all ${
-                    activeTab === "growth" ? "bg-background text-foreground shadow-2xs font-bold" : "text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  Daily Rate
-                </button>
-                <button
-                  onClick={() => setActiveTab("enterprise")}
-                  className={`py-1.5 text-[10px] uppercase font-mono transition-all ${
-                    activeTab === "enterprise" ? "bg-background text-foreground shadow-2xs font-bold" : "text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  Weekly Bundle
-                </button>
-              </div>
+              <Image
+                src="/gear-showcase/dumbbell-tilted.png"
+                alt="Adjustable dumbbell, tilted view"
+                width={1800}
+                height={1014}
+                priority
+                className="col-span-2 h-auto w-full origin-bottom scale-[1.25] object-contain drop-shadow-[0_26px_22px_rgba(0,0,0,0.22)] transition-transform duration-700 hover:scale-[1.3]"
+              />
 
-              {/* Line Items */}
-              <div className="space-y-3 font-sans text-xs">
-                <div className="flex justify-between py-2 border-b border-border text-muted-foreground">
-                  <span>Pro Carbon Mountain Bike</span>
-                  <span className="font-mono font-medium text-foreground">$150.00/day</span>
-                </div>
-                <div className="flex justify-between py-2 border-b border-border text-muted-foreground">
-                  <span>Professional Camping Kit</span>
-                  <span className="font-mono font-medium text-foreground">$80.00/day</span>
-                </div>
-                <div className="flex justify-between py-2 border-b border-border text-muted-foreground">
-                  <span>Portable Navigation System</span>
-                  <span className="font-mono font-medium text-foreground">$20.00/day</span>
-                </div>
-              </div>
+              <Image
+                src="/gear-showcase/dumbbell-front.png"
+                alt="Adjustable dumbbell, front view"
+                width={1800}
+                height={1014}
+                className="h-auto w-full origin-bottom scale-[1.15] object-contain drop-shadow-[0_18px_16px_rgba(0,0,0,0.18)] transition-transform duration-500 hover:scale-[1.2]"
+              />
 
-              {/* Total Calculation */}
-              <div className="bg-background p-4 border border-border space-y-2 font-mono">
-                <div className="flex justify-between text-[11px] text-muted-foreground">
-                  <span>Daily Subtotal</span>
-                  <span>$250.00</span>
-                </div>
-                <div className="flex justify-between text-sm font-bold text-foreground pt-1 border-t border-border">
-                  <span>Total Per Day</span>
-                  <span className="text-emerald-600">$250.00 USD</span>
-                </div>
-              </div>
-
-              {/* Panel Footer Action */}
-              <div className="flex items-center justify-between pt-2">
-                <span className="text-[10px] text-muted-foreground font-mono">Secure Rental Agreement</span>
-                <button className="inline-flex items-center gap-1.5 text-[11px] font-mono text-foreground hover:underline font-semibold">
-                  <Download className="h-3.5 w-3.5" /> Save Quote
-                </button>
-              </div>
-
+              <Image
+                src="/gear-showcase/dumbbell-side.png"
+                alt="Adjustable dumbbell, side view"
+                width={1800}
+                height={1014}
+                className="h-auto w-full origin-bottom scale-[1.15] object-contain drop-shadow-[0_18px_16px_rgba(0,0,0,0.18)] transition-transform duration-500 hover:scale-[1.2]"
+              />
             </div>
           </div>
 

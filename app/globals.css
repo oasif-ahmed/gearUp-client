@@ -23,7 +23,7 @@
   --border: #d8c9ac;
   --input: #e4e4e7;
   --ring: #bc3a28;
-  --radius: 0.5rem;
+  --radius: 0;
 }
 
 .dark {
@@ -68,9 +68,9 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
+  --radius-sm: 0;
+  --radius-md: 0;
+  --radius-lg: 0;
 }
 
 /* Custom button animations */
@@ -109,55 +109,27 @@
   animation: button-pulse 1.5s ease-in-out infinite;
 }
 
-/* Subtle rounded corners for common elements */
-.card, .btn, input, select, textarea, .dropdown-menu, .dialog, .sheet, .popover, .tooltip, .alert, .table, .badge, .avatar, .progress, .slider, .switch, .tabs, .accordion, .collapsible, .hover-card, .menubar, .menubar-item, .navigation-menu, .pagination, .breadcrumb, .sidebar, .header, .footer, .section, article, aside, figure, nav, section, main, header, footer, aside {
-  border-radius: var(--radius-lg);
+/* Square corners everywhere: component classes use rounded-none explicitly.
+   These rules previously re-rounded elements from unlayered CSS, which beat
+   Tailwind's layered utilities. */
+
+/* Profile dropdown: one predictable open/close motion (no zoom/origin jump). */
+@keyframes dropdown-open {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-/* Ensure buttons have subtle rounded corners */
-button, .btn {
-  border-radius: var(--radius-lg);
+@keyframes dropdown-close {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(-6px); }
 }
 
-/* Rounded corners for cards and containers */
-.card, [class*="card"], [class*="Card"] {
-  border-radius: var(--radius-lg);
+[data-slot="dropdown-menu-content"].profile-menu[data-state="open"] {
+  animation: dropdown-open 150ms ease-out;
 }
 
-/* Rounded corners for inputs and form elements */
-input, select, textarea, [role="combobox"], [role="listbox"] {
-  border-radius: var(--radius-md);
-}
-
-/* Rounded corners for dropdown menus and popovers */
-[data-radix-popper-content-wrapper], [data-radix-dropdown-menu-content], [data-radix-popover-content], [data-radix-tooltip-content], [data-radix-dialog-content], [data-radix-alert-dialog-content], [data-radix-sheet-content], [data-radix-drawer-content], [data-radix-hover-card-content] {
-  border-radius: var(--radius-lg);
-}
-
-/* Rounded corners for tables */
-table, [role="grid"] {
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-}
-
-/* Rounded corners for badges */
-.badge, [data-slot="badge"] {
-  border-radius: var(--radius-full);
-}
-
-/* Rounded corners for progress bars */
-[role="progressbar"], progress {
-  border-radius: var(--radius-full);
-}
-
-/* Rounded corners for sliders and switches */
-[role="slider"], [role="switch"] {
-  border-radius: var(--radius-full);
-}
-
-/* Rounded corners for tabs */
-[role="tablist"], [role="tabpanel"], [role="tab"] {
-  border-radius: var(--radius-md);
+[data-slot="dropdown-menu-content"].profile-menu[data-state="closed"] {
+  animation: dropdown-close 120ms ease-in;
 }
 
 /* Smooth transitions for all interactive elements */

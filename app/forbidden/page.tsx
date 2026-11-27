@@ -5,7 +5,7 @@ export default function ForbiddenPage() {
   return (
     <main className="flex min-h-[80vh] items-center justify-center px-6 bg-background">
       <div className="w-full max-w-xl text-center">
-        <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-red-500/10">
+        <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-none bg-red-500/10">
           <ShieldAlert className="h-10 w-10 text-red-500" />
         </div>
 
@@ -25,7 +25,7 @@ export default function ForbiddenPage() {
         <div className="mt-8 flex flex-wrap justify-center gap-4">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 font-medium text-primary-foreground transition hover:opacity-90"
+            className="inline-flex items-center gap-2 rounded-none bg-primary px-6 py-3 font-medium text-primary-foreground transition hover:opacity-90"
           >
             <Home size={18} />
             Back to Home
@@ -33,7 +33,7 @@ export default function ForbiddenPage() {
 
           <Link
             href="/login"
-            className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-6 py-3 font-medium text-foreground transition hover:bg-accent/50"
+            className="inline-flex items-center gap-2 rounded-none border border-border bg-card px-6 py-3 font-medium text-foreground transition hover:bg-accent/50"
           >
             <ArrowLeft size={18} />
             Login with another account

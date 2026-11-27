@@ -37,7 +37,7 @@ export function Navbar({
     >
       {/* Brand */}
       <div className="flex items-center gap-2">
-        <span className="flex size-6 items-center justify-center rounded-xs bg-foreground text-[11px] font-bold text-background">
+        <span className="flex size-6 items-center justify-center rounded-none bg-foreground text-[11px] font-bold text-background">
           B
         </span>
         <span className="text-sm font-bold uppercase tracking-[0.2em] text-foreground">
@@ -52,7 +52,7 @@ export function Navbar({
             key={idx}
             href={item.href}
             className={cn(
-              "rounded-md px-2.5 py-1 text-xs font-bold uppercase tracking-wider transition-colors",
+              "rounded-none px-2.5 py-1 text-xs font-bold uppercase tracking-wider transition-colors",
               item.active
                 ? "bg-accent text-accent-foreground shadow-xs"
                 : "text-muted-foreground hover:bg-secondary hover:text-foreground",
@@ -68,7 +68,7 @@ export function Navbar({
         <div className="flex items-center gap-2">{action}</div>
       ) : (
         <div className="flex items-center gap-2">
-          <span className="rounded-xs border border-dashed border-border bg-secondary px-2 py-1 text-[10px] font-bold uppercase text-foreground">
+          <span className="rounded-none border border-dashed border-border bg-secondary px-2 py-1 text-[10px] font-bold uppercase text-foreground">
             ADMIT ONE
           </span>
         </div>

@@ -26,7 +26,7 @@ export default function NotFound() {
         <div className="mt-8 flex flex-wrap justify-center gap-4">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 font-medium text-primary-foreground transition hover:opacity-90"
+            className="inline-flex items-center gap-2 rounded-none bg-primary px-6 py-3 font-medium text-primary-foreground transition hover:opacity-90"
           >
             <Home size={18} />
             Back to Home
@@ -34,7 +34,7 @@ export default function NotFound() {
 
           <Link
             href="/gear"
-            className="inline-flex items-center gap-2 rounded-lg border px-6 py-3 font-medium transition hover:bg-muted"
+            className="inline-flex items-center gap-2 rounded-none border px-6 py-3 font-medium transition hover:bg-muted"
           >
             <Search size={18} />
             Explore Gear

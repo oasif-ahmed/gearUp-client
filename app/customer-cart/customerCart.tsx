@@ -599,7 +599,7 @@ export default function CustomerCart({
               <ShoppingCart className="h-3.5 w-3.5" />
               Cart
               {cartItems.length > 0 && (
-                <span className="ml-1 px-1.5 py-0.5 bg-emerald-600 text-white text-[10px] rounded-full">
+                <span className="ml-1 px-1.5 py-0.5 bg-emerald-600 text-white text-[10px] rounded-none">
                   {cartItems.reduce(
                     (sum, item) => sum + Number(item.quantity),
                     0,
